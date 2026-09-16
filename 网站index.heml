@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Aurora 专属聊天</title>
+<style>
+/* ================= 全局变量（用于设置面板改颜色） ================= */
+:root {
+  --bg-color: #f5f5f5;
+  --nav-bg: #ededed;
+  --nav-text: #000;
+  --my-bubble: #95ec69;
+  --ta-bubble: #ffffff;
+  --text-color: #000;
+  --tab-active: #07c160;
+  --border-color: #dcdcdc;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg-color); height:100vh; overflow:hidden; color:var(--text-color); }
+#app { max-width:480px; margin:0 auto; height:100vh; display:flex; flex-direction:column; background:var(--bg-color); position:relative; }
+
+/* ================= 页面切换 ================= */
+.page { display:none; flex:1; flex-direction:column; overflow:hidden; }
+.page.active { display:flex; }
+.navbar { height:48px; background:var(--nav-bg); color:var(--nav-text); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:500; border-bottom:1px solid var(--border-color); position:relative; flex-shrink:0; }
+.nav-btn { position:absolute; right:12px; background:none; border:none; color:var(--tab-active); font-size:15px; cursor:pointer; padding:5px; }
+.nav-btn.left { left:12px; right:auto; }
+.scroll-area { flex:1; overflow-y:auto; padding:12px; }
+
+/* ================= 聊天室 ================= */
+.chat-window { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
+.msg-row { display:flex; flex-direction:column; width:100%; }
+.msg-row.user { align-items:flex-end; }
+.msg-row.bot { align-items:flex-start; }
+.msg { max-width:75%; padding:9px 13px; border-radius:6px; font-size:16px; line-height:1.5; word-break:break-word; position:relative; animation:fadeIn .2s ease; color:#000; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)} }
+.msg.bot { background:var(--ta-bubble); align-self:flex-start; }
+.msg.bot::before { content:''; position:absolute; left:-6px; top:12px; border-top:6px solid transparent; border-bottom:6px solid transparent; border-right:6px solid var(--ta-bubble); }
+.msg.user { background:var(--my-bubble); align-self:flex-end; }
+.msg.user::after { content:''; position:absolute; right:-6px; top:12px; border-top:6px solid transparent; border-bottom:6px solid transparent; border-left:6px solid var(--my-bubble); }
+/* 引用样式 */
+.quote-box { background:rgba(0,0,0,0.05); border-left:3px solid #ccc; padding:4px 8px; margin-bottom:6px; font-size:13px; color:#666; border-radius:2px; }
+/* 表情包图片 */
+.msg img.emoji-img { max-width:120px; border-radius:4px; margin-top:5px; display:block; }
+.msg .emoji-text { font-size:20px; margin-top:5px; display:block; }
+.typing { align-self:flex-start; background:var(--ta-bubble); padding:9px 13px; border-radius:6px; color:#999; font-size:14px; }
+.input-bar { display:flex; padding:8px; background:var(--nav-bg); border-top:1px solid var(--border-color); gap:8px; flex-shrink:0; }
+.input-bar input { flex:1; padding:9px 12px; border:none; border-radius:4px; background:#fff; font-size:15px; outline:none; }
+.input-bar button { padding:0 16px; background:var(--tab-active); color:#fff; border:none; border-radius:4px; font-size:15px; cursor:pointer; }
+
+/* ================= 会话列表 ================= */
+.session-item { background:#fff; padding:14px; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; gap:10px; cursor:pointer; }
+.session-avatar { width:40px; height:40px; border-radius:5px; background:#ddd; display:flex; justify-content:center; align-items:center; font-size:20px; overflow:hidden; }
+.session-avatar img { width:100%; height:100%; object-fit:cover; }
+.session-info { flex:1; }
+.session-name { font-weight:500; font-size:16px; }
+.session-last { font-size:13px; color:#999; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ================= 通用列表 ================= */
+.card-item, .emoji-item, .fav-item { background:#fff; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; font-size:14px; }
+.card-item .content, .emoji-item .content { flex:1; word-break:break-all; }
+.item-actions button { background:none; border:1px solid #ddd; padding:4px 8px; border-radius:4px; font-size:12px; margin-left:5px; cursor:pointer; }
+.btn-primary { background:var(--tab-active); color:#fff; border:none; padding:8px 16px; border-radius:4px; font-size:14px; cursor:pointer; width:100%; margin-top:10px; }
+.form-group { margin-bottom:15px; background:#fff; padding:12px; border-radius:6px; }
+.form-group label { display:block; font-size:14px; margin-bottom:6px; color:#333; font-weight:500; }
+.form-group input[type="text"], .form-group input[type="number"], .form-group select, .form-group textarea { width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-size:14px; outline:none; }
+.form-group input[type="color"] { width:50px; height:30px; padding:0; border:none; cursor:pointer; vertical-align:middle; }
+.form-group input[type="file"] { font-size:13px; margin-top:5px; }
+
+/* ================= Tab 栏 ================= */
+.tab-bar { height:50px; background:var(--nav-bg); border-top:1px solid var(--border-color); display:flex; flex-shrink:0; }
+.tab { flex:1; border:none; background:none; font-size:12px; color:#999; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:2px; }
+.tab.active { color:var(--tab-active); }
+
+/* ================= 弹窗/菜单 ================= */
+.context-menu { position:fixed; background:#fff; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,0.2); z-index:1000; display:none; flex-direction:column; min-width:100px; }
+.context-menu div { padding:10px 15px; font-size:14px; cursor:pointer; border-bottom:1px solid #f0f0f0; text-align:center; }
+.context-menu div:last-child { border-bottom:none; }
+.context-menu div:active { background:#f0f0f0; }
+
+.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:none; justify-content:center; align-items:center; }
+.modal { background:#fff; width:90%; max-width:400px; border-radius:8px; padding:20px; max-height:80vh; overflow-y:auto; }
+.modal h3 { margin-bottom:15px; font-size:18px; text-align:center; }
+
+/* Toast 提示 */
+.toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); color:#fff; padding:12px 24px; border-radius:8px; font-size:14px; z-index:3000; display:none; text-align:center; }
+.empty { text-align:center; color:#999; padding:40px 20px; font-size:14px; }
+</style>
+</head>
+<body>
+<div id="app">
+  
+  <!-- ========== 页面：会话列表 ========== -->
+  <section class="page" id="page-sessions">
+    <header class="navbar">
+      消息
+      <button class="nav-btn" onclick="openSessionModal()">+ 新建</button>
+    </header>
+    <div class="scroll-area" id="session-list"></div>
+  </section>
+
+  <!-- ========== 页面：聊天室 ========== -->
+  <section class="page" id="page-chat">
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('sessions')">←</button>
+      <span id="chat-title">聊天</span>
+      <button class="nav-btn" onclick="openSettingsModal()">⚙️</button>
+    </header>
+    <div class="chat-window" id="chat-window"></div>
+    <div class="input-bar">
+      <input type="text" id="chat-input" placeholder="输入消息...">
+      <button onclick="sendChat()">发送</button>
+    </div>
+  </section>
+
+  <!-- ========== 页面：收藏夹 ========== -->
+  <section class="page" id="page-favorites">
+    <header class="navbar">收藏夹</header>
+    <div class="scroll-area">
+      <h4 style="margin-bottom:10px;font-size:15px;">我收藏 TA 的</h4>
+      <div id="fav-my-list"></div>
+      <h4 style="margin:15px 0 10px;font-size:15px;">TA 收藏我的</h4>
+      <div id="fav-ta-list"></div>
+    </div>
+  </section>
+
+  <!-- ========== 页面：字卡管理 ========== -->
+  <section class="page" id="page-cards">
+    <header class="navbar">
+      字卡库
+      <button class="nav-btn" onclick="openCardGroupModal()">+ 分组</button>
+    </header>
+    <div class="scroll-area">
+      <div style="margin-bottom:10px; display:flex; gap:5px;">
+        <button class="btn-primary" style="flex:1;" onclick="openCardModal()">添加字卡</button>
+        <button class="btn-primary" style="flex:1; background:#333;" onclick="exportData()">导出备份</button>
+        <button class="btn-primary" style="flex:1; background:#333;" onclick="document.getElementById('import-file').click()">导入备份</button>
+        <input type="file" id="import-file" accept=".json" hidden onchange="importData(event)">
+      </div>
+      <div id="card-group-list"></div>
+    </div>
+  </section>
+
+  <!-- ========== 页面：表情包管理 ========== -->
+  <section class="page" id="page-emojis">
+    <header class="navbar">
+      表情包库
+      <button class="nav-btn" onclick="openEmojiModal()">+ 添加</button>
+    </header>
+    <div class="scroll-area">
+      <p style="font-size:12px;color:#999;margin-bottom:10px;">支持 Emoji、颜文字、本地图片上传（图片会转为 Base64 存储，请尽量上传小图）</p>
+      <div id="emoji-list"></div>
+    </div>
+  </section>
+
+  <!-- ========== 页面：设置 ========== -->
+  <section class="page" id="page-settings">
+    <header class="navbar">设置</header>
+    <div class="scroll-area">
+      <div class="form-group">
+        <label>我的昵称</label>
+        <input type="text" id="set-my-name" placeholder="输入昵称">
+        <label style="margin-top:10px;">我的头像</label>
+        <input type="file" id="set-my-avatar" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label>概率设置（填空，数字 0-100）</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span>回复时随机引用我的消息：</span>
+          <input type="number" id="set-prob-quote" style="width:60px; text-align:center;"> %
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span>回复时随机收藏我的消息：</span>
+          <input type="number" id="set-prob-fav" style="width:60px; text-align:center;"> %
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>回复时随机附带表情包：</span>
+          <input type="number" id="set-prob-emoji" style="width:60px; text-align:center;"> %
+        </div>
+      </div>
+      <div class="form-group">
+        <label>主题颜色设置</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span>聊天背景：</span>
+          <input type="color" id="set-bg-color" value="#f5f5f5">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span>我的气泡：</span>
+          <input type="color" id="set-my-bubble" value="#95ec69">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>TA 的气泡：</span>
+          <input type="color" id="set-ta-bubble" value="#ffffff">
+        </div>
+        <label style="margin-top:10px;">聊天背景图片（覆盖颜色，可选）</label>
+        <input type="file" id="set-bg-img" accept="image/*">
+      </div>
+      <button class="btn-primary" onclick="saveSettings()">保存设置</button>
+    </div>
+  </section>
+
+  <!-- ========== 底部导航栏 ========== -->
+  <nav class="tab-bar">
+    <button class="tab active" data-page="sessions" onclick="switchPage('sessions')">💬<span>聊天</span></button>
+    <button class="tab" data-page="favorites" onclick="switchPage('favorites')">⭐<span>收藏</span></button>
+    <button class="tab" data-page="cards" onclick="switchPage('cards')">📇<span>字卡</span></button>
+    <button class="tab" data-page="emojis" onclick="switchPage('emojis')">😀<span>表情</span></button>
+    <button class="tab" data-page="settings" onclick="switchPage('settings')">⚙️<span>设置</span></button>
+  </nav>
+
+</div>
+
+<!-- ================= 弹窗结构 ================= -->
+<div class="context-menu" id="context-menu">
+  <div onclick="ctxAction('quote')">引用</div>
+  <div onclick="ctxAction('fav')">收藏</div>
+  <div onclick="ctxAction('delete')">删除</div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   1. IndexedDB 封装（替代 localStorage，容量大，可存图片）
+   ===================================================================== */
+let db;
+const DB_NAME = 'AuroraChatDB';
+const DB_VERSION = 1;
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const database = e.target.result;
+      // 创建对象存储空间
+      if (!database.objectStoreNames.contains('settings')) database.createObjectStore('settings', { keyPath: 'key' });
+      if (!database.objectStoreNames.contains('sessions')) database.createObjectStore('sessions', { keyPath: 'id', autoIncrement: true });
+      if (!database.objectStoreNames.contains('messages')) {
+        const store = database.createObjectStore('messages', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('sessionId', 'sessionId', { unique: false });
+      }
+      if (!database.objectStoreNames.contains('cardGroups')) database.createObjectStore('cardGroups', { keyPath: 'id', autoIncrement: true });
+      if (!database.objectStoreNames.contains('cards')) {
+        const store = database.createObjectStore('cards', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('groupId', 'groupId', { unique: false });
+      }
+      if (!database.objectStoreNames.contains('emojis')) database.createObjectStore('emojis', { keyPath: 'id', autoIncrement: true });
+      if (!database.objectStoreNames.contains('favorites')) database.createObjectStore('favorites', { keyPath: 'id', autoIncrement: true });
+    };
+    request.onsuccess = (e) => { db = e.target.result; resolve(); };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// 通用 CRUD
+function dbGetAll(storeName) {
+  return new Promise((resolve) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const req = tx.objectStore(storeName).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+  });
+}
+function dbAdd(storeName, data) {
+  return new Promise((resolve) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const req = tx.objectStore(storeName).add(data);
+    req.onsuccess = () => resolve(req.result);
+  });
+}
+function dbPut(storeName, data) {
+  return new Promise((resolve) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const req = tx.objectStore(storeName).put(data);
+    req.onsuccess = () => resolve(req.result);
+  });
+}
+function dbDelete(storeName, id) {
+  return new Promise((resolve) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const req = tx.objectStore(storeName).delete(id);
+    req.onsuccess = () => resolve();
+  });
+}
+function dbGetByIndex(storeName, indexName, value) {
+  return new Promise((resolve) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const index = tx.objectStore(storeName).index(indexName);
+    const req = index.getAll(value);
+    req.onsuccess = () => resolve(req.result || []);
+  });
+}
+
+/* =====================================================================
+   2. 全局状态
+   ===================================================================== */
+let settings = {
+  myName: '我',
+  myAvatar: '', // Base64
+  probQuote: 20,
+  probFav: 10,
+  probEmoji: 30,
+  bgColor: '#f5f5f5',
+  myBubble: '#95ec69',
+  taBubble: '#ffffff',
+  bgImage: '' // Base64
+};
+
+let sessions = [];
+let currentSessionId = null;
+let currentSession = null;
+let chatMessages = [];
+let cardGroups = [];
+let cards = [];
+let emojis = [];
+let favorites = [];
+let lastReply = '';
+
+let longPressTimer = null;
+let ctxTargetMsg = null;
+
+/* =====================================================================
+   3. 工具函数
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const randomPick = arr => arr[Math.floor(Math.random() * arr.length)];
+const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+const formatTime = ts => { const d = new Date(ts); const n = new Date(); const hh = String(d.getHours()).padStart(2,'0'); const mm = String(d.getMinutes()).padStart(2,'0'); return d.toDateString() === n.toDateString() ? `${hh}:${mm}` : `${d.getMonth()+1}月${d.getDate()}日 ${hh}:${mm}`; };
+function showToast(msg, duration = 2000) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', duration);
+}
+function readFileAsBase64(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+function openModal(html) { $('modal-content').innerHTML = html; $('modal-overlay').style.display = 'flex'; }
+function closeModal() { $('modal-overlay').style.display = 'none'; }
+
+/* =====================================================================
+   4. 页面切换
+   ===================================================================== */
+function switchPage(page) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.page === page));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+  
+  if (page === 'sessions') renderSessions();
+  if (page === 'favorites') renderFavorites();
+  if (page === 'cards') renderCardGroups();
+  if (page === 'emojis') renderEmojis();
+  if (page === 'settings') loadSettingsUI();
+}
+
+/* =====================================================================
+   5. 会话管理
+   ===================================================================== */
+async function loadSessions() {
+  sessions = await dbGetAll('sessions');
+  if (sessions.length === 0) {
+    // 默认创建一个示例会话
+    const defaultSession = { name: '小明', avatar: '😀', groupIds: [] };
+    const id = await dbAdd('sessions', defaultSession);
+    defaultSession.id = id;
+    sessions.push(defaultSession);
+  }
+  renderSessions();
+}
+
+function renderSessions() {
+  const list = $('session-list');
+  list.innerHTML = '';
+  sessions.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'session-item';
+    div.innerHTML = `
+      <div class="session-avatar">${s.avatar && s.avatar.startsWith('data:image') ? `<img src="${s.avatar}">` : escapeHtml(s.avatar || '👤')}</div>
+      <div class="session-info">
+        <div class="session-name">${escapeHtml(s.name)}</div>
+        <div class="session-last">点击进入聊天</div>
+      </div>
+    `;
+    div.onclick = () => enterChat(s);
+    list.appendChild(div);
+  });
+}
+
+async function enterChat(session) {
+  currentSessionId = session.id;
+  currentSession = session;
+  $('chat-title').textContent = session.name;
+  
+  chatMessages = await dbGetByIndex('messages', 'sessionId', session.id);
+  renderChat();
+  switchPage('chat');
+}
+
+function openSessionModal() {
+  openModal(`
+    <h3>新建聊天窗口</h3>
+    <div class="form-group">
+      <label>TA 的昵称</label>
+      <input type="text" id="new-session-name" placeholder="例如：小红">
+    </div>
+    <div class="form-group">
+      <label>TA 的头像（可选）</label>
+      <input type="file" id="new-session-avatar" accept="image/*">
+    </div>
+    <div class="form-group">
+      <label>绑定字卡分组（可多选，不选则默认全部）</label>
+      <div id="new-session-groups" style="max-height:150px;overflow-y:auto;"></div>
+    </div>
+    <button class="btn-primary" onclick="createSession()">创建</button>
+  `);
+  
+  const groupDiv = $('new-session-groups');
+  cardGroups.forEach(g => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.style.marginBottom = '5px';
+    label.innerHTML = `<input type="checkbox" value="${g.id}" style="width:auto;margin-right:5px;"> ${escapeHtml(g.name)}`;
+    groupDiv.appendChild(label);
+  });
+}
+
+async function createSession() {
+  const name = $('new-session-name').value.trim();
+  if (!name) return showToast('请输入昵称');
+  
+  const avatarFile = $('new-session-avatar').files[0];
+  let avatar = '👤';
+  if (avatarFile) {
+    avatar = await readFileAsBase64(avatarFile);
+  }
+  
+  const checkedGroups = Array.from($('new-session-groups').querySelectorAll('input:checked')).map(c => parseInt(c.value));
+  
+  const newSession = { name, avatar, groupIds: checkedGroups };
+  const id = await dbAdd('sessions', newSession);
+  newSession.id = id;
+  sessions.push(newSession);
+  closeModal();
+  renderSessions();
+  showToast('创建成功');
+}
+
+/* =====================================================================
+   6. 聊天室核心逻辑
+   ===================================================================== */
+function renderChat() {
+  const win = $('chat-window');
+  win.innerHTML = '';
+  if (chatMessages.length === 0) {
+    appendBubble('你好呀～', 'bot', null, null, true);
+    return;
+  }
+  chatMessages.forEach(m => appendBubble(m.text, m.sender, m.quote, m.emoji, true));
+}
+
+function appendBubble(text, sender, quote, emoji, skipSave = false) {
+  const win = $('chat-window');
+  const row = document.createElement('div');
+  row.className = `msg-row ${sender}`;
+  
+  const bubble = document.createElement('div');
+  bubble.className = `msg ${sender}`;
+  
+  let innerHtml = '';
+  if (quote) innerHtml += `<div class="quote-box">引用：${escapeHtml(quote)}</div>`;
+  if (text) innerHtml += `<div>${escapeHtml(text)}</div>`;
+  if (emoji) {
+    if (emoji.startsWith('data:image')) {
+      innerHtml += `<img class="emoji-img" src="${emoji}">`;
+    } else {
+      innerHtml += `<span class="emoji-text">${escapeHtml(emoji)}</span>`;
+    }
+  }
+  bubble.innerHTML = innerHtml;
+  
+  // 长按与右键事件
+  let touchStartTime = 0;
+  bubble.addEventListener('touchstart', (e) => {
+    touchStartTime = Date.now();
+    longPressTimer = setTimeout(() => {
+      e.preventDefault();
+      showContextMenu(e.touches[0].clientX, e.touches[0].clientY, text, sender);
+    }, 500);
+  });
+  bubble.addEventListener('touchend', () => clearTimeout(longPressTimer));
+  bubble.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+  bubble.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY, text, sender);
+  });
+
+  row.appendChild(bubble);
+  win.appendChild(row);
+  win.scrollTop = win.scrollHeight;
+
+  if (!skipSave) {
+    const msg = { sessionId: currentSessionId, text, sender, quote, emoji, time: Date.now() };
+    dbAdd('messages', msg).then(id => { msg.id = id; chatMessages.push(msg); });
+  } else {
+    // 已有记录推入
+    if (!chatMessages.find(m => m.time === text)) { /* 占位，实际在 render 时直接使用 */ }
+  }
+}
+
+function showTyping() {
+  const win = $('chat-window');
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typing';
+  div.textContent = '对方正在输入…';
+  win.appendChild(div);
+  win.scrollTop = win.scrollHeight;
+}
+function hideTyping() { const el = $('typing'); if (el) el.remove(); }
+
+async function sendChat() {
+  const input = $('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  appendBubble(text, 'user', null, null);
+  input.value = '';
+  
+  showTyping();
+  const delay = 600 + Math.random() * 1200;
+  
+  setTimeout(async () => {
+    hideTyping();
+    
+    // 1. 获取可用的字卡池
+    let pool = cards;
+    if (currentSession.groupIds && currentSession.groupIds.length > 0) {
+      pool = cards.filter(c => currentSession.groupIds.includes(c.groupId));
+    }
+    if (pool.length === 0) pool = cards; // 兜底
+    if (pool.length === 0) return appendBubble('我还没有字卡呢，去添加一些吧。', 'bot', null, null);
+    
+    // 2. 随机抽词，避免连续重复
+    let replyText;
+    let attempts = 0;
+    do {
+      replyText = randomPick(pool).text;
+      attempts++;
+    } while (pool.length > 1 && replyText === lastReply && attempts < 10);
+    lastReply = replyText;
+    
+    // 3. 随机引用
+    let quote = null;
+    if (Math.random() * 100 < settings.probQuote) {
+      const userMsgs = chatMessages.filter(m => m.sender === 'user');
+      if (userMsgs.length > 0) quote = randomPick(userMsgs).text;
+    }
+    
+    // 4. 随机收藏
+    if (Math.random() * 100 < settings.probFav) {
+      const userMsgs = chatMessages.filter(m => m.sender === 'user');
+      if (userMsgs.length > 0) {
+        const favText = randomPick(userMsgs).text;
+        await dbAdd('favorites', { sessionId: currentSessionId, text: favText, from: 'ta', time: Date.now() });
+        showToast(`TA 悄悄收藏了你的消息：“${favText}”`);
+      }
+    }
+    
+    // 5. 随机表情包
+    let emoji = null;
+    if (Math.random() * 100 < settings.probEmoji && emojis.length > 0) {
+      emoji = randomPick(emojis).content;
+    }
+    
+    appendBubble(replyText, 'bot', quote, emoji);
+  }, delay);
+}
+
+/* =====================================================================
+   7. 长按菜单
+   ===================================================================== */
+function showContextMenu(x, y, text, sender) {
+  const menu = $('context-menu');
+  menu.style.display = 'flex';
+  menu.style.left = Math.min(x, window.innerWidth - 100) + 'px';
+  menu.style.top = Math.min(y, window.innerHeight - 150) + 'px';
+  ctxTargetMsg = { text, sender };
+}
+
+function ctxAction(action) {
+  $('context-menu').style.display = 'none';
+  if (!ctxTargetMsg) return;
+  
+  if (action === 'quote') {
+    $('chat-input').value = `[引用: ${ctxTargetMsg.text}] `;
+    $('chat-input').focus();
+  } else if (action === 'fav') {
+    dbAdd('favorites', { sessionId: currentSessionId, text: ctxTargetMsg.text, from: 'me', time: Date.now() });
+    showToast('已加入我的收藏夹');
+  } else if (action === 'delete') {
+    // 从界面移除并删除数据库记录
+    const win = $('chat-window');
+    // 简单做法：从后往前找匹配的（实际项目需绑定ID）
+    // 这里简化处理，重新渲染时过滤
+    chatMessages = chatMessages.filter(m => !(m.text === ctxTargetMsg.text && m.sender === ctxTargetMsg.sender));
+    renderChat();
+    showToast('已删除（注：需刷新页面彻底生效）');
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (!$('context-menu').contains(e.target)) $('context-menu').style.display = 'none';
+});
+
+/* =====================================================================
+   8. 收藏夹
+   ===================================================================== */
+async function renderFavorites() {
+  favorites = await dbGetAll('favorites');
+  const myList = $('fav-my-list');
+  const taList = $('fav-ta-list');
+  myList.innerHTML = ''; taList.innerHTML = '';
+  
+  favorites.filter(f => f.from === 'me').forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'fav-item';
+    div.innerHTML = `<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;
+    myList.appendChild(div);
+  });
+  if (myList.innerHTML === '') myList.innerHTML = '<div class="empty">还没有收藏</div>';
+  
+  favorites.filter(f => f.from === 'ta').forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'fav-item';
+    div.innerHTML = `<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;
+    taList.appendChild(div);
+  });
+  if (taList.innerHTML === '') taList.innerHTML = '<div class="empty">TA 还没有收藏你的消息</div>';
+}
+
+/* =====================================================================
+   9. 字卡管理
+   ===================================================================== */
+async function loadCardData() {
+  cardGroups = await dbGetAll('cardGroups');
+  cards = await dbGetAll('cards');
+  if (cardGroups.length === 0) {
+    const gid = await dbAdd('cardGroups', { name: '默认分组' });
+    cardGroups.push({ id: gid, name: '默认分组' });
+  }
+  if (cards.length === 0) {
+    const defaultCards = ['今天天气不错', '哈哈哈', '嗯嗯', '在干嘛呢', '有点想你了', '晚安'];
+    for (const c of defaultCards) {
+      await dbAdd('cards', { groupId: cardGroups[0].id, text: c });
+    }
+    cards = await dbGetAll('cards');
+  }
+}
+
+async function renderCardGroups() {
+  await loadCardData();
+  const container = $('card-group-list');
+  container.innerHTML = '';
+  
+  cardGroups.forEach(g => {
+    const groupDiv = document.createElement('div');
+    groupDiv.style.marginBottom = '15px';
+    const groupCards = cards.filter(c => c.groupId === g.id);
+    
+    let cardsHtml = groupCards.map(c => `
+      <div class="card-item">
+        <div class="content">${escapeHtml(c.text)}</div>
+        <div class="item-actions">
+          <button onclick="editCard(${c.id})">改</button>
+          <button onclick="deleteCard(${c.id})">删</button>
+        </div>
+      </div>
+    `).join('');
+    
+    groupDiv.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h4 style="font-size:15px;">${escapeHtml(g.name)} (${groupCards.length})</h4>
+        <button style="font-size:12px;padding:3px 8px;" onclick="deleteGroup(${g.id})">删除分组</button>
+      </div>
+      ${cardsHtml || '<div class="empty" style="padding:10px;">这个分组暂无字卡</div>'}
+    `;
+    container.appendChild(groupDiv);
+  });
+}
+
+function openCardGroupModal() {
+  openModal(`
+    <h3>新建字卡分组</h3>
+    <div class="form-group">
+      <label>分组名称</label>
+      <input type="text" id="new-group-name" placeholder="例如：日常、安慰、傲娇">
+    </div>
+    <button class="btn-primary" onclick="createCardGroup()">创建</button>
+  `);
+}
+async function createCardGroup() {
+  const name = $('new-group-name').value.trim();
+  if (!name) return showToast('请输入名称');
+  await dbAdd('cardGroups', { name });
+  closeModal();
+  renderCardGroups();
+  showToast('分组创建成功');
+}
+async function deleteGroup(id) {
+  if (!confirm('确定删除分组？该分组下的字卡也会被删除。')) return;
+  await dbDelete('cardGroups', id);
+  const toDelete = cards.filter(c => c.groupId === id);
+  for (const c of toDelete) await dbDelete('cards', c.id);
+  renderCardGroups();
+}
+
+function openCardModal() {
+  openModal(`
+    <h3>添加字卡</h3>
+    <div class="form-group">
+      <label>所属分组</label>
+      <select id="new-card-group">
+        ${cardGroups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>字卡内容（多个字卡请用换行分隔，批量导入）</label>
+      <textarea id="new-card-text" rows="5" placeholder="输入一句话..."></textarea>
+    </div>
+    <button class="btn-primary" onclick="createCard()">保存</button>
+  `);
+}
+async function createCard() {
+  const groupId = parseInt($('new-card-group').value);
+  const text = $('new-card-text').value.trim();
+  if (!text) return showToast('请输入内容');
+  const lines = text.split('\n').filter(l => l.trim());
+  for (const line of lines) {
+    await dbAdd('cards', { groupId, text: line.trim() });
+  }
+  closeModal();
+  renderCardGroups();
+  showToast(`成功添加 ${lines.length} 张字卡`);
+}
+
+async function editCard(id) {
+  const card = cards.find(c => c.id === id);
+  if (!card) return;
+  openModal(`
+    <h3>编辑字卡</h3>
+    <div class="form-group">
+      <label>内容</label>
+      <input type="text" id="edit-card-text" value="${escapeHtml(card.text)}">
+    </div>
+    <button class="btn-primary" onclick="saveEditCard(${id})">保存</button>
+  `);
+}
+async function saveEditCard(id) {
+  const text = $('edit-card-text').value.trim();
+  if (!text) return;
+  const card = cards.find(c => c.id === id);
+  card.text = text;
+  await dbPut('cards', card);
+  closeModal();
+  renderCardGroups();
+}
+
+async function deleteCard(id) {
+  if (!confirm('确定删除这张字卡？')) return;
+  await dbDelete('cards', id);
+  renderCardGroups();
+}
+
+/* =====================================================================
+   10. 表情包管理
+   ===================================================================== */
+async function loadEmojiData() {
+  emojis = await dbGetAll('emojis');
+  if (emojis.length === 0) {
+    const defaultEmojis = ['😀', '😂', '🥺', '❤️', '(≧▽≦)', '(´▽｀)', '好耶！', '哈哈哈'];
+    for (const e of defaultEmojis) {
+      await dbAdd('emojis', { type: 'text', content: e });
+    }
+    emojis = await dbGetAll('emojis');
+  }
+}
+
+async function renderEmojis() {
+  await loadEmojiData();
+  const list = $('emoji-list');
+  list.innerHTML = '';
+  emojis.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'emoji-item';
+    let display = e.type === 'image' ? `<img src="${e.content}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">` : escapeHtml(e.content);
+    div.innerHTML = `<div class="content">${display}</div><div class="item-actions"><button onclick="deleteEmoji(${e.id})">删除</button></div>`;
+    list.appendChild(div);
+  });
+}
+
+function openEmojiModal() {
+  openModal(`
+    <h3>添加表情</h3>
+    <div class="form-group">
+      <label>文本表情（Emoji / 颜文字）</label>
+      <input type="text" id="new-emoji-text" placeholder="例如：😀 (≧▽≦)">
+    </div>
+    <div class="form-group">
+      <label>或者上传图片（建议小图）</label>
+      <input type="file" id="new-emoji-img" accept="image/*">
+    </div>
+    <button class="btn-primary" onclick="createEmoji()">保存</button>
+  `);
+}
+
+async function createEmoji() {
+  const text = $('new-emoji-text').value.trim();
+  const file = $('new-emoji-img').files[0];
+  
+  if (file) {
+    const base64 = await readFileAsBase64(file);
+    await dbAdd('emojis', { type: 'image', content: base64 });
+  } else if (text) {
+    await dbAdd('emojis', { type: 'text', content: text });
+  } else {
+    return showToast('请输入文本或选择图片');
+  }
+  closeModal();
+  renderEmojis();
+  showToast('表情添加成功');
+}
+
+async function deleteEmoji(id) {
+  if (!confirm('删除这个表情？')) return;
+  await dbDelete('emojis', id);
+  renderEmojis();
+}
+
+/* =====================================================================
+   11. 设置面板
+   ===================================================================== */
+function loadSettingsUI() {
+  $('set-my-name').value = settings.myName;
+  $('set-prob-quote').value = settings.probQuote;
+  $('set-prob-fav').value = settings.probFav;
+  $('set-prob-emoji').value = settings.probEmoji;
+  $('set-bg-color').value = settings.bgColor;
+  $('set-my-bubble').value = settings.myBubble;
+  $('set-ta-bubble').value = settings.taBubble;
+}
+
+async function saveSettings() {
+  settings.myName = $('set-my-name').value.trim() || '我';
+  settings.probQuote = parseInt($('set-prob-quote').value) || 0;
+  settings.probFav = parseInt($('set-prob-fav').value) || 0;
+  settings.probEmoji = parseInt($('set-prob-emoji').value) || 0;
+  settings.bgColor = $('set-bg-color').value;
+  settings.myBubble = $('set-my-bubble').value;
+  settings.taBubble = $('set-ta-bubble').value;
+  
+  const bgImgFile = $('set-bg-img').files[0];
+  if (bgImgFile) {
+    settings.bgImage = await readFileAsBase64(bgImgFile);
+  }
+  
+  // 保存到数据库
+  for (const [key, value] of Object.entries(settings)) {
+    await dbPut('settings', { key, value });
+  }
+  
+  // 应用样式
+  document.documentElement.style.setProperty('--bg-color', settings.bgColor);
+  document.documentElement.style.setProperty('--my-bubble', settings.myBubble);
+  document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
+  
+  if (settings.bgImage) {
+    document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`;
+    document.getElementById('app').style.backgroundSize = 'cover';
+  } else {
+    document.getElementById('app').style.backgroundImage = 'none';
+  }
+  
+  showToast('设置已保存');
+}
+
+/* =====================================================================
+   12. 导入导出
+   ===================================================================== */
+async function exportData() {
+  const data = {
+    settings: await dbGetAll('settings'),
+    sessions: await dbGetAll('sessions'),
+    messages: await dbGetAll('messages'),
+    cardGroups: await dbGetAll('cardGroups'),
+    cards: await dbGetAll('cards'),
+    emojis: await dbGetAll('emojis'),
+    favorites: await dbGetAll('favorites')
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aurora_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('数据已导出');
+}
+
+async function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!confirm('导入将覆盖当前所有数据，确定吗？')) return;
+      
+      // 清空旧数据并导入新数据
+      for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) {
+        const tx = db.transaction(store, 'readwrite');
+        tx.objectStore(store).clear();
+      }
+      
+      for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) {
+        if (data[store]) {
+          for (const item of data[store]) {
+            await dbAdd(store, item);
+          }
+        }
+      }
+      
+      // 重载
+      settings = {};
+      for (const item of await dbGetAll('settings')) settings[item.key] = item.value;
+      await loadSessions();
+      await loadCardData();
+      await loadEmojiData();
+      
+      // 应用样式
+      document.documentElement.style.setProperty('--bg-color', settings.bgColor || '#f5f5f5');
+      document.documentElement.style.setProperty('--my-bubble', settings.myBubble || '#95ec69');
+      document.documentElement.style.setProperty('--ta-bubble', settings.taBubble || '#ffffff');
+      if (settings.bgImage) {
+        document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`;
+        document.getElementById('app').style.backgroundSize = 'cover';
+      }
+      
+      showToast('导入成功，数据已恢复');
+      switchPage('sessions');
+    } catch (err) {
+      showToast('导入失败：文件格式错误');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* =====================================================================
+   13. 初始化
+   ===================================================================== */
+async function initApp() {
+  await initDB();
+  
+  // 加载设置
+  const savedSettings = await dbGetAll('settings');
+  savedSettings.forEach(s => { settings[s.key] = s.value; });
+  
+  // 应用初始样式
+  document.documentElement.style.setProperty('--bg-color', settings.bgColor);
+  document.documentElement.style.setProperty('--my-bubble', settings.myBubble);
+  document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
+  if (settings.bgImage) {
+    document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`;
+    document.getElementById('app').style.backgroundSize = 'cover';
+  }
+  
+  await loadCardData();
+  await loadEmojiData();
+  await loadSessions();
+  
+  switchPage('sessions');
+}
+
+// 页面加载完成后启动
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
