@@ -17,8 +17,8 @@
   --border-color: #dcdcdc;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg-color); height:100vh; overflow:hidden; color:var(--text-color); }
-#app { max-width:480px; margin:0 auto; height:100vh; display:flex; flex-direction:column; background:var(--bg-color); position:relative; }
+body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg-color); height:100dvh; overflow:hidden; color:var(--text-color); }
+#app { max-width:480px; margin:0 auto; height:100dvh; display:flex; flex-direction:column; background:var(--bg-color); position:relative; }
 
 /* ================= 页面切换 ================= */
 .page { display:none; flex:1; flex-direction:column; overflow:hidden; }
@@ -95,7 +95,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
   <section class="page" id="page-sessions">
     <header class="navbar">
       消息
-      <button class="nav-btn" onclick="openSessionModal()">+ 新建</button>
+      <button class="nav-btn" onclick="switchPage('seeting')">+ 新建</button>
     </header>
     <div class="scroll-area" id="session-list"></div>
   </section>
