@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Aurora 专属空间</title>
 <style>
-:root{--bg-color:#F7F6F2;--nav-bg:#FFFFFF;--nav-text:#333333;--my-bubble:#A3B1A6;--ta-bubble:#FFFFFF;--text-color:#333333;--tab-active:#8E9B90;--border-color:#E5E5E5;--card-bg:#FFFFFF;}
+:root{--bg-color:#F7F6F2;--nav-bg:#FFFFFF;--nav-text:#333333;--my-bubble:#A3B1A6;--ta-bubble:#FFFFFF;--text-color:#333333;--tab-active:#8E9B90;--border-color:#E5E5E5;--card-bg:#FFFFFF;--widget-bg:linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);overflow:hidden;background:var(--bg-color);color:var(--text-color);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
 #app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;background:var(--bg-color);position:relative;overflow:hidden;}
@@ -26,7 +26,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .dock{height:70px;background:var(--nav-bg);border-top:1px solid var(--border-color);display:flex;justify-content:space-around;align-items:center;flex-shrink:0;}
 .dock-icon{display:flex;flex-direction:column;align-items:center;gap:4px;color:#8e8e93;font-size:11px;cursor:pointer;}
 .dock-icon .icon-box{width:44px;height:44px;border-radius:12px;box-shadow:none;background:transparent;color:#555;}
-.widget{background:linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%);border-radius:16px;padding:16px;color:#4A4A4A;margin-bottom:20px;cursor:pointer;}
+.widget{background:var(--widget-bg);border-radius:16px;padding:16px;color:#4A4A4A;margin-bottom:20px;cursor:pointer;text-align:center;}
 .widget-title{font-size:12px;opacity:0.8;margin-bottom:4px;}
 .widget-content{font-size:18px;font-weight:600;}
 /* 页面 */
@@ -38,19 +38,21 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .scroll-area{flex:1;overflow-y:auto;padding:12px;}
 /* 聊天 */
 .chat-names-bar{display:flex;justify-content:space-between;padding:8px 16px;background:var(--bg-color);font-size:13px;color:#666;border-bottom:1px solid var(--border-color);flex-shrink:0;}
-.chat-window{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;}
+.chat-window{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;background-position:center;background-size:cover;}
 .msg-row{display:flex;align-items:flex-start;gap:10px;width:100%;}
 .msg-row.user{flex-direction:row-reverse;}
 .avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;background:#e0e0e0;overflow:hidden;}
 .avatar img{width:100%;height:100%;object-fit:cover;}
-.msg{max-width:70%;padding:9px 13px;border-radius:8px;font-size:16px;line-height:1.5;word-break:break-word;position:relative;color:#fff;}
+.msg-container{display:flex;flex-direction:column;max-width:70%;}
+.msg-row.user .msg-container{align-items:flex-end;}
+.msg{padding:9px 13px;border-radius:8px;font-size:16px;line-height:1.5;word-break:break-word;position:relative;color:#fff;}
 .msg.bot{background:var(--ta-bubble);color:#333;}
 .msg.bot::before{content:'';position:absolute;left:-6px;top:12px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:6px solid var(--ta-bubble);}
 .msg.user{background:var(--my-bubble);color:#fff;}
 .msg.user::after{content:'';position:absolute;right:-6px;top:12px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:6px solid var(--my-bubble);}
 .quote-box{background:rgba(0,0,0,0.05);border-left:3px solid #ccc;padding:4px 8px;margin-bottom:6px;font-size:13px;color:#666;border-radius:2px;}
 .msg img.emoji-img{max-width:120px;border-radius:4px;margin-top:5px;display:block;}
-.msg-time{font-size:10px;color:#999;float:right;margin-top:5px;margin-left:10px;}
+.msg-time{font-size:10px;color:#999;margin-top:4px;}
 /* 输入栏 */
 .input-bar{display:flex;padding:8px 10px;background:var(--nav-bg);border-top:1px solid var(--border-color);gap:4px;flex-shrink:0;align-items:center;position:relative;}
 .input-bar input{flex:1;min-width:0;padding:10px 14px;border:none;border-radius:20px;background:#f0f0f0;font-size:15px;outline:none;}
@@ -61,7 +63,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .emoji-item-panel{width:40px;height:40px;display:flex;justify-content:center;align-items:center;font-size:24px;cursor:pointer;border-radius:8px;}
 .emoji-item-panel:active{background:#f0f0f0;}
 .emoji-item-panel img{width:100%;height:100%;object-fit:cover;border-radius:4px;}
-/* 弹窗与通用 */
+/* 通用元素 */
 .session-item,.card-item,.emoji-item,.fav-item{background:#fff;padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;}
 .item-actions button{background:none;border:1px solid #ddd;padding:4px 8px;border-radius:4px;font-size:12px;margin-left:5px;cursor:pointer;}
 .btn-primary{background:var(--my-bubble);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;width:100%;margin-top:10px;}
@@ -81,22 +83,24 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .close-btn{position:absolute;right:15px;top:15px;font-size:24px;color:#999;cursor:pointer;line-height:1;}
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:3000;display:none;text-align:center;}
 .empty{text-align:center;color:#999;padding:40px 20px;font-size:14px;}
-/* 通话大窗 */
-.call-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#222;z-index:4000;display:none;flex-direction:column;justify-content:center;align-items:center;color:#fff;}
-.call-overlay img{width:80px;height:80px;border-radius:50%;margin-bottom:20px;object-fit:cover;}
-.call-avatar-text{font-size:36px;font-weight:bold;}
-.call-timer{font-size:20px;margin-top:10px;font-family:monospace;}
-.call-hangup{width:60px;height:60px;border-radius:50%;background:#ff3b30;border:none;display:flex;justify-content:center;align-items:center;margin-top:40px;cursor:pointer;}
-.call-minimize{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:#fff;display:flex;justify-content:center;align-items:center;font-size:24px;cursor:pointer;}
-/* 通话灵动岛小窗 */
+/* 通话悬浮窗 */
+.call-float{position:fixed;top:100px;left:50%;transform:translateX(-50%);width:280px;height:380px;background:#222;border-radius:20px;z-index:4000;display:none;flex-direction:column;justify-content:center;align-items:center;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.5);resize:both;overflow:auto;min-width:200px;min-height:300px;}
+.call-float .call-minimize{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;justify-content:center;align-items:center;}
+.call-float img{width:70px;height:70px;border-radius:50%;margin-bottom:15px;object-fit:cover;}
+.call-float .call-timer{font-size:20px;margin-top:10px;font-family:monospace;}
+.call-float .call-hangup{width:60px;height:60px;border-radius:50%;background:#ff3b30;border:none;display:flex;justify-content:center;align-items:center;margin-top:30px;cursor:pointer;}
+/* 通话灵动岛 */
 .call-island{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1c1c1e;border-radius:30px;padding:6px 12px;display:none;align-items:center;gap:10px;z-index:5000;color:#fff;box-shadow:0 4px 15px rgba(0,0,0,0.3);cursor:move;min-width:180px;}
 .call-island img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;}
 .call-island-info{display:flex;flex-direction:column;flex:1;overflow:hidden;}
 .call-island-name{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .call-island-timer{font-size:11px;color:#aaa;font-family:monospace;}
 .call-island-hangup{width:32px;height:32px;border-radius:50%;background:#ff3b30;border:none;display:flex;justify-content:center;align-items:center;cursor:pointer;flex-shrink:0;}
-/* 陪伴弹幕 */
-#companion-barrage{height:150px;overflow:hidden;position:relative;background:#f5f5f5;border-radius:8px;margin-bottom:20px;text-align:left;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;}
+/* 陪伴悬浮窗 */
+.companion-float{position:fixed;top:150px;right:20px;width:260px;height:320px;background:rgba(255,255,255,0.95);border-radius:16px;z-index:4000;display:none;flex-direction:column;padding:15px;box-shadow:0 10px 30px rgba(0,0,0,0.15);resize:both;overflow:auto;min-width:200px;min-height:250px;}
+.companion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.companion-timer{font-size:24px;font-family:monospace;text-align:center;margin-bottom:10px;color:#4A4A4A;}
+.companion-barrage-area{flex:1;overflow:hidden;position:relative;background:#f5f5f5;border-radius:8px;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:10px;}
 .barrage-item{font-size:12px;color:#666;margin-bottom:4px;animation:fadeIn 0.5s;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 </style>
@@ -107,8 +111,8 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
   <section class="page active" id="page-home">
     <div class="home-container">
       <div class="home-page">
-        <div class="widget" onclick="openDailyWidget()">
-          <div class="widget-title" id="widget-date">9月17日 星期四</div>
+        <div class="widget">
+          <div class="widget-title" id="widget-date"></div>
           <div class="widget-content" id="widget-text">加载中...</div>
         </div>
         <div class="icon-grid">
@@ -222,10 +226,14 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>外观</header>
     <div class="scroll-area">
       <div class="form-group">
-        <label>主题颜色设置（点击选择）</label>
+        <label>主题颜色设置</label>
         <div class="color-picker-row" onclick="openColorPicker('bgColor','背景颜色')"><span>聊天/桌面背景色</span><div style="width:30px;height:30px;border-radius:50%;background:var(--bg-color);border:1px solid #ddd;"></div></div>
         <div class="color-picker-row" onclick="openColorPicker('myBubble','我的气泡')"><span>我的气泡颜色</span><div style="width:30px;height:30px;border-radius:50%;background:var(--my-bubble);border:1px solid #ddd;"></div></div>
         <div class="color-picker-row" onclick="openColorPicker('taBubble','TA的气泡')"><span>TA 的气泡颜色</span><div style="width:30px;height:30px;border-radius:50%;background:var(--ta-bubble);border:1px solid #ddd;"></div></div>
+      </div>
+      <div class="form-group">
+        <label>状态栏挂件颜色（莫兰迪渐变）</label>
+        <div class="color-picker-row" onclick="openWidgetGradientPicker()"><span>渐变方案</span><div style="width:30px;height:30px;border-radius:50%;background:var(--widget-bg);border:1px solid #ddd;"></div></div>
       </div>
       <button class="btn-primary" onclick="saveAppearance()">保存外观</button>
     </div>
@@ -236,11 +244,11 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 <div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
 <div class="toast" id="toast"></div>
 
-<!-- 通话大窗 -->
-<div class="call-overlay" id="call-overlay">
+<!-- 通话悬浮窗 -->
+<div class="call-float" id="call-float">
   <button class="call-minimize" onclick="minimizeCall()">−</button>
   <div id="call-avatar-container"></div>
-  <div id="call-name" style="font-size:20px;font-weight:bold;">对方</div>
+  <div id="call-name" style="font-size:18px;font-weight:bold;">对方</div>
   <div class="call-timer" id="call-timer">00:00</div>
   <button class="call-hangup" onclick="endCall()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg></button>
 </div>
@@ -252,8 +260,18 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
   <button class="call-island-hangup" onclick="endCall()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg></button>
 </div>
 
+<!-- 陪伴悬浮窗 -->
+<div class="companion-float" id="companion-float">
+  <div class="companion-header">
+    <span style="font-size:14px;font-weight:bold;" id="companion-title">陪伴中</span>
+    <button style="background:none;border:none;font-size:20px;cursor:pointer;" onclick="endCompanion()">×</button>
+  </div>
+  <div class="companion-timer" id="companion-timer">00:00:00</div>
+  <div class="companion-barrage-area" id="companion-barrage"></div>
+</div>
+
 <script>
-let db;const DB_NAME='AuroraChatDB';const DB_VERSION=2;
+let db;const DB_NAME='AuroraChatDB';const DB_VERSION=3;
 function initDB(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=(e)=>{const database=e.target.result;if(!database.objectStoreNames.contains('settings'))database.createObjectStore('settings',{keyPath:'key'});if(!database.objectStoreNames.contains('sessions'))database.createObjectStore('sessions',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('messages')){const store=database.createObjectStore('messages',{keyPath:'id',autoIncrement:true});store.createIndex('sessionId','sessionId',{unique:false});}if(!database.objectStoreNames.contains('cardGroups'))database.createObjectStore('cardGroups',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('cards')){const store=database.createObjectStore('cards',{keyPath:'id',autoIncrement:true});store.createIndex('groupId','groupId',{unique:false});}if(!database.objectStoreNames.contains('emojis'))database.createObjectStore('emojis',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('favorites'))database.createObjectStore('favorites',{keyPath:'id',autoIncrement:true});};request.onsuccess=(e)=>{db=e.target.result;resolve();};request.onerror=()=>reject(request.error);});}
 function dbGetAll(s){return new Promise(r=>{const tx=db.transaction(s,'readonly');const req=tx.objectStore(s).getAll();req.onsuccess=()=>r(req.result||[]);});}
 function dbAdd(s,d){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).add(d);req.onsuccess=()=>r(req.result);});}
@@ -261,7 +279,7 @@ function dbPut(s,d){return new Promise(r=>{const tx=db.transaction(s,'readwrite'
 function dbDelete(s,id){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).delete(id);req.onsuccess=()=>r();});}
 function dbGetByIndex(s,i,v){return new Promise(r=>{const tx=db.transaction(s,'readonly');const idx=tx.objectStore(s).index(i);const req=idx.getAll(v);req.onsuccess=()=>r(req.result||[]);});}
 
-const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',bgImage:'',msgInterval:5,barrageInterval:2};
+const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',bgImage:'',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2};
 let settings={...DEFAULT_SETTINGS};let sessions=[];let currentSessionId=null;let currentSession=null;let chatMessages=[];let cardGroups=[];let cards=[];let emojis=[];let favorites=[];let lastReply='';let longPressTimer=null;let ctxTargetMsg=null;let callInterval=null;let callSeconds=0;let msgTimer=null;let barrageTimer=null;let croppedImageBase64='';let croppedTargetKey='';
 
 const $=id=>document.getElementById(id);const randomPick=arr=>arr[Math.floor(Math.random()*arr.length)];const escapeHtml=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML;};const formatTime=ts=>{const d=new Date(ts);const n=new Date();const hh=String(d.getHours()).padStart(2,'0');const mm=String(d.getMinutes()).padStart(2,'0');return d.toDateString()===n.toDateString()?`${hh}:${mm}`:`${d.getMonth()+1}月${d.getDate()}日 ${hh}:${mm}`;};
@@ -279,8 +297,8 @@ function openFeature(name){
   if(name==='外观'){switchPage('appearance');loadAppearanceUI();return;}
   if(name==='收藏'){switchPage('favorites');renderFavorites();return;}
   $('feature-title').textContent=name;let content='';
-  if(name==='陪伴'){content=`<h3 style="margin-bottom:20px;">静音陪伴</h3><p style="color:#666;margin-bottom:20px;font-size:14px;">选择一种模式</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;width:100%;max-width:300px;"><button class="btn-primary" onclick="startCompanion('睡觉')">睡觉</button><button class="btn-primary" onclick="startCompanion('学习')">学习</button><button class="btn-primary" onclick="startCompanion('专注')">专注</button><button class="btn-primary" onclick="startCompanion('冥想')">冥想</button></div>`;}
-  else if(name==='占卜'){content=`<h3 style="font-size:20px;margin-bottom:20px;">🔮 塔罗占卜</h3><input type="text" id="divine-question" placeholder="输入你的问题..." style="width:80%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-bottom:20px;"><div style="display:flex;gap:15px;justify-content:center;margin-bottom:20px;"><button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="doDivine(1)">单张占卜</button><button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="doDivine(3)">三张占卜</button></div><div id="divine-result" style="display:flex;flex-direction:column;gap:15px;width:100%;align-items:center;"></div>`;}
+  if(name==='陪伴'){content=`<h3 style="margin-bottom:20px;">静音陪伴</h3><p style="color:#666;margin-bottom:20px;font-size:14px;">选择陪伴人</p><div style="display:flex;gap:10px;width:100%;max-width:300px;margin-bottom:20px;"><select id="companion-person" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">${sessions.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;width:100%;max-width:300px;"><button class="btn-primary" onclick="startCompanion('睡觉')">睡觉</button><button class="btn-primary" onclick="startCompanion('学习')">学习</button><button class="btn-primary" onclick="startCompanion('专注')">专注</button><button class="btn-primary" onclick="startCompanion('冥想')">冥想</button></div>`;}
+  else if(name==='占卜'){content=`<h3 style="font-size:20px;margin-bottom:20px;">🔮 塔罗占卜</h3><input type="text" id="divine-question" placeholder="输入你的问题..." style="width:80%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-bottom:20px;"><div style="display:flex;gap:15px;justify-content:center;margin-bottom:20px;"><button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="doDivine(1)">单张占卜</button><button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="doDivine(3)">三张占卜</button></div><div id="divine-result" style="display:flex;flex-direction:row;justify-content:center;gap:10px;width:100%;flex-wrap:wrap;margin-top:20px;"></div>`;}
   else{content=`<div class="empty">「${name}」板块正在开发中</div>`;}
   $('feature-content').innerHTML=content;switchPage('feature');
 }
@@ -296,14 +314,16 @@ function appendBubble(text,sender,quote,emoji,skipSave=false,time=Date.now()){
   const win=$('chat-window');const row=document.createElement('div');row.className=`msg-row ${sender}`;
   const avatarSrc=sender==='user'?settings.myAvatar:(currentSession?currentSession.avatar:'👥');let avatarHtml='';if(avatarSrc&&avatarSrc.startsWith('data:image'))avatarHtml=`<img src="${avatarSrc}">`;else avatarHtml=`<span>${avatarSrc||(sender==='user'?'👤':'👥')}</span>`;
   const avatarDiv=document.createElement('div');avatarDiv.className='avatar';avatarDiv.innerHTML=avatarHtml;
+  const container=document.createElement('div');container.className='msg-container';
   const bubble=document.createElement('div');bubble.className=`msg ${sender}`;
   let innerHtml='';if(quote)innerHtml+=`<div class="quote-box">引用：${escapeHtml(quote)}</div>`;if(text)innerHtml+=`<div>${escapeHtml(text)}</div>`;if(emoji){if(emoji.startsWith('data:image'))innerHtml+=`<img class="emoji-img" src="${emoji}">`;else innerHtml+=`<span class="emoji-text">${escapeHtml(emoji)}</span>`;}
-  innerHtml+=`<span class="msg-time">${formatTime(time)}</span>`;
   bubble.innerHTML=innerHtml;
+  const timeDiv=document.createElement('div');timeDiv.className='msg-time';timeDiv.textContent=formatTime(time);
+  container.appendChild(bubble);container.appendChild(timeDiv);
   bubble.addEventListener('touchstart',(e)=>{longPressTimer=setTimeout(()=>{e.preventDefault();showContextMenu(e.touches[0].clientX,e.touches[0].clientY,text,sender);},500);});
   bubble.addEventListener('touchend',()=>clearTimeout(longPressTimer));bubble.addEventListener('touchmove',()=>clearTimeout(longPressTimer));
   bubble.addEventListener('contextmenu',(e)=>{e.preventDefault();showContextMenu(e.clientX,e.clientY,text,sender);});
-  row.appendChild(avatarDiv);row.appendChild(bubble);win.appendChild(row);win.scrollTop=win.scrollHeight;
+  row.appendChild(avatarDiv);row.appendChild(container);win.appendChild(row);win.scrollTop=win.scrollHeight;
   if(!skipSave){const msg={sessionId:currentSessionId,text,sender,quote,emoji,time:Date.now()};dbAdd('messages',msg).then(id=>{msg.id=id;chatMessages.push(msg);});}
 }
 function showTyping(){const win=$('chat-window');const div=document.createElement('div');div.className='typing';div.id='typing';div.textContent='对方正在输入…';win.appendChild(div);win.scrollTop=win.scrollHeight;}
@@ -319,61 +339,57 @@ document.addEventListener('click',(e)=>{if(!$('context-menu').contains(e.target)
 
 async function renderFavorites(){favorites=await dbGetAll('favorites');const myList=$('fav-my-list');const taList=$('fav-ta-list');myList.innerHTML='';taList.innerHTML='';favorites.filter(f=>f.from==='me').forEach(f=>{const div=document.createElement('div');div.className='fav-item';div.innerHTML=`<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;myList.appendChild(div);});if(myList.innerHTML==='')myList.innerHTML='<div class="empty">还没有收藏</div>';favorites.filter(f=>f.from==='ta').forEach(f=>{const div=document.createElement('div');div.className='fav-item';div.innerHTML=`<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;taList.appendChild(div);});if(taList.innerHTML==='')taList.innerHTML='<div class="empty">TA 还没有收藏你的消息</div>';}
 
-async function loadCardData(){cardGroups=await dbGetAll('cardGroups');cards=await dbGetAll('cards');if(cardGroups.length===0){const gid=await dbAdd('cardGroups',{name:'聊天分组'});cardGroups.push({id:gid,name:'聊天分组'});}if(!cardGroups.find(g=>g.name==='每日状态')){await dbAdd('cardGroups',{name:'每日状态'});cardGroups=await dbGetAll('cardGroups');}if(cards.length===0){const defaultCards=['今天天气不错','哈哈哈','嗯嗯','在干嘛呢','有点想你了','晚安'];for(const c of defaultCards)await dbAdd('cards',{groupId:cardGroups[0].id,text:c});cards=await dbGetAll('cards');}}
-async function renderCardGroups(){await loadCardData();const container=$('card-group-list');container.innerHTML='';cardGroups.forEach(g=>{const groupDiv=document.createElement('div');groupDiv.style.marginBottom='15px';const groupCards=cards.filter(c=>c.groupId===g.id);let cardsHtml=groupCards.map(c=>`<div class="card-item"><div class="content">${escapeHtml(c.text)}</div><div class="item-actions"><button onclick="editCard(${c.id})">改</button><button onclick="deleteCard(${c.id})">删</button></div></div>`).join('');groupDiv.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><h4 style="font-size:15px;">${escapeHtml(g.name)} (${groupCards.length})</h4><button style="font-size:12px;padding:3px 8px;" onclick="deleteGroup(${g.id})">删除分组</button></div>${cardsHtml||'<div class="empty" style="padding:10px;">这个分组暂无字卡</div>'}`;container.appendChild(groupDiv);});}
+async function loadCardData(){cardGroups=await dbGetAll('cardGroups');cards=await dbGetAll('cards');if(cardGroups.length===0){const gid=await dbAdd('cardGroups',{name:'聊天分组',isPinned:true});cardGroups.push({id:gid,name:'聊天分组',isPinned:true});}if(!cardGroups.find(g=>g.name==='每日状态')){await dbAdd('cardGroups',{name:'每日状态',isPinned:true});cardGroups=await dbGetAll('cardGroups');}if(cards.length===0){const defaultCards=['今天天气不错','哈哈哈','嗯嗯','在干嘛呢','有点想你了','晚安'];for(const c of defaultCards)await dbAdd('cards',{groupId:cardGroups[0].id,text:c});cards=await dbGetAll('cards');}}
+async function renderCardGroups(){await loadCardData();const container=$('card-group-list');container.innerHTML='';cardGroups.sort((a,b)=>(b.isPinned?1:0)-(a.isPinned?1:0));cardGroups.forEach(g=>{const groupDiv=document.createElement('div');groupDiv.style.marginBottom='15px';const groupCards=cards.filter(c=>c.groupId===g.id);let cardsHtml=groupCards.map(c=>`<div class="card-item"><div class="content">${escapeHtml(c.text)}</div><div class="item-actions"><button onclick="editCard(${c.id})">改</button><button onclick="deleteCard(${c.id})">删</button></div></div>`).join('');const isDailyStatus=g.name==='每日状态';const pinBtn=`<button style="font-size:12px;padding:3px 8px;" onclick="togglePinGroup(${g.id})">${g.isPinned?'取消置顶':'置顶'}</button>`;const delBtn=isDailyStatus?'':`<button style="font-size:12px;padding:3px 8px;" onclick="deleteGroup(${g.id})">删除分组</button>`;groupDiv.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><h4 style="font-size:15px;">${escapeHtml(g.name)} (${groupCards.length})</h4><div>${pinBtn} ${delBtn}</div></div>${cardsHtml||'<div class="empty" style="padding:10px;">这个分组暂无字卡</div>'}`;container.appendChild(groupDiv);});}
 function openCardGroupModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>新建字卡分组</h3><div class="form-group"><label>分组名称</label><input type="text" id="new-group-name" placeholder="例如：日常、安慰、每日状态"></div><button class="btn-primary" onclick="createCardGroup()">创建</button>`);}
 async function createCardGroup(){const name=$('new-group-name').value.trim();if(!name)return showToast('请输入名称');await dbAdd('cardGroups',{name});closeModal();renderCardGroups();showToast('分组创建成功');}
 async function deleteGroup(id){if(!confirm('确定删除分组？该分组下的字卡也会被删除。'))return;await dbDelete('cardGroups',id);const toDelete=cards.filter(c=>c.groupId===id);for(const c of toDelete)await dbDelete('cards',c.id);renderCardGroups();}
+async function togglePinGroup(id){const group=cardGroups.find(g=>g.id===id);if(!group)return;group.isPinned=!group.isPinned;await dbPut('cardGroups',group);renderCardGroups();}
 function openCardModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>添加字卡</h3><div class="form-group"><label>所属分组</label><select id="new-card-group">${cardGroups.map(g=>`<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('')}</select></div><div class="form-group"><label>字卡内容（多个字卡请用换行分隔，批量导入）</label><textarea id="new-card-text" rows="5" placeholder="输入一句话..."></textarea></div><button class="btn-primary" onclick="createCard()">保存</button>`);}
 async function createCard(){const groupId=parseInt($('new-card-group').value);const text=$('new-card-text').value.trim();if(!text)return showToast('请输入内容');const lines=text.split('\n').filter(l=>l.trim());for(const line of lines)await dbAdd('cards',{groupId,text:line.trim()});closeModal();renderCardGroups();showToast(`成功添加 ${lines.length} 张字卡`);}
 async function editCard(id){const card=cards.find(c=>c.id===id);if(!card)return;openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>编辑字卡</h3><div class="form-group"><label>内容</label><input type="text" id="edit-card-text" value="${escapeHtml(card.text)}"></div><button class="btn-primary" onclick="saveEditCard(${id})">保存</button>`);}
 async function saveEditCard(id){const text=$('edit-card-text').value.trim();if(!text)return;const card=cards.find(c=>c.id===id);card.text=text;await dbPut('cards',card);closeModal();renderCardGroups();}
 async function deleteCard(id){if(!confirm('确定删除这张字卡？'))return;await dbDelete('cards',id);renderCardGroups();}
 
-async function loadEmojiData(){emojis=await dbGetAll('emojis');if(emojis.length===0){const defaultEmojis=['😀','😂','🥺','❤️','(≧▽≦)','(´▽｀)','好耶！','哈哈哈'];for(const e of defaultEmojis)await dbAdd('emojis',{type:'text',content:e});emojis=await dbGetAll('emojis');}}
-async function renderEmojis(){await loadEmojiData();const list=$('emoji-list');list.innerHTML='';emojis.forEach(e=>{const div=document.createElement('div');div.className='emoji-item';let display=e.type==='image'?`<img src="${e.content}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">`:escapeHtml(e.content);div.innerHTML=`<div class="content">${display}</div><div class="item-actions"><button onclick="deleteEmoji(${e.id})">删除</button></div>`;list.appendChild(div);});}
+async function loadEmojiData(){emojis=await dbGetAll('emojis');}
+async function renderEmojis(){await loadEmojiData();const list=$('emoji-list');list.innerHTML='';emojis.forEach(e=>{const div=document.createElement('div');div.className='emoji-item';let display=e.type==='image'?`<img src="${e.content}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">`:escapeHtml(e.content);div.innerHTML=`<div class="content">${display}</div><div class="item-actions"><button onclick="deleteEmoji(${e.id})">删除</button></div>`;list.appendChild(div);});if(emojis.length===0)list.innerHTML='<div class="empty">暂无表情，点击右上角添加</div>';}
 function openEmojiModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>添加表情</h3><div class="form-group"><label>文本表情（Emoji / 颜文字）</label><input type="text" id="new-emoji-text" placeholder="例如：😀 (≧▽≦)"></div><div class="form-group"><label>或者上传图片</label><input type="file" id="new-emoji-img" accept="image/*"></div><button class="btn-primary" onclick="createEmoji()">保存</button>`);}
 async function createEmoji(){const text=$('new-emoji-text').value.trim();const file=$('new-emoji-img').files[0];if(file){const base64=await readFileAsBase64(file);await dbAdd('emojis',{type:'image',content:base64});}else if(text){await dbAdd('emojis',{type:'text',content:text});}else{return showToast('请输入文本或选择图片');}closeModal();renderEmojis();showToast('表情添加成功');}
 async function deleteEmoji(id){if(!confirm('删除这个表情？'))return;await dbDelete('emojis',id);renderEmojis();}
 
 function openColorPicker(key,title){const colors=['#F7F6F2','#D4E0D9','#F2EBE5','#FFFFFF','#A3B1A6','#C9B4B0','#95ec69','#FFD3B6','#FFAAA5','#FF8B94','#D4A5A5','#A8E6CF','#DCEDC1'];let html=`<div class="close-btn" onclick="closeModal()">×</div><h3>选择${title}</h3><div class="color-circles">`;colors.forEach(c=>{html+=`<div class="color-circle" style="background:${c};" onclick="applyColor('${key}','${c}')"></div>`;});html+=`</div>`;openModal(html);}
 function applyColor(key,color){settings[key]=color;const root=document.documentElement;if(key==='bgColor'){root.style.setProperty('--bg-color',color);}if(key==='myBubble'){root.style.setProperty('--my-bubble',color);}if(key==='taBubble'){root.style.setProperty('--ta-bubble',color);}closeModal();showToast('颜色已更新，记得点保存哦');}
+function openWidgetGradientPicker(){const gradients=['linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)','linear-gradient(135deg,#E2D9F3 0%,#F3E7E9 100%)','linear-gradient(135deg,#D6E4FF 0%,#F2E9E4 100%)','linear-gradient(135deg,#F5E6E8 0%,#D5E1DF 100%)','linear-gradient(135deg,#E8DCD2 0%,#DCE4E8 100%)'];let html=`<div class="close-btn" onclick="closeModal()">×</div><h3>选择状态栏渐变</h3><div class="color-circles">`;gradients.forEach(g=>{html+=`<div class="color-circle" style="background:${g};" onclick="applyWidgetGradient('${g}')"></div>`;});html+=`</div>`;openModal(html);}
+function applyWidgetGradient(gradient){settings.widgetBg=gradient;document.documentElement.style.setProperty('--widget-bg',gradient);closeModal();showToast('状态栏渐变已更新，记得保存');}
 function loadSettingsUI(){$('set-my-name').value=settings.myName;$('set-prob-quote').value=settings.probQuote;$('set-prob-fav').value=settings.probFav;$('set-prob-emoji').value=settings.probEmoji;$('set-prob-msg-interval').value=settings.msgInterval;$('set-prob-barrage-interval').value=settings.barrageInterval;}
 async function saveSettings(){settings.myName=$('set-my-name').value.trim()||'我';settings.probQuote=parseInt($('set-prob-quote').value)||0;settings.probFav=parseInt($('set-prob-fav').value)||0;settings.probEmoji=parseInt($('set-prob-emoji').value)||0;settings.msgInterval=parseInt($('set-prob-msg-interval').value)||5;settings.barrageInterval=parseInt($('set-prob-barrage-interval').value)||2;for(const [key,value]of Object.entries(settings))await dbPut('settings',{key,value});if($('chat-my-name'))$('chat-my-name').textContent=settings.myName;if(currentSession)renderChat();showToast('设置已保存');setTimeout(()=>switchPage('home'),500);setupTimers();}
 function loadAppearanceUI(){}
 async function saveAppearance(){for(const [key,value]of Object.entries(settings))await dbPut('settings',{key,value});showToast('外观已保存');setTimeout(()=>switchPage('home'),500);}
 
 function cropImage(event,targetKey){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(e)=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const size=Math.min(img.width,img.height);canvas.width=size;canvas.height=size;const ctx=canvas.getContext('2d');const sx=(img.width-size)/2;const sy=(img.height-size)/2;ctx.drawImage(img,sx,sy,size,size,0,0,size,size);croppedImageBase64=canvas.toDataURL('image/jpeg',0.8);if(targetKey==='myAvatar'){settings.myAvatar=croppedImageBase64;showToast('头像已更新，点击保存生效');}else if(targetKey==='newSessionAvatar'){showToast('头像已裁剪，点击创建即可');}else if(targetKey==='chatBg'){settings.chatBgImage=croppedImageBase64;applyChatBg();}};img.src=e.target.result;};reader.readAsDataURL(file);event.target.value='';}
-function applyChatBg(){if(settings.chatBgImage){$('page-chat').style.backgroundImage=`url(${settings.chatBgImage})`;$('page-chat').style.backgroundSize='cover';}else{$('page-chat').style.backgroundImage='none';}}
+function applyChatBg(){if(settings.chatBgImage){$('chat-window').style.backgroundImage=`url(${settings.chatBgImage})`;}else{$('chat-window').style.backgroundImage='none';}}
 function editTaProfile(){if(!currentSession)return;openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>修改 TA 的资料</h3><div class="form-group"><label>昵称</label><input type="text" id="edit-ta-name" value="${escapeHtml(currentSession.name)}"></div><div class="form-group"><label>头像（不上传则保持原样）</label><input type="file" id="edit-ta-avatar" accept="image/*" onchange="cropImage(event,'newSessionAvatar')"></div><button class="btn-primary" onclick="saveTaProfile()">保存</button>`);}
 async function saveTaProfile(){const newName=$('edit-ta-name').value.trim();if(newName){currentSession.name=newName;$('chat-title').textContent=newName;$('chat-ta-name').textContent=newName;}if(croppedImageBase64){currentSession.avatar=croppedImageBase64;croppedImageBase64='';}await dbPut('sessions',currentSession);const idx=sessions.findIndex(s=>s.id===currentSession.id);if(idx!==-1)sessions[idx]=currentSession;closeModal();renderChat();showToast('资料已更新');}
 function openChatMenu(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>聊天设置</h3><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn-primary" onclick="closeModal();openFeature('朋友圈')">朋友圈</button><button class="btn-primary" onclick="document.getElementById('chat-bg-input').click()">改变当前聊天背景</button><input type="file" id="chat-bg-input" accept="image/*" hidden onchange="cropImage(event,'chatBg')"></div>`);}
 
 let companionTimer=null;let companionMsgTimer=null;
-function startCompanion(type){openModal(`<div style="text-align:center;padding:10px;"><h3 style="margin-bottom:20px;">${type}陪伴中</h3><div style="font-size:48px;font-family:monospace;margin-bottom:20px;" id="companion-timer">00:00:00</div><div id="companion-barrage"></div><button class="btn-primary" style="background:#ff3b30;width:auto;padding:10px 30px;float:right;" onclick="endCompanion()">结束陪伴</button><div style="clear:both;"></div></div>`);let seconds=0;companionTimer=setInterval(()=>{seconds++;const h=String(Math.floor(seconds/3600)).padStart(2,'0');const m=String(Math.floor((seconds%3600)/60)).padStart(2,'0');const s=String(seconds%60).padStart(2,'0');if($('companion-timer'))$('companion-timer').textContent=`${h}:${m}:${s}`;},1000);const addBarrage=()=>{const text=getRandomCardFromPool('chat');const div=document.createElement('div');div.className='barrage-item';div.textContent=`> ${text}`;if($('companion-barrage')){$('companion-barrage').appendChild(div);$('companion-barrage').scrollTop=$('companion-barrage').scrollHeight;}};addBarrage();companionMsgTimer=setInterval(addBarrage,settings.barrageInterval*60*1000);}
-function endCompanion(){clearInterval(companionTimer);clearInterval(companionMsgTimer);closeModal();showToast('陪伴结束');}
+function startCompanion(type){const personId=parseInt($('companion-person').value);const person=sessions.find(s=>s.id===personId);if(!person)return;const name=person.name;$('companion-title').textContent=`${type}陪伴中 - ${name}`;$('companion-float').style.display='flex';let seconds=0;if(companionTimer)clearInterval(companionTimer);companionTimer=setInterval(()=>{seconds++;const h=String(Math.floor(seconds/3600)).padStart(2,'0');const m=String(Math.floor((seconds%3600)/60)).padStart(2,'0');const s=String(seconds%60).padStart(2,'0');$('companion-timer').textContent=`${h}:${m}:${s}`;},1000);const addBarrage=()=>{const text=getRandomCardFromPool('chat');const div=document.createElement('div');div.className='barrage-item';div.textContent=`> ${name}：${text}`;if($('companion-barrage')){$('companion-barrage').appendChild(div);$('companion-barrage').scrollTop=$('companion-barrage').scrollHeight;}};addBarrage();if(companionMsgTimer)clearInterval(companionMsgTimer);companionMsgTimer=setInterval(addBarrage,settings.barrageInterval*60*1000);}
+function endCompanion(){clearInterval(companionTimer);clearInterval(companionMsgTimer);$('companion-float').style.display='none';showToast('陪伴结束');}
 function getRandomCardFromPool(type){if(type==='status'){const dailyGroup=cardGroups.find(g=>g.name==='每日状态');const pool=dailyGroup?cards.filter(c=>c.groupId===dailyGroup.id):[];if(pool.length>0)return randomPick(pool).text;}const pool=cards.length?cards:[{text:'今天也要加油哦'}];return randomPick(pool).text;}
 const TAROT_DECK=['愚者','魔术师','女祭司','女皇','皇帝','教皇','恋人','战车','力量','隐士','命运之轮','正义','倒吊人','死神','节制','恶魔','高塔','星星','月亮','太阳','审判','世界','权杖 Ace','权杖 2','权杖 3','权杖 4','权杖 5','权杖 6','权杖 7','权杖 8','权杖 9','权杖 10','权杖 侍从','权杖 骑士','权杖 王后','权杖 国王','圣杯 Ace','圣杯 2','圣杯 3','圣杯 4','圣杯 5','圣杯 6','圣杯 7','圣杯 8','圣杯 9','圣杯 10','圣杯 侍从','圣杯 骑士','圣杯 王后','圣杯 国王','宝剑 Ace','宝剑 2','宝剑 3','宝剑 4','宝剑 5','宝剑 6','宝剑 7','宝剑 8','宝剑 9','宝剑 10','宝剑 侍从','宝剑 骑士','宝剑 王后','宝剑 国王','星币 Ace','星币 2','星币 3','星币 4','星币 5','星币 6','星币 7','星币 8','星币 9','星币 10','星币 侍从','星币 骑士','星币 王后','星币 国王'];
-function doDivine(count){const question=$('divine-question').value.trim();if(!question)return showToast('请先输入你的问题');const resultDiv=$('divine-result');resultDiv.innerHTML='';for(let i=0;i<count;i++){const card=randomPick(TAROT_DECK);const isUpright=Math.random()<0.5;const position=isUpright?'正位':'逆位';const cardDiv=document.createElement('div');cardDiv.style.cssText='width:120px;height:180px;border-radius:12px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.1);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;border:1px solid #eee;';cardDiv.innerHTML=`<div style="font-size:16px;font-weight:bold;text-align:center;margin-bottom:10px;">${card}</div><div style="font-size:12px;color:${isUpright?'#4A4A4A':'#C9B4B0'};">${position}</div>`;resultDiv.appendChild(cardDiv);}}
+function doDivine(count){const question=$('divine-question').value.trim();if(!question)return showToast('请先输入你的问题');const resultDiv=$('divine-result');resultDiv.innerHTML='';for(let i=0;i<count;i++){const card=randomPick(TAROT_DECK);const isUpright=Math.random()<0.5;const position=isUpright?'正位':'逆位';const cardDiv=document.createElement('div');cardDiv.style.cssText='width:30%;max-width:100px;height:150px;border-radius:12px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.1);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:5px;border:1px solid #eee;';cardDiv.innerHTML=`<div style="font-size:14px;font-weight:bold;text-align:center;margin-bottom:10px;word-break:break-all;">${card}</div><div style="font-size:12px;color:${isUpright?'#4A4A4A':'#C9B4B0'};">${position}</div>`;resultDiv.appendChild(cardDiv);}}
 
-function startCall(){if(!currentSession)return showToast('请先进入聊天');if(Math.random()<0.5){showToast('对方已拒绝');return;}showCallOverlay();}
-function showCallOverlay(){$('call-overlay').style.display='flex';$('call-island').style.display='none';$('call-name').textContent=currentSession.name;const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<div class="call-avatar-text">${currentSession.avatar||'👤'}</div>`;$('call-avatar-container').innerHTML=avatarHtml;callSeconds=0;$('call-timer').textContent='00:00';if(callInterval)clearInterval(callInterval);callInterval=setInterval(()=>{callSeconds++;const m=String(Math.floor(callSeconds/60)).padStart(2,'0');const s=String(callSeconds%60).padStart(2,'0');$('call-timer').textContent=`${m}:${s}`;$('call-island-timer').textContent=`${m}:${s}`;},1000);}
-function minimizeCall(){$('call-overlay').style.display='none';$('call-island').style.display='flex';const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<span style="font-size:20px;">${currentSession.avatar||'👤'}</span>`;$('call-island-avatar').innerHTML=avatarHtml;$('call-island-name').textContent=currentSession.name;}
-function endCall(){clearInterval(callInterval);callInterval=null;$('call-overlay').style.display='none';$('call-island').style.display='none';}
-// 拖动灵动岛
-let isDraggingIsland=false;let islandStartX,islandStartY,islandInitialLeft,islandInitialTop;
-const island=$('call-island');island.addEventListener('touchstart',(e)=>{isDraggingIsland=true;const touch=e.touches[0];islandStartX=touch.clientX;islandStartY=touch.clientY;const rect=island.getBoundingClientRect();islandInitialLeft=rect.left;islandInitialTop=rect.top;island.style.transform='none';island.style.left=islandInitialLeft+'px';island.style.top=islandInitialTop+'px';});
-island.addEventListener('touchmove',(e)=>{if(!isDraggingIsland)return;e.preventDefault();const touch=e.touches[0];const dx=touch.clientX-islandStartX;const dy=touch.clientY-islandStartY;island.style.left=(islandInitialLeft+dx)+'px';island.style.top=(islandInitialTop+dy)+'px';},{passive:false});
-island.addEventListener('touchend',()=>{isDraggingIsland=false;});
-
+function startCall(){if(!currentSession)return showToast('请先进入聊天');if(Math.random()<0.5){showToast('对方已拒绝');return;}showCallFloat();}
+function showCallFloat(){$('call-float').style.display='flex';$('call-island').style.display='none';$('call-name').textContent=currentSession.name;const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<div style="font-size:36px;">${currentSession.avatar||'👤'}</div>`;$('call-avatar-container').innerHTML=avatarHtml;callSeconds=0;$('call-timer').textContent='00:00';if(callInterval)clearInterval(callInterval);callInterval=setInterval(()=>{callSeconds++;const m=String(Math.floor(callSeconds/60)).padStart(2,'0');const s=String(callSeconds%60).padStart(2,'0');$('call-timer').textContent=`${m}:${s}`;$('call-island-timer').textContent=`${m}:${s}`;},1000);}
+function minimizeCall(){$('call-float').style.display='none';$('call-island').style.display='flex';const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<span style="font-size:20px;">${currentSession.avatar||'👤'}</span>`;$('call-island-avatar').innerHTML=avatarHtml;$('call-island-name').textContent=currentSession.name;}
+function endCall(){clearInterval(callInterval);callInterval=null;$('call-float').style.display='none';$('call-island').style.display='none';}
+let isDraggingIsland=false;let islandStartX,islandStartY,islandInitialLeft,islandInitialTop;const island=$('call-island');island.addEventListener('touchstart',(e)=>{isDraggingIsland=true;const touch=e.touches[0];islandStartX=touch.clientX;islandStartY=touch.clientY;const rect=island.getBoundingClientRect();islandInitialLeft=rect.left;islandInitialTop=rect.top;island.style.transform='none';island.style.left=islandInitialLeft+'px';island.style.top=islandInitialTop+'px';});island.addEventListener('touchmove',(e)=>{if(!isDraggingIsland)return;e.preventDefault();const touch=e.touches[0];const dx=touch.clientX-islandStartX;const dy=touch.clientY-islandStartY;island.style.left=(islandInitialLeft+dx)+'px';island.style.top=(islandInitialTop+dy)+'px';},{passive:false});island.addEventListener('touchend',()=>{isDraggingIsland=false;});
 function setupTimers(){if(msgTimer)clearInterval(msgTimer);msgTimer=setInterval(()=>{if(currentSession&&!document.getElementById('page-chat').classList.contains('active')){if(Math.random()<0.2){const pool=cards.length?cards:[{text:'在干嘛呢？'}];const msg=randomPick(pool).text;dbAdd('messages',{sessionId:currentSessionId,text:msg,sender:'bot',time:Date.now()});chatMessages.push({text:msg,sender:'bot',time:Date.now()});showToast(`📩 ${currentSession.name}: ${msg}`);const badge=$('badge-chat');if(badge)badge.style.display='block';}}},settings.msgInterval*60*1000);}
-function openDailyWidget(){const dateStr=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>${dateStr}</h3><div style="text-align:center;font-size:20px;margin:20px 0;color:#4A4A4A;">${getRandomCardFromPool('status')}</div><button class="btn-primary" onclick="closeModal()">知道了，开始今天</button>`);}
-
 async function initApp(){
   await initDB();
   const savedSettings=await dbGetAll('settings');const loaded={};savedSettings.forEach(s=>{loaded[s.key]=s.value;});
   settings={...DEFAULT_SETTINGS,...loaded};
-  document.documentElement.style.setProperty('--bg-color',settings.bgColor);document.documentElement.style.setProperty('--my-bubble',settings.myBubble);document.documentElement.style.setProperty('--ta-bubble',settings.taBubble);
+  document.documentElement.style.setProperty('--bg-color',settings.bgColor);document.documentElement.style.setProperty('--my-bubble',settings.myBubble);document.documentElement.style.setProperty('--ta-bubble',settings.taBubble);document.documentElement.style.setProperty('--widget-bg',settings.widgetBg);
   if(settings.bgImage){document.getElementById('app').style.backgroundImage=`url(${settings.bgImage})`;document.getElementById('app').style.backgroundSize='cover';}
   await loadCardData();await loadEmojiData();await loadSessions();
   const dateStr=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
