@@ -6,19 +6,24 @@
 <title>Aurora 专属空间</title>
 <style>
 :root {
-  --bg-color: #f2f2f7;
-  --nav-bg: rgba(255,255,255,0.8);
-  --nav-text: #000;
-  --my-bubble: #95ec69;
-  --ta-bubble: #ffffff;
-  --text-color: #000;
-  --tab-active: #07c160;
-  --border-color: #e5e5ea;
-  --card-bg: #ffffff;
+  --bg-color: #F7F6F2;
+  --nav-bg: #FFFFFF;
+  --nav-text: #333333;
+  --my-bubble: #A3B1A6;
+  --ta-bubble: #FFFFFF;
+  --text-color: #333333;
+  --tab-active: #8E9B90;
+  --border-color: #E5E5E5;
+  --card-bg: #FFFFFF;
+  --accent-color: #C9B4B0;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg-color); height:100dvh; overflow:hidden; color:var(--text-color); }
 #app { max-width:480px; margin:0 auto; height:100dvh; display:flex; flex-direction:column; background:var(--bg-color); position:relative; overflow:hidden; }
+
+/* 线条图标通用 */
+.svg-icon { width:24px; height:24px; stroke:currentColor; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.svg-icon-sm { width:18px; height:18px; stroke:currentColor; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
 
 /* ================= 桌面多页滑动 ================= */
 #page-home { display:none; flex:1; flex-direction:column; overflow:hidden; }
@@ -28,17 +33,17 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 .home-page { flex:0 0 100%; scroll-snap-align:start; padding:20px; display:flex; flex-direction:column; }
 .icon-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:20px 15px; margin-top:10px; }
 .app-icon { display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; position:relative; }
-.icon-box { width:60px; height:60px; border-radius:16px; background:var(--card-bg); display:flex; justify-content:center; align-items:center; font-size:28px; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:transform 0.1s; }
+.icon-box { width:60px; height:60px; border-radius:16px; background:var(--card-bg); display:flex; justify-content:center; align-items:center; font-size:28px; box-shadow:0 2px 8px rgba(0,0,0,0.05); color:#555; transition:transform 0.1s; }
 .app-icon:active .icon-box { transform:scale(0.9); }
 .icon-label { font-size:12px; color:#555; font-weight:500; }
 .badge { position:absolute; top:-2px; right:8px; background:#ff3b30; color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; border:2px solid var(--bg-color); }
 .dock { height:70px; background:var(--nav-bg); backdrop-filter:blur(10px); border-top:1px solid var(--border-color); display:flex; justify-content:space-around; align-items:center; flex-shrink:0; }
 .dock-icon { display:flex; flex-direction:column; align-items:center; gap:4px; color:#8e8e93; font-size:11px; cursor:pointer; }
-.dock-icon .icon-box { width:44px; height:44px; border-radius:12px; font-size:22px; box-shadow:none; background:transparent; }
+.dock-icon .icon-box { width:44px; height:44px; border-radius:12px; font-size:22px; box-shadow:none; background:transparent; color:#555; }
 .dock-icon.active { color:var(--tab-active); }
 
 /* 桌面挂件 */
-.widget { background:linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); border-radius:16px; padding:16px; color:#fff; margin-bottom:20px; cursor:pointer; box-shadow:0 4px 15px rgba(161,196,253,0.3); }
+.widget { background:linear-gradient(135deg, #D4E0D9 0%, #F2EBE5 100%); border-radius:16px; padding:16px; color:#4A4A4A; margin-bottom:20px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
 .widget-title { font-size:12px; opacity:0.8; margin-bottom:4px; }
 .widget-content { font-size:18px; font-weight:600; }
 .widget-sub { font-size:13px; margin-top:6px; opacity:0.9; }
@@ -46,8 +51,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 /* ================= 通用页面与导航 ================= */
 .page { display:none; flex:1; flex-direction:column; overflow:hidden; background:var(--bg-color); position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; }
 .page.active { display:flex; }
-.navbar { height:48px; background:var(--nav-bg); backdrop-filter:blur(10px); color:var(--nav-text); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:500; border-bottom:1px solid var(--border-color); position:relative; flex-shrink:0; z-index:11; }
-.nav-btn { position:absolute; right:12px; background:none; border:none; color:var(--tab-active); font-size:15px; cursor:pointer; padding:5px; }
+.navbar { height:48px; background:var(--nav-bg); color:var(--nav-text); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:500; border-bottom:1px solid var(--border-color); position:relative; flex-shrink:0; z-index:11; }
+.nav-btn { position:absolute; right:12px; background:none; border:none; color:var(--tab-active); font-size:15px; cursor:pointer; padding:5px; display:flex; align-items:center; }
 .nav-btn.left { left:12px; right:auto; }
 .scroll-area { flex:1; overflow-y:auto; padding:12px; }
 
@@ -58,22 +63,23 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 .msg-row.user { flex-direction:row-reverse; }
 .avatar { width:36px; height:36px; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; background:#e0e0e0; overflow:hidden; }
 .avatar img { width:100%; height:100%; object-fit:cover; }
-.msg { max-width:70%; padding:9px 13px; border-radius:6px; font-size:16px; line-height:1.5; word-break:break-word; position:relative; animation:fadeIn .2s ease; color:#000; }
+.msg { max-width:70%; padding:9px 13px; border-radius:8px; font-size:16px; line-height:1.5; word-break:break-word; position:relative; animation:fadeIn .2s ease; color:#fff; }
 @keyframes fadeIn { from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)} }
-.msg.bot { background:var(--ta-bubble); }
+.msg.bot { background:var(--ta-bubble); color:#333; }
 .msg.bot::before { content:''; position:absolute; left:-6px; top:12px; border-top:6px solid transparent; border-bottom:6px solid transparent; border-right:6px solid var(--ta-bubble); }
-.msg.user { background:var(--my-bubble); }
+.msg.user { background:var(--my-bubble); color:#fff; }
 .msg.user::after { content:''; position:absolute; right:-6px; top:12px; border-top:6px solid transparent; border-bottom:6px solid transparent; border-left:6px solid var(--my-bubble); }
 .quote-box { background:rgba(0,0,0,0.05); border-left:3px solid #ccc; padding:4px 8px; margin-bottom:6px; font-size:13px; color:#666; border-radius:2px; }
 .msg img.emoji-img { max-width:120px; border-radius:4px; margin-top:5px; display:block; }
 .msg .emoji-text { font-size:20px; margin-top:5px; display:block; }
 
-/* 输入栏 */
-.input-bar { display:flex; padding:8px; background:var(--nav-bg); border-top:1px solid var(--border-color); gap:8px; flex-shrink:0; align-items:center; }
-.input-bar input { flex:1; padding:9px 12px; border:none; border-radius:20px; background:#fff; font-size:15px; outline:none; padding-left:15px; }
-.circle-btn { width:36px; height:36px; border-radius:50%; background:#fff; border:none; display:flex; justify-content:center; align-items:center; font-size:18px; cursor:pointer; color:#555; flex-shrink:0; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-.circle-btn.send { background:var(--tab-active); color:#fff; }
-.circle-btn.send:active { background:#06ad56; }
+/* 输入栏（修复溢出） */
+.input-bar { display:flex; padding:8px 10px; background:var(--nav-bg); border-top:1px solid var(--border-color); gap:6px; flex-shrink:0; align-items:center; }
+.input-bar input { flex:1; min-width:0; padding:10px 14px; border:none; border-radius:20px; background:#f0f0f0; font-size:15px; outline:none; }
+.circle-btn { width:34px; height:34px; border-radius:50%; background:transparent; border:none; display:flex; justify-content:center; align-items:center; font-size:18px; cursor:pointer; color:#555; flex-shrink:0; transition:background 0.2s; }
+.circle-btn:active { background:#e0e0e0; }
+.circle-btn.send { background:var(--my-bubble); color:#fff; }
+.circle-btn.send:active { background:var(--tab-active); }
 
 /* 其他通用 */
 .session-item { background:#fff; padding:14px; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; gap:10px; cursor:pointer; }
@@ -85,23 +91,39 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 .card-item, .emoji-item, .fav-item { background:#fff; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; font-size:14px; }
 .card-item .content, .emoji-item .content { flex:1; word-break:break-all; }
 .item-actions button { background:none; border:1px solid #ddd; padding:4px 8px; border-radius:4px; font-size:12px; margin-left:5px; cursor:pointer; }
-.btn-primary { background:var(--tab-active); color:#fff; border:none; padding:10px 16px; border-radius:8px; font-size:14px; cursor:pointer; width:100%; margin-top:10px; }
+.btn-primary { background:var(--my-bubble); color:#fff; border:none; padding:10px 16px; border-radius:8px; font-size:14px; cursor:pointer; width:100%; margin-top:10px; }
 .form-group { margin-bottom:15px; background:#fff; padding:12px; border-radius:8px; }
 .form-group label { display:block; font-size:14px; margin-bottom:6px; color:#333; font-weight:500; }
 .form-group input[type="text"], .form-group input[type="number"], .form-group select, .form-group textarea { width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-size:14px; outline:none; }
-.form-group input[type="color"] { width:50px; height:30px; padding:0; border:none; cursor:pointer; vertical-align:middle; }
 .form-group input[type="file"] { font-size:13px; margin-top:5px; }
+.color-picker-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; cursor:pointer; }
+.color-picker-row:last-child { border-bottom:none; }
+.color-circles { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.color-circle { width:30px; height:30px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
+.color-circle.active { border-color: #333; }
+
 .context-menu { position:fixed; background:#fff; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,0.2); z-index:1000; display:none; flex-direction:column; min-width:100px; }
 .context-menu div { padding:10px 15px; font-size:14px; cursor:pointer; border-bottom:1px solid #f0f0f0; text-align:center; }
 .context-menu div:last-child { border-bottom:none; }
 .context-menu div:active { background:#f0f0f0; }
 .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:none; justify-content:center; align-items:center; }
-.modal { background:#fff; width:90%; max-width:400px; border-radius:12px; padding:20px; max-height:80vh; overflow-y:auto; }
+.modal { background:#fff; width:90%; max-width:400px; border-radius:12px; padding:20px; max-height:80vh; overflow-y:auto; position:relative; }
 .modal h3 { margin-bottom:15px; font-size:18px; text-align:center; }
+.close-btn { position:absolute; right:15px; top:15px; font-size:24px; color:#999; cursor:pointer; line-height:1; }
 .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); color:#fff; padding:12px 24px; border-radius:8px; font-size:14px; z-index:3000; display:none; text-align:center; }
 .empty { text-align:center; color:#999; padding:40px 20px; font-size:14px; }
+
+/* 通话悬浮小窗 */
+.call-window { position:fixed; background:#333; color:#fff; border-radius:16px; padding:15px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:5000; display:none; flex-direction:column; align-items:center; justify-content:center; resize:both; overflow:auto; min-width:120px; min-height:180px; }
+.call-window img { width:50px; height:50px; border-radius:50%; margin-bottom:10px; object-fit:cover; }
+.call-window .hangup { background:#ff3b30; border:none; color:#fff; padding:5px 15px; border-radius:20px; margin-top:10px; cursor:pointer; font-size:12px; }
+
+/* 每日挂件 */
+.widget { background:linear-gradient(135deg, #D4E0D9 0%, #F2EBE5 100%); border-radius:16px; padding:16px; color:#4A4A4A; margin-bottom:20px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
 </style>
 </head>
+```### 【第 2 段】紧接上一段，粘贴到下方（body 主体结构第一部分）：
+```html
 <body>
 <div id="app">
 
@@ -110,29 +132,27 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
     <div class="home-container">
       <!-- 第一页 -->
       <div class="home-page">
-        <!-- 每日打卡挂件 -->
-        <div class="widget" onclick="showDailyWidget()">
-          <div class="widget-title">GOOD MORNING</div>
-          <div class="widget-content" id="widget-date">2026 · 九月十七日</div>
-          <div class="widget-sub" id="widget-status">今天也要元气满满，我在这里陪着你 ✦</div>
+        <div class="widget" onclick="showToast('今日签：' + getRandomCardFromPool('status'))">
+          <div class="widget-title">每日一语</div>
+          <div class="widget-content" id="widget-text">加载中...</div>
         </div>
 
         <div class="icon-grid">
           <div class="app-icon" onclick="openChatList()">
-            <div class="icon-box">💬</div>
+            <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>
             <div class="icon-label">聊天</div>
             <div class="badge" id="badge-chat" style="display:none;">1</div>
           </div>
           <div class="app-icon" onclick="openFeature('占卜')">
-            <div class="icon-box">🔮</div>
+            <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg></div>
             <div class="icon-label">占卜</div>
           </div>
           <div class="app-icon" onclick="openFeature('写信')">
-            <div class="icon-box">✉️</div>
+            <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
             <div class="icon-label">写信</div>
           </div>
           <div class="app-icon" onclick="openFeature('陪伴')">
-            <div class="icon-box">🧘</div>
+            <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
             <div class="icon-label">陪伴</div>
           </div>
         </div>
@@ -142,7 +162,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
       <div class="home-page">
         <div class="icon-grid" style="margin-top:20px;">
           <div class="app-icon" onclick="openFeature('小游戏')">
-            <div class="icon-box">🎮</div>
+            <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"></path></svg></div>
             <div class="icon-label">小游戏</div>
           </div>
         </div>
@@ -152,87 +172,105 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
     <!-- 桌面底部 Dock -->
     <nav class="dock">
       <div class="dock-icon" onclick="openFeature('外观')">
-        <div class="icon-box">🎨</div>
+        <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg></div>
         <span>外观</span>
       </div>
       <div class="dock-icon" onclick="openFeature('字卡')">
-        <div class="icon-box">📇</div>
+        <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
         <span>字卡</span>
       </div>
       <div class="dock-icon" onclick="openFeature('设置')">
-        <div class="icon-box">⚙️</div>
+        <div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
         <span>设置</span>
       </div>
     </nav>
   </section>
-
   <!-- ================= 会话列表页 ================= -->
-  <section class="page" id="page-sessions">
-    <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
-      消息
-      <button class="nav-btn" onclick="openSessionModal()">+ 新建</button>
-    </header>
-    <div class="scroll-area" id="session-list"></div>
-  </section>
+<section class="page" id="page-sessions">
+  <header class="navbar">
+    <button class="nav-btn left" onclick="switchPage('home')">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面
+    </button>
+    消息
+    <button class="nav-btn" onclick="openSessionModal()">+ 新建</button>
+  </header>
+  <div class="scroll-area" id="session-list"></div>
+</section>
 
-  <!-- ================= 聊天室页 ================= -->
-  <section class="page" id="page-chat">
-    <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('sessions')">←</button>
-      <span id="chat-title">聊天</span>
-      <button class="nav-btn" onclick="openFeature('设置')">⚙️</button>
-    </header>
-    <div class="chat-names-bar">
-      <span id="chat-ta-name">TA</span>
-      <span id="chat-my-name">我</span>
-    </div>
-    <div class="chat-window" id="chat-window"></div>
-    <!-- 输入栏改造 -->
-    <div class="input-bar">
-      <button class="circle-btn" onclick="document.getElementById('chat-img-input').click()">🖼️</button>
-      <input type="file" id="chat-img-input" accept="image/*" hidden onchange="sendLocalImage(event)">
-      <button class="circle-btn" onclick="openEmojiPicker()">😀</button>
-      <button class="circle-btn" onclick="showToast('通话功能开发中')">📹</button>
-      <input type="text" id="chat-input" placeholder="输入消息...">
-      <button class="circle-btn" onclick="openAskModal()">❓</button>
-      <button class="circle-btn send" onclick="sendChat()">✈️</button>
-    </div>
-  </section>
+<!-- ================= 聊天室页 ================= -->
+<section class="page" id="page-chat">
+  <header class="navbar">
+    <button class="nav-btn left" onclick="switchPage('sessions')">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    </button>
+    <span id="chat-title">聊天</span>
+    <button class="nav-btn" onclick="openFeature('设置')">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+  </header>
+  <div class="chat-names-bar">
+    <span id="chat-ta-name">TA</span>
+    <span id="chat-my-name">我</span>
+  </div>
+  <div class="chat-window" id="chat-window"></div>
+  <div class="input-bar">
+    <button class="circle-btn" onclick="document.getElementById('chat-img-input').click()">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+    </button>
+    <input type="file" id="chat-img-input" accept="image/*" hidden onchange="sendLocalImage(event)">
+    <button class="circle-btn" onclick="openEmojiPicker()">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+    </button>
+    <button class="circle-btn" onclick="startCall()">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+    </button>
+    <input type="text" id="chat-input" placeholder="输入消息...">
+    <button class="circle-btn" onclick="openAskModal()">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+    </button>
+    <button class="circle-btn send" onclick="sendChat()">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </div>
+</section>
 
-  <!-- ================= 功能占位页（占卜/写信/陪伴/外观/字卡/设置/小游戏） ================= -->
-  <section class="page" id="page-feature">
-    <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
-      <span id="feature-title">功能</span>
-    </header>
-    <div class="scroll-area" id="feature-content" style="display:flex; justify-content:center; align-items:center; height:100%;">
-      <div class="empty">功能开发中，敬请期待...</div>
-    </div>
-  </section>
+<!-- ================= 功能占位页（占卜/写信/陪伴/外观/字卡/设置/小游戏） ================= -->
+<section class="page" id="page-feature">
+  <header class="navbar">
+    <button class="nav-btn left" onclick="switchPage('home')">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面
+    </button>
+    <span id="feature-title">功能</span>
+  </header>
+  <div class="scroll-area" id="feature-content" style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; padding:20px;">
+  </div>
+</section>
 
-  <!-- ================= 字卡库页（保留基础功能，待下一批升级） ================= -->
-  <section class="page" id="page-cards">
-    <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
-      字卡库
-      <button class="nav-btn" onclick="openCardGroupModal()">+ 分组</button>
-    </header>
-    <div class="scroll-area">
-      <div style="margin-bottom:10px; display:flex; gap:5px;">
-        <button class="btn-primary" style="flex:1;" onclick="openCardModal()">添加字卡</button>
-        <button class="btn-primary" style="flex:1; background:#333;" onclick="exportData()">导出备份</button>
-        <button class="btn-primary" style="flex:1; background:#333;" onclick="document.getElementById('import-file').click()">导入备份</button>
-        <input type="file" id="import-file" accept=".json" hidden onchange="importData(event)">
-      </div>
-      <div id="card-group-list"></div>
+<!-- ================= 字卡库页 ================= -->
+<section class="page" id="page-cards">
+  <header class="navbar">
+    <button class="nav-btn left" onclick="switchPage('home')">
+      <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面
+    </button>
+    字卡库
+    <button class="nav-btn" onclick="openCardGroupModal()">+ 分组</button>
+  </header>
+  <div class="scroll-area">
+    <div style="margin-bottom:10px; display:flex; gap:5px;">
+      <button class="btn-primary" style="flex:1;" onclick="openCardModal()">添加字卡</button>
+      <button class="btn-primary" style="flex:1; background:#333;" onclick="exportData()">导出全量备份</button>
+      <button class="btn-primary" style="flex:1; background:#333;" onclick="document.getElementById('import-file').click()">导入数据</button>
+      <input type="file" id="import-file" accept=".json" hidden onchange="importData(event)">
     </div>
-  </section>
-
+    <div id="card-group-list"></div>
+  </div>
+</section>
   <!-- ================= 表情包库页 ================= -->
   <section class="page" id="page-emojis">
     <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      <button class="nav-btn left" onclick="switchPage('home')">
+        <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面
+      </button>
       表情包库
       <button class="nav-btn" onclick="openEmojiModal()">+ 添加</button>
     </header>
@@ -244,7 +282,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
   <!-- ================= 设置页（集中管理） ================= -->
   <section class="page" id="page-settings">
     <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      <button class="nav-btn left" onclick="switchPage('home')">
+        <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面
+      </button>
       设置
     </header>
     <div class="scroll-area">
@@ -270,35 +310,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
         </div>
       </div>
       <div class="form-group">
-        <label>主题颜色设置</label>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span>聊天背景：</span>
-          <input type="color" id="set-bg-color" value="#f2f2f7">
+        <label>主题颜色设置（点击选择）</label>
+        <div class="color-picker-row" onclick="openColorPicker('bgColor', '背景颜色')">
+          <span>聊天/桌面背景色</span>
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--bg-color); border:1px solid #ddd;"></div>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span>我的气泡：</span>
-          <input type="color" id="set-my-bubble" value="#95ec69">
+        <div class="color-picker-row" onclick="openColorPicker('myBubble', '我的气泡')">
+          <span>我的气泡颜色</span>
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--my-bubble); border:1px solid #ddd;"></div>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span>TA 的气泡：</span>
-          <input type="color" id="set-ta-bubble" value="#ffffff">
+        <div class="color-picker-row" onclick="openColorPicker('taBubble', 'TA的气泡')">
+          <span>TA 的气泡颜色</span>
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--ta-bubble); border:1px solid #ddd;"></div>
         </div>
       </div>
       <button class="btn-primary" onclick="saveSettings()">保存设置</button>
-    </div>
-  </section>
-
-  <!-- ================= 收藏夹页 ================= -->
-  <section class="page" id="page-favorites">
-    <header class="navbar">
-      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
-      收藏夹
-    </header>
-    <div class="scroll-area">
-      <h4 style="margin-bottom:10px;font-size:15px;">我收藏 TA 的</h4>
-      <div id="fav-my-list"></div>
-      <h4 style="margin:15px 0 10px;font-size:15px;">TA 收藏我的</h4>
-      <div id="fav-ta-list"></div>
     </div>
   </section>
 
@@ -313,9 +339,16 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 <div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
 <div class="toast" id="toast"></div>
 
+<!-- 通话悬浮窗 -->
+<div class="call-window" id="call-window">
+  <img id="call-avatar" src="" alt="">
+  <div id="call-name" style="font-size:14px; font-weight:bold;">对方</div>
+  <div id="call-timer" style="font-size:12px; margin-top:5px;">00:00</div>
+  <button class="hangup" onclick="endCall()">挂断</button>
+</div>
 <script>
 /* =====================================================================
-   IndexedDB 初始化与基础工具（保持不变，修复部分逻辑）
+   IndexedDB 初始化与基础工具
    ===================================================================== */
 let db;
 const DB_NAME = 'AuroraChatDB';
@@ -351,10 +384,13 @@ function dbPut(storeName, data) { return new Promise((resolve) => { const tx = d
 function dbDelete(storeName, id) { return new Promise((resolve) => { const tx = db.transaction(storeName, 'readwrite'); const req = tx.objectStore(storeName).delete(id); req.onsuccess = () => resolve(); }); }
 function dbGetByIndex(storeName, indexName, value) { return new Promise((resolve) => { const tx = db.transaction(storeName, 'readonly'); const index = tx.objectStore(storeName).index(indexName); const req = index.getAll(value); req.onsuccess = () => resolve(req.result || []); }); }
 
-let settings = { myName: '我', myAvatar: '', probQuote: 20, probFav: 10, probEmoji: 30, bgColor: '#f2f2f7', myBubble: '#95ec69', taBubble: '#ffffff', bgImage: '' };
+// 全局状态 (包含兜底默认值，修复 undefined 和黑色背景)
+const DEFAULT_SETTINGS = { myName: '我', myAvatar: '', probQuote: 20, probFav: 10, probEmoji: 30, bgColor: '#F7F6F2', myBubble: '#A3B1A6', taBubble: '#FFFFFF', bgImage: '' };
+let settings = { ...DEFAULT_SETTINGS };
 let sessions = []; let currentSessionId = null; let currentSession = null;
 let chatMessages = []; let cardGroups = []; let cards = []; let emojis = []; let favorites = []; let lastReply = '';
 let longPressTimer = null; let ctxTargetMsg = null;
+let callTimerInterval = null; let callSeconds = 0;
 
 const $ = id => document.getElementById(id);
 const randomPick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -382,34 +418,28 @@ function openFeature(name) {
   switchPage('home');
   if (name === '字卡') { switchPage('cards'); renderCardGroups(); return; }
   if (name === '设置') { switchPage('settings'); loadSettingsUI(); return; }
-  if (name === '外观') { showToast('外观设置在设置里哦'); return; }
+  if (name === '外观') { switchPage('settings'); loadSettingsUI(); return; }
   
-  // 对于占卜、写信、陪伴、小游戏，进入占位页面
+  // 处理占卜、写信、陪伴、小游戏
   $('feature-title').textContent = name;
   let content = '';
   if (name === '陪伴') {
-    content = `<div style="text-align:center; width:100%;">
-      <h3 style="font-size:20px; margin-bottom:20px;">静音陪伴</h3>
-      <p style="color:#666; margin-bottom:30px;">选择一种模式，让你我安静地待一会儿</p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:30px;">
-        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始睡觉陪伴')">😴 睡觉</button>
-        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始学习陪伴')">📚 学习</button>
-        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始专注陪伴')">🎯 专注</button>
-        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始冥想陪伴')">🧘 冥想</button>
-      </div>
-      <div style="font-size:48px; font-family:monospace; margin-bottom:20px;" id="companion-timer">00:00:00</div>
-      <button class="btn-primary" style="background:#ff3b30; width:auto; padding:10px 30px;" onclick="showToast('陪伴已结束')">结束陪伴</button>
-    </div>`;
+    content = `<h3 style="margin-bottom:20px;">静音陪伴</h3>
+      <p style="color:#666; margin-bottom:20px; font-size:14px;">选择一种模式，让你我安静地待一会儿</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; width:100%; max-width:300px;">
+        <button class="btn-primary" onclick="startCompanion('睡觉')">睡觉</button>
+        <button class="btn-primary" onclick="startCompanion('学习')">学习</button>
+        <button class="btn-primary" onclick="startCompanion('专注')">专注</button>
+        <button class="btn-primary" onclick="startCompanion('冥想')">冥想</button>
+      </div>`;
   } else if (name === '占卜') {
-    content = `<div style="text-align:center; width:100%;">
-      <h3 style="font-size:20px; margin-bottom:20px;">🔮 塔罗占卜</h3>
+    content = `<h3 style="font-size:20px; margin-bottom:20px;">🔮 塔罗占卜</h3>
       <input type="text" id="divine-question" placeholder="输入你的问题..." style="width:80%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:20px;">
-      <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('单张占卜功能开发中')">单张占卜</button>
-        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('三张占卜功能开发中')">三张占卜</button>
+      <div style="display:flex; gap:15px; justify-content:center; margin-bottom:20px;">
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="doDivine(1)">单张占卜</button>
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="doDivine(3)">三张占卜</button>
       </div>
-      <div class="empty">结果将在这里以卡片形式展示</div>
-    </div>`;
+      <div id="divine-result" style="display:flex; flex-direction:column; gap:15px; width:100%; align-items:center;"></div>`;
   } else {
     content = `<div class="empty">「${name}」板块正在开发中，敬请期待！</div>`;
   }
@@ -417,12 +447,15 @@ function openFeature(name) {
   switchPage('feature');
 }
 
-// 模拟每日打卡挂件点击
-function showDailyWidget() {
-  showToast('今日天气：花香四溢 | 状态：你有没有想我');
+// 获取指定分组的随机字卡（用于状态栏挂件）
+function getRandomCardFromPool(type) {
+  if (type === 'status') {
+    const pool = cards.length ? cards : [{ text: '今天也要加油哦' }];
+    return randomPick(pool).text;
+  }
+  return '今天也要加油哦';
 }
-
-/* =====================================================================
+ /* =====================================================================
    会话列表管理（修复删除功能）
    ===================================================================== */
 async function loadSessions() {
@@ -468,7 +501,7 @@ async function enterChat(session) {
 }
 
 function openSessionModal() {
-  openModal(`<h3>新建聊天窗口</h3><div class="form-group"><label>TA 的昵称</label><input type="text" id="new-session-name" placeholder="例如：小红"></div><div class="form-group"><label>TA 的头像（可选）</label><input type="file" id="new-session-avatar" accept="image/*"></div><div class="form-group"><label>绑定字卡分组（可多选）</label><div id="new-session-groups" style="max-height:150px;overflow-y:auto;"></div></div><button class="btn-primary" onclick="createSession()">创建</button>`);
+  openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>新建聊天窗口</h3><div class="form-group"><label>TA 的昵称</label><input type="text" id="new-session-name" placeholder="例如：小红"></div><div class="form-group"><label>TA 的头像（可选）</label><input type="file" id="new-session-avatar" accept="image/*"></div><div class="form-group"><label>绑定字卡分组（可多选）</label><div id="new-session-groups" style="max-height:150px;overflow-y:auto;"></div></div><button class="btn-primary" onclick="createSession()">创建</button>`);
   const groupDiv = $('new-session-groups'); cardGroups.forEach(g => { const label = document.createElement('label'); label.style.display = 'block'; label.style.marginBottom = '5px'; label.innerHTML = `<input type="checkbox" value="${g.id}" style="width:auto;margin-right:5px;"> ${escapeHtml(g.name)}`; groupDiv.appendChild(label); });
 }
 
@@ -526,13 +559,11 @@ async function sendChat() {
     appendBubble(replyText, 'bot', quote, emoji);
   }, delay);
 }
-
-// 新增：发送本地图片
+  // 发送本地图片
 function sendLocalImage(event) {
   const file = event.target.files[0]; if (!file) return;
   readFileAsBase64(file).then(base64 => {
-    appendBubble('', 'user', null, base64); // 图片作为 emoji 附加发送
-    // 触发对方回复
+    appendBubble('', 'user', null, base64); 
     setTimeout(() => {
       let pool = cards; if (pool.length === 0) return;
       const replyText = randomPick(pool).text;
@@ -542,10 +573,9 @@ function sendLocalImage(event) {
   event.target.value = '';
 }
 
-// 新增：打开表情包选择器
+// 打开表情包选择器
 function openEmojiPicker() {
   if (emojis.length === 0) return showToast('表情库是空的，去添加吧');
-  // 简单用 prompt 选一个
   const list = emojis.map((e, i) => `${i+1}. ${e.type === 'image' ? '[图片]' : e.content}`).join('\n');
   const choice = prompt(`选择表情编号 (1-${emojis.length}):\n${list}`);
   if (!choice) return;
@@ -553,7 +583,6 @@ function openEmojiPicker() {
   if (isNaN(index) || index < 0 || index >= emojis.length) return showToast('选择无效');
   const emoji = emojis[index].content;
   appendBubble('', 'user', null, emoji);
-  // 触发对方回复
   setTimeout(() => {
     if (cards.length === 0) return;
     const replyText = randomPick(cards).text;
@@ -561,9 +590,10 @@ function openEmojiPicker() {
   }, 800 + Math.random() * 1000);
 }
 
-// 新增：提问按钮逻辑
+// 提问按钮逻辑
 function openAskModal() {
   openModal(`
+    <div class="close-btn" onclick="closeModal()">×</div>
     <h3>向 TA 提问</h3>
     <div class="form-group">
       <label>你的问题</label>
@@ -582,7 +612,6 @@ async function submitAsk() {
   const optionsRaw = $('ask-options').value.trim();
   if (!question) return showToast('请输入问题');
   closeModal();
-  // 显示提问气泡
   appendBubble(question, 'user', null, null);
   showTyping();
   setTimeout(async () => {
@@ -601,7 +630,7 @@ async function submitAsk() {
 }
 
 /* =====================================================================
-   长按菜单、字卡管理、表情管理、设置保存（修复头像保存）
+   长按菜单、字卡管理、表情管理、设置保存
    ===================================================================== */
 function showContextMenu(x, y, text, sender) {
   const menu = $('context-menu'); menu.style.display = 'flex'; menu.style.left = Math.min(x, window.innerWidth - 100) + 'px'; menu.style.top = Math.min(y, window.innerHeight - 150) + 'px'; ctxTargetMsg = { text, sender };
@@ -623,7 +652,7 @@ async function renderFavorites() {
   if (taList.innerHTML === '') taList.innerHTML = '<div class="empty">TA 还没有收藏你的消息</div>';
 }
 
-// 字卡管理（保留基础功能，导入导出待升级）
+// 字卡管理
 async function loadCardData() {
   cardGroups = await dbGetAll('cardGroups'); cards = await dbGetAll('cards');
   if (cardGroups.length === 0) { const gid = await dbAdd('cardGroups', { name: '默认分组' }); cardGroups.push({ id: gid, name: '默认分组' }); }
@@ -638,12 +667,12 @@ async function renderCardGroups() {
     container.appendChild(groupDiv);
   });
 }
-function openCardGroupModal() { openModal(`<h3>新建字卡分组</h3><div class="form-group"><label>分组名称</label><input type="text" id="new-group-name" placeholder="例如：日常、安慰、傲娇"></div><button class="btn-primary" onclick="createCardGroup()">创建</button>`); }
+function openCardGroupModal() { openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>新建字卡分组</h3><div class="form-group"><label>分组名称</label><input type="text" id="new-group-name" placeholder="例如：日常、安慰、傲娇"></div><button class="btn-primary" onclick="createCardGroup()">创建</button>`); }
 async function createCardGroup() { const name = $('new-group-name').value.trim(); if (!name) return showToast('请输入名称'); await dbAdd('cardGroups', { name }); closeModal(); renderCardGroups(); showToast('分组创建成功'); }
 async function deleteGroup(id) { if (!confirm('确定删除分组？该分组下的字卡也会被删除。')) return; await dbDelete('cardGroups', id); const toDelete = cards.filter(c => c.groupId === id); for (const c of toDelete) await dbDelete('cards', c.id); renderCardGroups(); }
-function openCardModal() { openModal(`<h3>添加字卡</h3><div class="form-group"><label>所属分组</label><select id="new-card-group">${cardGroups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('')}</select></div><div class="form-group"><label>字卡内容（多个字卡请用换行分隔，批量导入）</label><textarea id="new-card-text" rows="5" placeholder="输入一句话..."></textarea></div><button class="btn-primary" onclick="createCard()">保存</button>`); }
+function openCardModal() { openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>添加字卡</h3><div class="form-group"><label>所属分组</label><select id="new-card-group">${cardGroups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('')}</select></div><div class="form-group"><label>字卡内容（多个字卡请用换行分隔，批量导入）</label><textarea id="new-card-text" rows="5" placeholder="输入一句话..."></textarea></div><button class="btn-primary" onclick="createCard()">保存</button>`); }
 async function createCard() { const groupId = parseInt($('new-card-group').value); const text = $('new-card-text').value.trim(); if (!text) return showToast('请输入内容'); const lines = text.split('\n').filter(l => l.trim()); for (const line of lines) await dbAdd('cards', { groupId, text: line.trim() }); closeModal(); renderCardGroups(); showToast(`成功添加 ${lines.length} 张字卡`); }
-async function editCard(id) { const card = cards.find(c => c.id === id); if (!card) return; openModal(`<h3>编辑字卡</h3><div class="form-group"><label>内容</label><input type="text" id="edit-card-text" value="${escapeHtml(card.text)}"></div><button class="btn-primary" onclick="saveEditCard(${id})">保存</button>`); }
+async function editCard(id) { const card = cards.find(c => c.id === id); if (!card) return; openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>编辑字卡</h3><div class="form-group"><label>内容</label><input type="text" id="edit-card-text" value="${escapeHtml(card.text)}"></div><button class="btn-primary" onclick="saveEditCard(${id})">保存</button>`); }
 async function saveEditCard(id) { const text = $('edit-card-text').value.trim(); if (!text) return; const card = cards.find(c => c.id === id); card.text = text; await dbPut('cards', card); closeModal(); renderCardGroups(); }
 async function deleteCard(id) { if (!confirm('确定删除这张字卡？')) return; await dbDelete('cards', id); renderCardGroups(); }
 
@@ -656,28 +685,42 @@ async function renderEmojis() {
   await loadEmojiData(); const list = $('emoji-list'); list.innerHTML = '';
   emojis.forEach(e => { const div = document.createElement('div'); div.className = 'emoji-item'; let display = e.type === 'image' ? `<img src="${e.content}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">` : escapeHtml(e.content); div.innerHTML = `<div class="content">${display}</div><div class="item-actions"><button onclick="deleteEmoji(${e.id})">删除</button></div>`; list.appendChild(div); });
 }
-function openEmojiModal() { openModal(`<h3>添加表情</h3><div class="form-group"><label>文本表情（Emoji / 颜文字）</label><input type="text" id="new-emoji-text" placeholder="例如：😀 (≧▽≦)"></div><div class="form-group"><label>或者上传图片（建议小图）</label><input type="file" id="new-emoji-img" accept="image/*"></div><button class="btn-primary" onclick="createEmoji()">保存</button>`); }
+function openEmojiModal() { openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>添加表情</h3><div class="form-group"><label>文本表情（Emoji / 颜文字）</label><input type="text" id="new-emoji-text" placeholder="例如：😀 (≧▽≦)"></div><div class="form-group"><label>或者上传图片（建议小图）</label><input type="file" id="new-emoji-img" accept="image/*"></div><button class="btn-primary" onclick="createEmoji()">保存</button>`); }
 async function createEmoji() { const text = $('new-emoji-text').value.trim(); const file = $('new-emoji-img').files[0]; if (file) { const base64 = await readFileAsBase64(file); await dbAdd('emojis', { type: 'image', content: base64 }); } else if (text) { await dbAdd('emojis', { type: 'text', content: text }); } else { return showToast('请输入文本或选择图片'); } closeModal(); renderEmojis(); showToast('表情添加成功'); }
 async function deleteEmoji(id) { if (!confirm('删除这个表情？')) return; await dbDelete('emojis', id); renderEmojis(); }
 
-// 设置（修复头像保存）
-function loadSettingsUI() { $('set-my-name').value = settings.myName; $('set-prob-quote').value = settings.probQuote; $('set-prob-fav').value = settings.probFav; $('set-prob-emoji').value = settings.probEmoji; $('set-bg-color').value = settings.bgColor; $('set-my-bubble').value = settings.myBubble; $('set-ta-bubble').value = settings.taBubble; }
+// 颜色圆圈选择器
+function openColorPicker(key, title) {
+  const colors = ['#F7F6F2', '#D4E0D9', '#F2EBE5', '#FFFFFF', '#A3B1A6', '#C9B4B0', '#95ec69', '#FFD3B6', '#FFAAA5', '#FF8B94', '#D4A5A5', '#A8E6CF', '#DCEDC1'];
+  let html = `<div class="close-btn" onclick="closeModal()">×</div><h3>选择${title}</h3><div class="color-circles" style="justify-content:center;">`;
+  colors.forEach(c => { html += `<div class="color-circle" style="background:${c};" onclick="applyColor('${key}', '${c}')"></div>`; });
+  html += `</div>`;
+  openModal(html);
+}
+
+function applyColor(key, color) {
+  settings[key] = color;
+  const root = document.documentElement;
+  if (key === 'bgColor') { root.style.setProperty('--bg-color', color); }
+  if (key === 'myBubble') { root.style.setProperty('--my-bubble', color); }
+  if (key === 'taBubble') { root.style.setProperty('--ta-bubble', color); }
+  closeModal();
+  showToast('颜色已更新，记得点保存哦');
+}
+
+// 设置
+function loadSettingsUI() { $('set-my-name').value = settings.myName; $('set-prob-quote').value = settings.probQuote; $('set-prob-fav').value = settings.probFav; $('set-prob-emoji').value = settings.probEmoji; }
 async function saveSettings() {
-  settings.myName = $('set-my-name').value.trim() || '我'; settings.probQuote = parseInt($('set-prob-quote').value) || 0; settings.probFav = parseInt($('set-prob-fav').value) || 0; settings.probEmoji = parseInt($('set-prob-emoji').value) || 0; settings.bgColor = $('set-bg-color').value; settings.myBubble = $('set-my-bubble').value; settings.taBubble = $('set-ta-bubble').value;
-  const avatarFile = $('set-my-avatar').files[0]; 
-  if (avatarFile) settings.myAvatar = await readFileAsBase64(avatarFile); // 修复头像读取
-  const bgImgFile = $('set-bg-img') ? $('set-bg-img').files[0] : null; if (bgImgFile) settings.bgImage = await readFileAsBase64(bgImgFile);
+  settings.myName = $('set-my-name').value.trim() || '我'; settings.probQuote = parseInt($('set-prob-quote').value) || 0; settings.probFav = parseInt($('set-prob-fav').value) || 0; settings.probEmoji = parseInt($('set-prob-emoji').value) || 0;
+  const avatarFile = $('set-my-avatar').files[0]; if (avatarFile) settings.myAvatar = await readFileAsBase64(avatarFile);
   for (const [key, value] of Object.entries(settings)) await dbPut('settings', { key, value });
   document.documentElement.style.setProperty('--bg-color', settings.bgColor); document.documentElement.style.setProperty('--my-bubble', settings.myBubble); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
-  if (settings.bgImage) { document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`; document.getElementById('app').style.backgroundSize = 'cover'; } else document.getElementById('app').style.backgroundImage = 'none';
   if ($('chat-my-name')) $('chat-my-name').textContent = settings.myName;
-  // 重新渲染聊天以更新头像
   if (currentSession) renderChat();
   showToast('设置已保存');
   setTimeout(() => switchPage('home'), 500);
 }
-
-// 导入导出
+  // 导入导出
 async function exportData() {
   const data = { settings: await dbGetAll('settings'), sessions: await dbGetAll('sessions'), messages: await dbGetAll('messages'), cardGroups: await dbGetAll('cardGroups'), cards: await dbGetAll('cards'), emojis: await dbGetAll('emojis'), favorites: await dbGetAll('favorites') };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `aurora_backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); showToast('数据已导出');
@@ -687,27 +730,187 @@ async function importData(event) {
   const reader = new FileReader();
   reader.onload = async (e) => {
     try {
-      const data = JSON.parse(e.target.result); if (!confirm('导入将覆盖当前所有数据，确定吗？')) return;
-      for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).clear(); }
-      for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) { if (data[store]) for (const item of data[store]) await dbAdd(store, item); }
-      settings = {}; for (const item of await dbGetAll('settings')) settings[item.key] = item.value; await loadSessions(); await loadCardData(); await loadEmojiData();
-      document.documentElement.style.setProperty('--bg-color', settings.bgColor || '#f2f2f7'); document.documentElement.style.setProperty('--my-bubble', settings.myBubble || '#95ec69'); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble || '#ffffff');
-      if (settings.bgImage) { document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`; document.getElementById('app').style.backgroundSize = 'cover'; }
-      showToast('导入成功，数据已恢复'); switchPage('home');
+      const data = JSON.parse(e.target.result);
+      if (data.cards && data.cardGroups) {
+        if (!confirm('导入将覆盖当前所有数据，确定吗？')) return;
+        for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).clear(); }
+        for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) { if (data[store]) for (const item of data[store]) await dbAdd(store, item); }
+        settings = {}; for (const item of await dbGetAll('settings')) settings[item.key] = item.value; await loadSessions(); await loadCardData(); await loadEmojiData();
+        document.documentElement.style.setProperty('--bg-color', settings.bgColor || '#F7F6F2'); document.documentElement.style.setProperty('--my-bubble', settings.myBubble || '#A3B1A6'); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble || '#FFFFFF');
+        showToast('导入成功'); switchPage('home');
+      } else {
+        showToast('文件格式不正确');
+      }
     } catch (err) { showToast('导入失败：文件格式错误'); console.error(err); }
   };
   reader.readAsText(file); event.target.value = '';
 }
 
-// 启动
+/* =====================================================================
+   陪伴功能、占卜功能、通话功能
+   ===================================================================== */
+let companionTimer = null;
+let companionMsgTimer = null;
+
+function startCompanion(type) {
+  openModal(`
+    <div style="text-align:center; padding:10px;">
+      <h3 style="margin-bottom:20px;">${type}陪伴中</h3>
+      <div style="font-size:48px; font-family:monospace; margin-bottom:20px;" id="companion-timer">00:00:00</div>
+      <div id="companion-barrage" style="height:150px; overflow:hidden; position:relative; background:#f5f5f5; border-radius:8px; margin-bottom:20px; text-align:left; padding:10px; display:flex; flex-direction:column; justify-content:flex-end;"></div>
+      <button class="btn-primary" style="background:#ff3b30; width:auto; padding:10px 30px; float:right;" onclick="endCompanion()">结束陪伴</button>
+      <div style="clear:both;"></div>
+    </div>
+  `);
+  
+  let seconds = 0;
+  companionTimer = setInterval(() => {
+    seconds++;
+    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    if ($('companion-timer')) $('companion-timer').textContent = `${h}:${m}:${s}`;
+  }, 1000);
+
+  const addBarrage = () => {
+    const text = getRandomCardFromPool('chat');
+    const div = document.createElement('div');
+    div.style.cssText = 'font-size:12px; color:#666; margin-bottom:4px; animation: fadeIn 0.5s;';
+    div.textContent = `> ${text}`;
+    if ($('companion-barrage')) {
+      $('companion-barrage').appendChild(div);
+      $('companion-barrage').scrollTop = $('companion-barrage').scrollHeight;
+    }
+  };
+  addBarrage(); 
+  companionMsgTimer = setInterval(addBarrage, 2 * 60 * 1000); 
+}
+
+function endCompanion() {
+  clearInterval(companionTimer);
+  clearInterval(companionMsgTimer);
+  closeModal();
+  showToast('陪伴结束');
+}
+
+// 塔罗牌占卜逻辑（78张牌）
+const TAROT_DECK = [
+  '愚者', '魔术师', '女祭司', '女皇', '皇帝', '教皇', '恋人', '战车', '力量', '隐士', '命运之轮', '正义', '倒吊人', '死神', '节制', '恶魔', '高塔', '星星', '月亮', '太阳', '审判', '世界',
+  '权杖 Ace', '权杖 2', '权杖 3', '权杖 4', '权杖 5', '权杖 6', '权杖 7', '权杖 8', '权杖 9', '权杖 10', '权杖 侍从', '权杖 骑士', '权杖 王后', '权杖 国王',
+  '圣杯 Ace', '圣杯 2', '圣杯 3', '圣杯 4', '圣杯 5', '圣杯 6', '圣杯 7', '圣杯 8', '圣杯 9', '圣杯 10', '圣杯 侍从', '圣杯 骑士', '圣杯 王后', '圣杯 国王',
+  '宝剑 Ace', '宝剑 2', '宝剑 3', '宝剑 4', '宝剑 5', '宝剑 6', '宝剑 7', '宝剑 8', '宝剑 9', '宝剑 10', '宝剑 侍从', '宝剑 骑士', '宝剑 王后', '宝剑 国王',
+  '星币 Ace', '星币 2', '星币 3', '星币 4', '星币 5', '星币 6', '星币 7', '星币 8', '星币 9', '星币 10', '星币 侍从', '星币 骑士', '星币 王后', '星币 国王'
+];
+
+function doDivine(count) {
+  const question = $('divine-question').value.trim();
+  if (!question) return showToast('请先输入你的问题');
+  const resultDiv = $('divine-result');
+  resultDiv.innerHTML = '';
+  
+  for (let i = 0; i < count; i++) {
+    const card = randomPick(TAROT_DECK);
+    const isUpright = Math.random() < 0.5;
+    const position = isUpright ? '正位' : '逆位';
+    
+    const cardDiv = document.createElement('div');
+    cardDiv.style.cssText = 'width:120px; height:180px; border-radius:12px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px; border:1px solid #eee;';
+    cardDiv.innerHTML = `<div style="font-size:16px; font-weight:bold; text-align:center; margin-bottom:10px;">${card}</div><div style="font-size:12px; color:${isUpright ? '#4A4A4A' : '#C9B4B0'};">${position}</div>`;
+    resultDiv.appendChild(cardDiv);
+  }
+}
+
+// 通话功能
+let callWindowEl, callTimerEl, callNameEl, callAvatarEl;
+
+function startCall() {
+  if (!currentSession) return showToast('请先进入聊天');
+  if (Math.random() < 0.5) {
+    showToast('对方已拒绝');
+    return;
+  }
+  showCallWindow(false); 
+}
+
+function showCallWindow(isIncoming) {
+  callWindowEl = $('call-window');
+  callTimerEl = $('call-timer');
+  callNameEl = $('call-name');
+  callAvatarEl = $('call-avatar');
+  
+  callNameEl.textContent = currentSession.name;
+  if (currentSession.avatar && currentSession.avatar.startsWith('data:image')) {
+    callAvatarEl.src = currentSession.avatar;
+  } else {
+    callAvatarEl.src = ''; 
+  }
+  
+  callWindowEl.style.display = 'flex';
+  callWindowEl.style.left = '20px';
+  callWindowEl.style.top = '80px';
+  callSeconds = 0;
+  callTimerEl.textContent = '00:00';
+  
+  if (callTimerInterval) clearInterval(callTimerInterval);
+  callTimerInterval = setInterval(() => {
+    callSeconds++;
+    const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+    const s = String(callSeconds % 60).padStart(2, '0');
+    if (callTimerEl) callTimerEl.textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function endCall() {
+  clearInterval(callTimerInterval);
+  callTimerInterval = null;
+  if (callWindowEl) callWindowEl.style.display = 'none';
+}
+
+// 模拟对方主动来电
+setInterval(() => {
+  if (Math.random() < 0.1) { 
+    if (currentSession && !callTimerInterval) {
+      // 可以在这里补充真正的来电弹窗逻辑
+    }
+  }
+}, 20 * 60 * 1000); 
+
+// 聊天主动发消息
+setInterval(() => {
+  if (currentSession && !document.getElementById('page-chat').classList.contains('active')) {
+    if (Math.random() < 0.2) { 
+      const pool = cards.length ? cards : [{ text: '在干嘛呢？' }];
+      const msg = randomPick(pool).text;
+      dbAdd('messages', { sessionId: currentSessionId, text: msg, sender: 'bot', time: Date.now() });
+      chatMessages.push({ text: msg, sender: 'bot', time: Date.now() });
+      showToast(`📩 ${currentSession.name}: ${msg}`);
+      const badge = $('badge-chat');
+      if (badge) badge.style.display = 'block';
+    }
+  }
+}, 5 * 60 * 1000); 
+
+/* =====================================================================
+   启动
+   ===================================================================== */
 async function initApp() {
   await initDB();
-  const savedSettings = await dbGetAll('settings'); savedSettings.forEach(s => { settings[s.key] = s.value; });
-  document.documentElement.style.setProperty('--bg-color', settings.bgColor); document.documentElement.style.setProperty('--my-bubble', settings.myBubble); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
-  if (settings.bgImage) { document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`; document.getElementById('app').style.backgroundSize = 'cover'; }
+  
+  const savedSettings = await dbGetAll('settings');
+  const loaded = {};
+  savedSettings.forEach(s => { loaded[s.key] = s.value; });
+  settings = { ...DEFAULT_SETTINGS, ...loaded };
+
+  document.documentElement.style.setProperty('--bg-color', settings.bgColor);
+  document.documentElement.style.setProperty('--my-bubble', settings.myBubble);
+  document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
+  
   await loadCardData(); await loadEmojiData(); await loadSessions(); 
   
-  // 默认显示主页面
+  if ($('widget-text')) {
+    $('widget-text').textContent = getRandomCardFromPool('status');
+  }
+  
   switchPage('home');
 }
 window.addEventListener('DOMContentLoaded', initApp);
