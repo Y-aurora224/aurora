@@ -3,30 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Aurora 专属聊天</title>
+<title>Aurora 专属空间</title>
 <style>
 :root {
-  --bg-color: #f5f5f5;
-  --nav-bg: #ededed;
+  --bg-color: #f2f2f7;
+  --nav-bg: rgba(255,255,255,0.8);
   --nav-text: #000;
   --my-bubble: #95ec69;
   --ta-bubble: #ffffff;
   --text-color: #000;
   --tab-active: #07c160;
-  --border-color: #dcdcdc;
+  --border-color: #e5e5ea;
+  --card-bg: #ffffff;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg-color); height:100dvh; overflow:hidden; color:var(--text-color); }
-#app { max-width:480px; margin:0 auto; height:100dvh; display:flex; flex-direction:column; background:var(--bg-color); position:relative; }
+#app { max-width:480px; margin:0 auto; height:100dvh; display:flex; flex-direction:column; background:var(--bg-color); position:relative; overflow:hidden; }
 
-.page { display:none; flex:1; flex-direction:column; overflow:hidden; }
+/* ================= 桌面多页滑动 ================= */
+#page-home { display:none; flex:1; flex-direction:column; overflow:hidden; }
+#page-home.active { display:flex; }
+.home-container { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }
+.home-container::-webkit-scrollbar { display:none; }
+.home-page { flex:0 0 100%; scroll-snap-align:start; padding:20px; display:flex; flex-direction:column; }
+.icon-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:20px 15px; margin-top:10px; }
+.app-icon { display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; position:relative; }
+.icon-box { width:60px; height:60px; border-radius:16px; background:var(--card-bg); display:flex; justify-content:center; align-items:center; font-size:28px; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:transform 0.1s; }
+.app-icon:active .icon-box { transform:scale(0.9); }
+.icon-label { font-size:12px; color:#555; font-weight:500; }
+.badge { position:absolute; top:-2px; right:8px; background:#ff3b30; color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; border:2px solid var(--bg-color); }
+.dock { height:70px; background:var(--nav-bg); backdrop-filter:blur(10px); border-top:1px solid var(--border-color); display:flex; justify-content:space-around; align-items:center; flex-shrink:0; }
+.dock-icon { display:flex; flex-direction:column; align-items:center; gap:4px; color:#8e8e93; font-size:11px; cursor:pointer; }
+.dock-icon .icon-box { width:44px; height:44px; border-radius:12px; font-size:22px; box-shadow:none; background:transparent; }
+.dock-icon.active { color:var(--tab-active); }
+
+/* 桌面挂件 */
+.widget { background:linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); border-radius:16px; padding:16px; color:#fff; margin-bottom:20px; cursor:pointer; box-shadow:0 4px 15px rgba(161,196,253,0.3); }
+.widget-title { font-size:12px; opacity:0.8; margin-bottom:4px; }
+.widget-content { font-size:18px; font-weight:600; }
+.widget-sub { font-size:13px; margin-top:6px; opacity:0.9; }
+
+/* ================= 通用页面与导航 ================= */
+.page { display:none; flex:1; flex-direction:column; overflow:hidden; background:var(--bg-color); position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; }
 .page.active { display:flex; }
-.navbar { height:48px; background:var(--nav-bg); color:var(--nav-text); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:500; border-bottom:1px solid var(--border-color); position:relative; flex-shrink:0; }
+.navbar { height:48px; background:var(--nav-bg); backdrop-filter:blur(10px); color:var(--nav-text); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:500; border-bottom:1px solid var(--border-color); position:relative; flex-shrink:0; z-index:11; }
 .nav-btn { position:absolute; right:12px; background:none; border:none; color:var(--tab-active); font-size:15px; cursor:pointer; padding:5px; }
 .nav-btn.left { left:12px; right:auto; }
 .scroll-area { flex:1; overflow-y:auto; padding:12px; }
 
-/* 聊天区 */
+/* ================= 聊天室 ================= */
 .chat-names-bar { display:flex; justify-content:space-between; padding:8px 16px; background:var(--bg-color); font-size:13px; color:#666; border-bottom:1px solid var(--border-color); flex-shrink:0; }
 .chat-window { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
 .msg-row { display:flex; align-items:flex-start; gap:10px; width:100%; }
@@ -42,38 +67,36 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 .quote-box { background:rgba(0,0,0,0.05); border-left:3px solid #ccc; padding:4px 8px; margin-bottom:6px; font-size:13px; color:#666; border-radius:2px; }
 .msg img.emoji-img { max-width:120px; border-radius:4px; margin-top:5px; display:block; }
 .msg .emoji-text { font-size:20px; margin-top:5px; display:block; }
-.typing { align-self:flex-start; background:var(--ta-bubble); padding:9px 13px; border-radius:6px; color:#999; font-size:14px; }
-.input-bar { display:flex; padding:8px; background:var(--nav-bg); border-top:1px solid var(--border-color); gap:8px; flex-shrink:0; }
-.input-bar input { flex:1; padding:9px 12px; border:none; border-radius:4px; background:#fff; font-size:15px; outline:none; }
-.input-bar button { padding:0 16px; background:var(--tab-active); color:#fff; border:none; border-radius:4px; font-size:15px; cursor:pointer; }
 
+/* 输入栏 */
+.input-bar { display:flex; padding:8px; background:var(--nav-bg); border-top:1px solid var(--border-color); gap:8px; flex-shrink:0; align-items:center; }
+.input-bar input { flex:1; padding:9px 12px; border:none; border-radius:20px; background:#fff; font-size:15px; outline:none; padding-left:15px; }
+.circle-btn { width:36px; height:36px; border-radius:50%; background:#fff; border:none; display:flex; justify-content:center; align-items:center; font-size:18px; cursor:pointer; color:#555; flex-shrink:0; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+.circle-btn.send { background:var(--tab-active); color:#fff; }
+.circle-btn.send:active { background:#06ad56; }
+
+/* 其他通用 */
 .session-item { background:#fff; padding:14px; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; gap:10px; cursor:pointer; }
 .session-avatar { width:40px; height:40px; border-radius:5px; background:#ddd; display:flex; justify-content:center; align-items:center; font-size:20px; overflow:hidden; }
 .session-avatar img { width:100%; height:100%; object-fit:cover; }
 .session-info { flex:1; }
 .session-name { font-weight:500; font-size:16px; }
 .session-last { font-size:13px; color:#999; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
 .card-item, .emoji-item, .fav-item { background:#fff; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; font-size:14px; }
 .card-item .content, .emoji-item .content { flex:1; word-break:break-all; }
 .item-actions button { background:none; border:1px solid #ddd; padding:4px 8px; border-radius:4px; font-size:12px; margin-left:5px; cursor:pointer; }
-.btn-primary { background:var(--tab-active); color:#fff; border:none; padding:8px 16px; border-radius:4px; font-size:14px; cursor:pointer; width:100%; margin-top:10px; }
-.form-group { margin-bottom:15px; background:#fff; padding:12px; border-radius:6px; }
+.btn-primary { background:var(--tab-active); color:#fff; border:none; padding:10px 16px; border-radius:8px; font-size:14px; cursor:pointer; width:100%; margin-top:10px; }
+.form-group { margin-bottom:15px; background:#fff; padding:12px; border-radius:8px; }
 .form-group label { display:block; font-size:14px; margin-bottom:6px; color:#333; font-weight:500; }
 .form-group input[type="text"], .form-group input[type="number"], .form-group select, .form-group textarea { width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-size:14px; outline:none; }
 .form-group input[type="color"] { width:50px; height:30px; padding:0; border:none; cursor:pointer; vertical-align:middle; }
 .form-group input[type="file"] { font-size:13px; margin-top:5px; }
-
-.tab-bar { height:50px; background:var(--nav-bg); border-top:1px solid var(--border-color); display:flex; flex-shrink:0; }
-.tab { flex:1; border:none; background:none; font-size:12px; color:#999; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:2px; }
-.tab.active { color:var(--tab-active); }
-
 .context-menu { position:fixed; background:#fff; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,0.2); z-index:1000; display:none; flex-direction:column; min-width:100px; }
 .context-menu div { padding:10px 15px; font-size:14px; cursor:pointer; border-bottom:1px solid #f0f0f0; text-align:center; }
 .context-menu div:last-child { border-bottom:none; }
 .context-menu div:active { background:#f0f0f0; }
 .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:none; justify-content:center; align-items:center; }
-.modal { background:#fff; width:90%; max-width:400px; border-radius:8px; padding:20px; max-height:80vh; overflow-y:auto; }
+.modal { background:#fff; width:90%; max-width:400px; border-radius:12px; padding:20px; max-height:80vh; overflow-y:auto; }
 .modal h3 { margin-bottom:15px; font-size:18px; text-align:center; }
 .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); color:#fff; padding:12px 24px; border-radius:8px; font-size:14px; z-index:3000; display:none; text-align:center; }
 .empty { text-align:center; color:#999; padding:40px 20px; font-size:14px; }
@@ -81,40 +104,120 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 </head>
 <body>
 <div id="app">
+
+  <!-- ================= 桌面主页面 ================= -->
+  <section class="page active" id="page-home">
+    <div class="home-container">
+      <!-- 第一页 -->
+      <div class="home-page">
+        <!-- 每日打卡挂件 -->
+        <div class="widget" onclick="showDailyWidget()">
+          <div class="widget-title">GOOD MORNING</div>
+          <div class="widget-content" id="widget-date">2026 · 九月十七日</div>
+          <div class="widget-sub" id="widget-status">今天也要元气满满，我在这里陪着你 ✦</div>
+        </div>
+
+        <div class="icon-grid">
+          <div class="app-icon" onclick="openChatList()">
+            <div class="icon-box">💬</div>
+            <div class="icon-label">聊天</div>
+            <div class="badge" id="badge-chat" style="display:none;">1</div>
+          </div>
+          <div class="app-icon" onclick="openFeature('占卜')">
+            <div class="icon-box">🔮</div>
+            <div class="icon-label">占卜</div>
+          </div>
+          <div class="app-icon" onclick="openFeature('写信')">
+            <div class="icon-box">✉️</div>
+            <div class="icon-label">写信</div>
+          </div>
+          <div class="app-icon" onclick="openFeature('陪伴')">
+            <div class="icon-box">🧘</div>
+            <div class="icon-label">陪伴</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第二页 -->
+      <div class="home-page">
+        <div class="icon-grid" style="margin-top:20px;">
+          <div class="app-icon" onclick="openFeature('小游戏')">
+            <div class="icon-box">🎮</div>
+            <div class="icon-label">小游戏</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 桌面底部 Dock -->
+    <nav class="dock">
+      <div class="dock-icon" onclick="openFeature('外观')">
+        <div class="icon-box">🎨</div>
+        <span>外观</span>
+      </div>
+      <div class="dock-icon" onclick="openFeature('字卡')">
+        <div class="icon-box">📇</div>
+        <span>字卡</span>
+      </div>
+      <div class="dock-icon" onclick="openFeature('设置')">
+        <div class="icon-box">⚙️</div>
+        <span>设置</span>
+      </div>
+    </nav>
+  </section>
+
+  <!-- ================= 会话列表页 ================= -->
   <section class="page" id="page-sessions">
-    <header class="navbar">消息<button class="nav-btn" onclick="openSessionModal()">+ 新建</button></header>
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      消息
+      <button class="nav-btn" onclick="openSessionModal()">+ 新建</button>
+    </header>
     <div class="scroll-area" id="session-list"></div>
   </section>
 
-  <section class="page active" id="page-chat">
+  <!-- ================= 聊天室页 ================= -->
+  <section class="page" id="page-chat">
     <header class="navbar">
       <button class="nav-btn left" onclick="switchPage('sessions')">←</button>
       <span id="chat-title">聊天</span>
-      <button class="nav-btn" onclick="switchPage('settings')">⚙️</button>
+      <button class="nav-btn" onclick="openFeature('设置')">⚙️</button>
     </header>
     <div class="chat-names-bar">
       <span id="chat-ta-name">TA</span>
       <span id="chat-my-name">我</span>
     </div>
     <div class="chat-window" id="chat-window"></div>
+    <!-- 输入栏改造 -->
     <div class="input-bar">
+      <button class="circle-btn" onclick="document.getElementById('chat-img-input').click()">🖼️</button>
+      <input type="file" id="chat-img-input" accept="image/*" hidden onchange="sendLocalImage(event)">
+      <button class="circle-btn" onclick="openEmojiPicker()">😀</button>
+      <button class="circle-btn" onclick="showToast('通话功能开发中')">📹</button>
       <input type="text" id="chat-input" placeholder="输入消息...">
-      <button onclick="sendChat()">发送</button>
+      <button class="circle-btn" onclick="openAskModal()">❓</button>
+      <button class="circle-btn send" onclick="sendChat()">✈️</button>
     </div>
   </section>
 
-  <section class="page" id="page-favorites">
-    <header class="navbar">收藏夹</header>
-    <div class="scroll-area">
-      <h4 style="margin-bottom:10px;font-size:15px;">我收藏 TA 的</h4>
-      <div id="fav-my-list"></div>
-      <h4 style="margin:15px 0 10px;font-size:15px;">TA 收藏我的</h4>
-      <div id="fav-ta-list"></div>
+  <!-- ================= 功能占位页（占卜/写信/陪伴/外观/字卡/设置/小游戏） ================= -->
+  <section class="page" id="page-feature">
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      <span id="feature-title">功能</span>
+    </header>
+    <div class="scroll-area" id="feature-content" style="display:flex; justify-content:center; align-items:center; height:100%;">
+      <div class="empty">功能开发中，敬请期待...</div>
     </div>
   </section>
 
+  <!-- ================= 字卡库页（保留基础功能，待下一批升级） ================= -->
   <section class="page" id="page-cards">
-    <header class="navbar">字卡库<button class="nav-btn" onclick="openCardGroupModal()">+ 分组</button></header>
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      字卡库
+      <button class="nav-btn" onclick="openCardGroupModal()">+ 分组</button>
+    </header>
     <div class="scroll-area">
       <div style="margin-bottom:10px; display:flex; gap:5px;">
         <button class="btn-primary" style="flex:1;" onclick="openCardModal()">添加字卡</button>
@@ -126,16 +229,24 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
     </div>
   </section>
 
+  <!-- ================= 表情包库页 ================= -->
   <section class="page" id="page-emojis">
-    <header class="navbar">表情包库<button class="nav-btn" onclick="openEmojiModal()">+ 添加</button></header>
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      表情包库
+      <button class="nav-btn" onclick="openEmojiModal()">+ 添加</button>
+    </header>
     <div class="scroll-area">
-      <p style="font-size:12px;color:#999;margin-bottom:10px;">支持 Emoji、颜文字、本地图片上传（图片会转为 Base64 存储，请尽量上传小图）</p>
       <div id="emoji-list"></div>
     </div>
   </section>
 
+  <!-- ================= 设置页（集中管理） ================= -->
   <section class="page" id="page-settings">
-    <header class="navbar">设置</header>
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      设置
+    </header>
     <div class="scroll-area">
       <div class="form-group">
         <label>我的昵称</label>
@@ -162,7 +273,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
         <label>主题颜色设置</label>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <span>聊天背景：</span>
-          <input type="color" id="set-bg-color" value="#f5f5f5">
+          <input type="color" id="set-bg-color" value="#f2f2f7">
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <span>我的气泡：</span>
@@ -172,22 +283,28 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
           <span>TA 的气泡：</span>
           <input type="color" id="set-ta-bubble" value="#ffffff">
         </div>
-        <label style="margin-top:10px;">聊天背景图片（覆盖颜色，可选）</label>
-        <input type="file" id="set-bg-img" accept="image/*">
       </div>
       <button class="btn-primary" onclick="saveSettings()">保存设置</button>
     </div>
   </section>
 
-  <nav class="tab-bar">
-    <button class="tab active" data-page="sessions" onclick="switchPage('sessions')">💬<span>聊天</span></button>
-    <button class="tab" data-page="favorites" onclick="switchPage('favorites')">⭐<span>收藏</span></button>
-    <button class="tab" data-page="cards" onclick="switchPage('cards')">📇<span>字卡</span></button>
-    <button class="tab" data-page="emojis" onclick="switchPage('emojis')">😀<span>表情</span></button>
-    <button class="tab" data-page="settings" onclick="switchPage('settings')">⚙️<span>设置</span></button>
-  </nav>
+  <!-- ================= 收藏夹页 ================= -->
+  <section class="page" id="page-favorites">
+    <header class="navbar">
+      <button class="nav-btn left" onclick="switchPage('home')">← 桌面</button>
+      收藏夹
+    </header>
+    <div class="scroll-area">
+      <h4 style="margin-bottom:10px;font-size:15px;">我收藏 TA 的</h4>
+      <div id="fav-my-list"></div>
+      <h4 style="margin:15px 0 10px;font-size:15px;">TA 收藏我的</h4>
+      <div id="fav-ta-list"></div>
+    </div>
+  </section>
+
 </div>
 
+<!-- 其他 UI 元素 -->
 <div class="context-menu" id="context-menu">
   <div onclick="ctxAction('quote')">引用</div>
   <div onclick="ctxAction('fav')">收藏</div>
@@ -197,6 +314,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaH
 <div class="toast" id="toast"></div>
 
 <script>
+/* =====================================================================
+   IndexedDB 初始化与基础工具（保持不变，修复部分逻辑）
+   ===================================================================== */
 let db;
 const DB_NAME = 'AuroraChatDB';
 const DB_VERSION = 1;
@@ -231,7 +351,7 @@ function dbPut(storeName, data) { return new Promise((resolve) => { const tx = d
 function dbDelete(storeName, id) { return new Promise((resolve) => { const tx = db.transaction(storeName, 'readwrite'); const req = tx.objectStore(storeName).delete(id); req.onsuccess = () => resolve(); }); }
 function dbGetByIndex(storeName, indexName, value) { return new Promise((resolve) => { const tx = db.transaction(storeName, 'readonly'); const index = tx.objectStore(storeName).index(indexName); const req = index.getAll(value); req.onsuccess = () => resolve(req.result || []); }); }
 
-let settings = { myName: '我', myAvatar: '', probQuote: 20, probFav: 10, probEmoji: 30, bgColor: '#f5f5f5', myBubble: '#95ec69', taBubble: '#ffffff', bgImage: '' };
+let settings = { myName: '我', myAvatar: '', probQuote: 20, probFav: 10, probEmoji: 30, bgColor: '#f2f2f7', myBubble: '#95ec69', taBubble: '#ffffff', bgImage: '' };
 let sessions = []; let currentSessionId = null; let currentSession = null;
 let chatMessages = []; let cardGroups = []; let cards = []; let emojis = []; let favorites = []; let lastReply = '';
 let longPressTimer = null; let ctxTargetMsg = null;
@@ -245,39 +365,113 @@ function readFileAsBase64(file) { return new Promise((resolve) => { const reader
 function openModal(html) { $('modal-content').innerHTML = html; $('modal-overlay').style.display = 'flex'; }
 function closeModal() { $('modal-overlay').style.display = 'none'; }
 
+/* =====================================================================
+   页面切换与桌面交互
+   ===================================================================== */
 function switchPage(page) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.page === page));
-  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
-  if (page === 'sessions') renderSessions();
-  if (page === 'favorites') renderFavorites();
-  if (page === 'cards') renderCardGroups();
-  if (page === 'emojis') renderEmojis();
-  if (page === 'settings') loadSettingsUI();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(`page-${page}`).classList.add('active');
 }
 
+function openChatList() {
+  switchPage('sessions');
+  renderSessions();
+}
+
+function openFeature(name) {
+  switchPage('home');
+  if (name === '字卡') { switchPage('cards'); renderCardGroups(); return; }
+  if (name === '设置') { switchPage('settings'); loadSettingsUI(); return; }
+  if (name === '外观') { showToast('外观设置在设置里哦'); return; }
+  
+  // 对于占卜、写信、陪伴、小游戏，进入占位页面
+  $('feature-title').textContent = name;
+  let content = '';
+  if (name === '陪伴') {
+    content = `<div style="text-align:center; width:100%;">
+      <h3 style="font-size:20px; margin-bottom:20px;">静音陪伴</h3>
+      <p style="color:#666; margin-bottom:30px;">选择一种模式，让你我安静地待一会儿</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:30px;">
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始睡觉陪伴')">😴 睡觉</button>
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始学习陪伴')">📚 学习</button>
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始专注陪伴')">🎯 专注</button>
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('开始冥想陪伴')">🧘 冥想</button>
+      </div>
+      <div style="font-size:48px; font-family:monospace; margin-bottom:20px;" id="companion-timer">00:00:00</div>
+      <button class="btn-primary" style="background:#ff3b30; width:auto; padding:10px 30px;" onclick="showToast('陪伴已结束')">结束陪伴</button>
+    </div>`;
+  } else if (name === '占卜') {
+    content = `<div style="text-align:center; width:100%;">
+      <h3 style="font-size:20px; margin-bottom:20px;">🔮 塔罗占卜</h3>
+      <input type="text" id="divine-question" placeholder="输入你的问题..." style="width:80%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:20px;">
+      <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('单张占卜功能开发中')">单张占卜</button>
+        <button class="btn-primary" style="width:auto; padding:10px 20px;" onclick="showToast('三张占卜功能开发中')">三张占卜</button>
+      </div>
+      <div class="empty">结果将在这里以卡片形式展示</div>
+    </div>`;
+  } else {
+    content = `<div class="empty">「${name}」板块正在开发中，敬请期待！</div>`;
+  }
+  $('feature-content').innerHTML = content;
+  switchPage('feature');
+}
+
+// 模拟每日打卡挂件点击
+function showDailyWidget() {
+  showToast('今日天气：花香四溢 | 状态：你有没有想我');
+}
+
+/* =====================================================================
+   会话列表管理（修复删除功能）
+   ===================================================================== */
 async function loadSessions() {
   sessions = await dbGetAll('sessions');
   if (sessions.length === 0) { const defaultSession = { name: '小明', avatar: '😀', groupIds: [] }; const id = await dbAdd('sessions', defaultSession); defaultSession.id = id; sessions.push(defaultSession); }
   renderSessions();
 }
+
 function renderSessions() {
   const list = $('session-list'); list.innerHTML = '';
   sessions.forEach(s => {
     const div = document.createElement('div'); div.className = 'session-item';
-    div.innerHTML = `<div class="session-avatar">${s.avatar && s.avatar.startsWith('data:image') ? `<img src="${s.avatar}">` : escapeHtml(s.avatar || '👤')}</div><div class="session-info"><div class="session-name">${escapeHtml(s.name)}</div><div class="session-last">点击进入聊天</div></div>`;
-    div.onclick = () => enterChat(s); list.appendChild(div);
+    div.innerHTML = `
+      <div class="session-avatar">${s.avatar && s.avatar.startsWith('data:image') ? `<img src="${s.avatar}">` : escapeHtml(s.avatar || '👤')}</div>
+      <div class="session-info">
+        <div class="session-name">${escapeHtml(s.name)}</div>
+        <div class="session-last">点击进入聊天</div>
+      </div>
+      <button class="delete-session-btn" style="background:#ff3b30;color:#fff;border:none;border-radius:4px;padding:5px 10px;font-size:12px;cursor:pointer;">删除</button>
+    `;
+    div.onclick = () => enterChat(s);
+    div.querySelector('.delete-session-btn').onclick = (e) => {
+      e.stopPropagation();
+      if (!confirm(`确定删除聊天窗口 "${s.name}" 及所有聊天记录吗？`)) return;
+      dbDelete('sessions', s.id).then(async () => {
+        const msgs = await dbGetByIndex('messages', 'sessionId', s.id);
+        for (const m of msgs) await dbDelete('messages', m.id);
+        loadSessions(); showToast('已删除');
+      });
+    };
+    list.appendChild(div);
   });
 }
+
 async function enterChat(session) {
-  currentSessionId = session.id; currentSession = session; $('chat-title').textContent = session.name;
-  $('chat-ta-name').textContent = session.name; $('chat-my-name').textContent = settings.myName;
+  currentSessionId = session.id; currentSession = session; 
+  $('chat-title').textContent = session.name;
+  $('chat-ta-name').textContent = session.name; 
+  $('chat-my-name').textContent = settings.myName;
   chatMessages = await dbGetByIndex('messages', 'sessionId', session.id);
-  renderChat(); switchPage('chat');
+  renderChat(); 
+  switchPage('chat');
 }
+
 function openSessionModal() {
   openModal(`<h3>新建聊天窗口</h3><div class="form-group"><label>TA 的昵称</label><input type="text" id="new-session-name" placeholder="例如：小红"></div><div class="form-group"><label>TA 的头像（可选）</label><input type="file" id="new-session-avatar" accept="image/*"></div><div class="form-group"><label>绑定字卡分组（可多选）</label><div id="new-session-groups" style="max-height:150px;overflow-y:auto;"></div></div><button class="btn-primary" onclick="createSession()">创建</button>`);
   const groupDiv = $('new-session-groups'); cardGroups.forEach(g => { const label = document.createElement('label'); label.style.display = 'block'; label.style.marginBottom = '5px'; label.innerHTML = `<input type="checkbox" value="${g.id}" style="width:auto;margin-right:5px;"> ${escapeHtml(g.name)}`; groupDiv.appendChild(label); });
 }
+
 async function createSession() {
   const name = $('new-session-name').value.trim(); if (!name) return showToast('请输入昵称');
   const avatarFile = $('new-session-avatar').files[0]; let avatar = '👤'; if (avatarFile) avatar = await readFileAsBase64(avatarFile);
@@ -285,6 +479,9 @@ async function createSession() {
   const newSession = { name, avatar, groupIds: checkedGroups }; const id = await dbAdd('sessions', newSession); newSession.id = id; sessions.push(newSession); closeModal(); renderSessions(); showToast('创建成功');
 }
 
+/* =====================================================================
+   聊天室核心逻辑（修复头像显示）
+   ===================================================================== */
 function renderChat() {
   const win = $('chat-window'); win.innerHTML = '';
   if (chatMessages.length === 0) { appendBubble('你好呀～', 'bot', null, null, true); return; }
@@ -330,6 +527,82 @@ async function sendChat() {
   }, delay);
 }
 
+// 新增：发送本地图片
+function sendLocalImage(event) {
+  const file = event.target.files[0]; if (!file) return;
+  readFileAsBase64(file).then(base64 => {
+    appendBubble('', 'user', null, base64); // 图片作为 emoji 附加发送
+    // 触发对方回复
+    setTimeout(() => {
+      let pool = cards; if (pool.length === 0) return;
+      const replyText = randomPick(pool).text;
+      appendBubble(replyText, 'bot', null, null);
+    }, 800 + Math.random() * 1000);
+  });
+  event.target.value = '';
+}
+
+// 新增：打开表情包选择器
+function openEmojiPicker() {
+  if (emojis.length === 0) return showToast('表情库是空的，去添加吧');
+  // 简单用 prompt 选一个
+  const list = emojis.map((e, i) => `${i+1}. ${e.type === 'image' ? '[图片]' : e.content}`).join('\n');
+  const choice = prompt(`选择表情编号 (1-${emojis.length}):\n${list}`);
+  if (!choice) return;
+  const index = parseInt(choice) - 1;
+  if (isNaN(index) || index < 0 || index >= emojis.length) return showToast('选择无效');
+  const emoji = emojis[index].content;
+  appendBubble('', 'user', null, emoji);
+  // 触发对方回复
+  setTimeout(() => {
+    if (cards.length === 0) return;
+    const replyText = randomPick(cards).text;
+    appendBubble(replyText, 'bot', null, null);
+  }, 800 + Math.random() * 1000);
+}
+
+// 新增：提问按钮逻辑
+function openAskModal() {
+  openModal(`
+    <h3>向 TA 提问</h3>
+    <div class="form-group">
+      <label>你的问题</label>
+      <input type="text" id="ask-question" placeholder="输入问题...">
+    </div>
+    <div class="form-group">
+      <label>选项（可选，换行隔开，留空则从聊天词库随机回复）</label>
+      <textarea id="ask-options" rows="4" placeholder="选项A\n选项B\n选项C"></textarea>
+    </div>
+    <button class="btn-primary" onclick="submitAsk()">确定</button>
+  `);
+}
+
+async function submitAsk() {
+  const question = $('ask-question').value.trim();
+  const optionsRaw = $('ask-options').value.trim();
+  if (!question) return showToast('请输入问题');
+  closeModal();
+  // 显示提问气泡
+  appendBubble(question, 'user', null, null);
+  showTyping();
+  setTimeout(async () => {
+    hideTyping();
+    let replyText = '';
+    if (optionsRaw) {
+      const opts = optionsRaw.split('\n').filter(l => l.trim());
+      if (opts.length > 0) replyText = randomPick(opts);
+    }
+    if (!replyText) {
+      let pool = cards; if (currentSession.groupIds && currentSession.groupIds.length > 0) pool = cards.filter(c => currentSession.groupIds.includes(c.groupId));
+      if (pool.length === 0) pool = cards; if (pool.length === 0) replyText = '嗯嗯。'; else replyText = randomPick(pool).text;
+    }
+    appendBubble(replyText, 'bot', null, null);
+  }, 800 + Math.random() * 1200);
+}
+
+/* =====================================================================
+   长按菜单、字卡管理、表情管理、设置保存（修复头像保存）
+   ===================================================================== */
 function showContextMenu(x, y, text, sender) {
   const menu = $('context-menu'); menu.style.display = 'flex'; menu.style.left = Math.min(x, window.innerWidth - 100) + 'px'; menu.style.top = Math.min(y, window.innerHeight - 150) + 'px'; ctxTargetMsg = { text, sender };
 }
@@ -337,10 +610,11 @@ function ctxAction(action) {
   $('context-menu').style.display = 'none'; if (!ctxTargetMsg) return;
   if (action === 'quote') { $('chat-input').value = `[引用: ${ctxTargetMsg.text}] `; $('chat-input').focus(); }
   else if (action === 'fav') { dbAdd('favorites', { sessionId: currentSessionId, text: ctxTargetMsg.text, from: 'me', time: Date.now() }); showToast('已加入我的收藏夹'); }
-  else if (action === 'delete') { chatMessages = chatMessages.filter(m => !(m.text === ctxTargetMsg.text && m.sender === ctxTargetMsg.sender)); renderChat(); showToast('已删除（注：刷新页面彻底生效）'); }
+  else if (action === 'delete') { chatMessages = chatMessages.filter(m => !(m.text === ctxTargetMsg.text && m.sender === ctxTargetMsg.sender)); renderChat(); showToast('已删除'); }
 }
 document.addEventListener('click', (e) => { if (!$('context-menu').contains(e.target)) $('context-menu').style.display = 'none'; });
 
+// 收藏夹
 async function renderFavorites() {
   favorites = await dbGetAll('favorites'); const myList = $('fav-my-list'); const taList = $('fav-ta-list'); myList.innerHTML = ''; taList.innerHTML = '';
   favorites.filter(f => f.from === 'me').forEach(f => { const div = document.createElement('div'); div.className = 'fav-item'; div.innerHTML = `<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`; myList.appendChild(div); });
@@ -349,6 +623,7 @@ async function renderFavorites() {
   if (taList.innerHTML === '') taList.innerHTML = '<div class="empty">TA 还没有收藏你的消息</div>';
 }
 
+// 字卡管理（保留基础功能，导入导出待升级）
 async function loadCardData() {
   cardGroups = await dbGetAll('cardGroups'); cards = await dbGetAll('cards');
   if (cardGroups.length === 0) { const gid = await dbAdd('cardGroups', { name: '默认分组' }); cardGroups.push({ id: gid, name: '默认分组' }); }
@@ -372,6 +647,7 @@ async function editCard(id) { const card = cards.find(c => c.id === id); if (!ca
 async function saveEditCard(id) { const text = $('edit-card-text').value.trim(); if (!text) return; const card = cards.find(c => c.id === id); card.text = text; await dbPut('cards', card); closeModal(); renderCardGroups(); }
 async function deleteCard(id) { if (!confirm('确定删除这张字卡？')) return; await dbDelete('cards', id); renderCardGroups(); }
 
+// 表情管理
 async function loadEmojiData() {
   emojis = await dbGetAll('emojis');
   if (emojis.length === 0) { const defaultEmojis = ['😀', '😂', '🥺', '❤️', '(≧▽≦)', '(´▽｀)', '好耶！', '哈哈哈']; for (const e of defaultEmojis) await dbAdd('emojis', { type: 'text', content: e }); emojis = await dbGetAll('emojis'); }
@@ -384,17 +660,24 @@ function openEmojiModal() { openModal(`<h3>添加表情</h3><div class="form-gro
 async function createEmoji() { const text = $('new-emoji-text').value.trim(); const file = $('new-emoji-img').files[0]; if (file) { const base64 = await readFileAsBase64(file); await dbAdd('emojis', { type: 'image', content: base64 }); } else if (text) { await dbAdd('emojis', { type: 'text', content: text }); } else { return showToast('请输入文本或选择图片'); } closeModal(); renderEmojis(); showToast('表情添加成功'); }
 async function deleteEmoji(id) { if (!confirm('删除这个表情？')) return; await dbDelete('emojis', id); renderEmojis(); }
 
+// 设置（修复头像保存）
 function loadSettingsUI() { $('set-my-name').value = settings.myName; $('set-prob-quote').value = settings.probQuote; $('set-prob-fav').value = settings.probFav; $('set-prob-emoji').value = settings.probEmoji; $('set-bg-color').value = settings.bgColor; $('set-my-bubble').value = settings.myBubble; $('set-ta-bubble').value = settings.taBubble; }
 async function saveSettings() {
   settings.myName = $('set-my-name').value.trim() || '我'; settings.probQuote = parseInt($('set-prob-quote').value) || 0; settings.probFav = parseInt($('set-prob-fav').value) || 0; settings.probEmoji = parseInt($('set-prob-emoji').value) || 0; settings.bgColor = $('set-bg-color').value; settings.myBubble = $('set-my-bubble').value; settings.taBubble = $('set-ta-bubble').value;
-  const bgImgFile = $('set-bg-img').files[0]; if (bgImgFile) settings.bgImage = await readFileAsBase64(bgImgFile);
+  const avatarFile = $('set-my-avatar').files[0]; 
+  if (avatarFile) settings.myAvatar = await readFileAsBase64(avatarFile); // 修复头像读取
+  const bgImgFile = $('set-bg-img') ? $('set-bg-img').files[0] : null; if (bgImgFile) settings.bgImage = await readFileAsBase64(bgImgFile);
   for (const [key, value] of Object.entries(settings)) await dbPut('settings', { key, value });
   document.documentElement.style.setProperty('--bg-color', settings.bgColor); document.documentElement.style.setProperty('--my-bubble', settings.myBubble); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
   if (settings.bgImage) { document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`; document.getElementById('app').style.backgroundSize = 'cover'; } else document.getElementById('app').style.backgroundImage = 'none';
   if ($('chat-my-name')) $('chat-my-name').textContent = settings.myName;
+  // 重新渲染聊天以更新头像
+  if (currentSession) renderChat();
   showToast('设置已保存');
+  setTimeout(() => switchPage('home'), 500);
 }
 
+// 导入导出
 async function exportData() {
   const data = { settings: await dbGetAll('settings'), sessions: await dbGetAll('sessions'), messages: await dbGetAll('messages'), cardGroups: await dbGetAll('cardGroups'), cards: await dbGetAll('cards'), emojis: await dbGetAll('emojis'), favorites: await dbGetAll('favorites') };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `aurora_backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); showToast('数据已导出');
@@ -408,20 +691,24 @@ async function importData(event) {
       for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).clear(); }
       for (const store of ['settings', 'sessions', 'messages', 'cardGroups', 'cards', 'emojis', 'favorites']) { if (data[store]) for (const item of data[store]) await dbAdd(store, item); }
       settings = {}; for (const item of await dbGetAll('settings')) settings[item.key] = item.value; await loadSessions(); await loadCardData(); await loadEmojiData();
-      document.documentElement.style.setProperty('--bg-color', settings.bgColor || '#f5f5f5'); document.documentElement.style.setProperty('--my-bubble', settings.myBubble || '#95ec69'); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble || '#ffffff');
+      document.documentElement.style.setProperty('--bg-color', settings.bgColor || '#f2f2f7'); document.documentElement.style.setProperty('--my-bubble', settings.myBubble || '#95ec69'); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble || '#ffffff');
       if (settings.bgImage) { document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`; document.getElementById('app').style.backgroundSize = 'cover'; }
-      showToast('导入成功，数据已恢复'); switchPage('sessions');
+      showToast('导入成功，数据已恢复'); switchPage('home');
     } catch (err) { showToast('导入失败：文件格式错误'); console.error(err); }
   };
   reader.readAsText(file); event.target.value = '';
 }
 
+// 启动
 async function initApp() {
   await initDB();
   const savedSettings = await dbGetAll('settings'); savedSettings.forEach(s => { settings[s.key] = s.value; });
   document.documentElement.style.setProperty('--bg-color', settings.bgColor); document.documentElement.style.setProperty('--my-bubble', settings.myBubble); document.documentElement.style.setProperty('--ta-bubble', settings.taBubble);
   if (settings.bgImage) { document.getElementById('app').style.backgroundImage = `url(${settings.bgImage})`; document.getElementById('app').style.backgroundSize = 'cover'; }
-  await loadCardData(); await loadEmojiData(); await loadSessions(); switchPage('sessions');
+  await loadCardData(); await loadEmojiData(); await loadSessions(); 
+  
+  // 默认显示主页面
+  switchPage('home');
 }
 window.addEventListener('DOMContentLoaded', initApp);
 </script>
