@@ -61,10 +61,10 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .circle-btn{width:32px;height:32px;border-radius:50%;background:transparent;border:none;display:flex;justify-content:center;align-items:center;font-size:18px;cursor:pointer;color:#555;flex-shrink:0;}
 .circle-btn.send{background:var(--my-bubble);color:#fff;}
 /* 表情面板 */
-.emoji-panel{position:absolute;bottom:55px;left:10px;right:10px;background:#fff;border-radius:12px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);padding:10px;display:none;grid-template-columns:repeat(6,1fr);gap:10px;z-index:100;max-height:200px;overflow-y:auto;}
-.emoji-item-panel{width:40px;height:40px;display:flex;justify-content:center;align-items:center;font-size:24px;cursor:pointer;border-radius:8px;}
-.emoji-item-panel:active{background:#f0f0f0;}
-.emoji-item-panel img{width:100%;height:100%;object-fit:cover;border-radius:4px;}
+.emoji-panel{position:absolute;bottom:60px;left:10px;right:10px;background:#fff;border-radius:16px;box-shadow:0 -4px 15px rgba(0,0,0,0.1);padding:15px;display:none;grid-template-columns:repeat(4,1fr);gap:12px;z-index:100;max-height:300px;overflow-y:auto;}
+.emoji-item-panel{width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:32px;cursor:pointer;border-radius:12px;background:#f7f7f7;transition:transform 0.1s;margin:0 auto;}
+.emoji-item-panel:active{transform:scale(0.9);background:#e0e0e0;}
+.emoji-item-panel img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
 /* 通用元素 */
 .session-item,.card-item,.emoji-item,.fav-item{background:#fff;padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;}
 .session-name{font-weight:600;font-size:16px;text-align:center;width:100%;}
@@ -361,7 +361,54 @@ async function sendChat(){const input=$('chat-input');const text=input.value.tri
   const delay=minDelay+Math.random()*(maxDelay-minDelay);
   setTimeout(async()=>{hideTyping();let pool=cards;if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));if(pool.length===0)pool=cards;if(pool.length===0)return appendBubble('我还没有字卡呢，去添加一些吧。','bot',null,null);let replyText;let attempts=0;do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);lastReply=replyText;let quote=null;if(Math.random()*100<settings.probQuote){const userMsgs=chatMessages.filter(m=>m.sender==='user');if(userMsgs.length>0)quote=randomPick(userMsgs).text;}if(Math.random()*100<settings.probFav){const userMsgs=chatMessages.filter(m=>m.sender==='user');if(userMsgs.length>0){const favText=randomPick(userMsgs).text;await dbAdd('favorites',{sessionId:currentSessionId,text:favText,from:'ta',time:Date.now()});showToast(`TA 悄悄收藏了你的消息：“${favText}”`);}}let emoji=null;if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;appendBubble(replyText,'bot',quote,emoji);},delay);}
 function sendLocalImage(event){const file=event.target.files[0];if(!file)return;readFileAsBase64(file).then(base64=>{appendBubble('','user',null,base64);setTimeout(()=>{let pool=cards;if(pool.length===0)return;const replyText=randomPick(pool).text;appendBubble(replyText,'bot',null,null);},800+Math.random()*1000);});event.target.value='';}
-function toggleEmojiPanel(){const panel=$('emoji-panel');if(panel.style.display==='grid'){panel.style.display='none';return;}panel.innerHTML='';emojis.forEach(e=>{const div=document.createElement('div');div.className='emoji-item-panel';if(e.type==='image')div.innerHTML=`<img src="${e.content}">`;else div.textContent=e.content;div.onclick=()=>{panel.style.display='none';appendBubble('','user',null,e.content);setTimeout(()=>{if(cards.length===0)return;const replyText=randomPick(cards).text;appendBubble(replyText,'bot',null,null);},800+Math.random()*1000);};panel.appendChild(div);});const addBtn=document.createElement('div');addBtn.className='emoji-item-panel';addBtn.innerHTML='<span style="font-size:20px;">+</span>';addBtn.onclick=()=>{panel.style.display='none';openEmojiModal();};panel.appendChild(addBtn);panel.style.display='grid';}
+function toggleEmojiPanel() {
+  const panel = $('emoji-panel');
+  if (panel.style.display === 'grid') { panel.style.display = 'none'; return; }
+  panel.innerHTML = '';
+  
+  emojis.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'emoji-item-panel';
+    if (e.type === 'image') div.innerHTML = `<img src="${e.content}">`;
+    else div.textContent = e.content;
+
+    let clickCount = 0;
+    let clickTimer = null;
+    div.addEventListener('click', () => {
+      clickCount++;
+      if (clickCount === 1) {
+        clickTimer = setTimeout(() => {
+          clickCount = 0;
+          // 单击：发送表情
+          panel.style.display = 'none';
+          appendBubble('', 'user', null, e.content);
+          setTimeout(() => {
+            if (cards.length === 0) return;
+            const replyText = randomPick(cards).text;
+            appendBubble(replyText, 'bot', null, null);
+          }, 800 + Math.random() * 1000);
+        }, 300);
+      } else if (clickCount === 2) {
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        // 双击：询问是否删除
+        if (confirm('是否删除这个表情？')) {
+          deleteEmoji(e.id).then(() => { toggleEmojiPanel(); }); // 删除后刷新面板
+        }
+      }
+    });
+    panel.appendChild(div);
+  });
+
+  // 添加按钮
+  const addBtn = document.createElement('div');
+  addBtn.className = 'emoji-item-panel';
+  addBtn.innerHTML = '<span style="font-size:28px;">+</span>';
+  addBtn.onclick = () => { panel.style.display = 'none'; openEmojiModal(); };
+  panel.appendChild(addBtn);
+  
+  panel.style.display = 'grid';
+}
 function openAskModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>向 TA 提问</h3><div class="form-group"><label>你的问题</label><input type="text" id="ask-question" placeholder="输入问题..."></div><div class="form-group"><label>选项（可选，换行隔开，留空则从聊天词库随机回复）</label><textarea id="ask-options" rows="4" placeholder="选项A\n选项B\n选项C"></textarea></div><button class="btn-primary" onclick="submitAsk()">确定</button>`);}
 async function submitAsk(){const question=$('ask-question').value.trim();const optionsRaw=$('ask-options').value.trim();if(!question)return showToast('请输入问题');closeModal();appendBubble(question,'user',null,null);showTyping();setTimeout(async()=>{hideTyping();let replyText='';if(optionsRaw){const opts=optionsRaw.split('\n').filter(l=>l.trim());if(opts.length>0)replyText=randomPick(opts);}if(!replyText){let pool=cards;if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));if(pool.length===0)pool=cards;if(pool.length===0)replyText='嗯嗯。';else replyText=randomPick(pool).text;}appendBubble(replyText,'bot',null,null);},800+Math.random()*1200);}
 function showContextMenu(x,y,text,sender){const menu=$('context-menu');menu.style.display='flex';menu.style.left=Math.min(x,window.innerWidth-100)+'px';menu.style.top=Math.min(y,window.innerHeight-150)+'px';ctxTargetMsg={text,sender};}
