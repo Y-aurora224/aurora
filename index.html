@@ -328,9 +328,20 @@ function appendBubble(text,sender,quote,emoji,skipSave=false,time=Date.now()){
   bubble.innerHTML=innerHtml;
   const timeDiv=document.createElement('div');timeDiv.className='msg-time';timeDiv.textContent=formatTime(time);
   container.appendChild(bubble);container.appendChild(timeDiv);
-  bubble.addEventListener('touchstart',(e)=>{longPressTimer=setTimeout(()=>{e.preventDefault();showContextMenu(e.touches[0].clientX,e.touches[0].clientY,text,sender);},500);});
-  bubble.addEventListener('touchend',()=>clearTimeout(longPressTimer));bubble.addEventListener('touchmove',()=>clearTimeout(longPressTimer));
-  bubble.addEventListener('contextmenu',(e)=>{e.preventDefault();showContextMenu(e.clientX,e.clientY,text,sender);});
+  let lastTap = 0;
+  bubble.addEventListener('touchend', (e) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 300 && tapLength > 0) {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      showContextMenu(touch.clientX, touch.clientY, text, sender);
+      lastTap = 0; 
+    } else {
+      lastTap = currentTime;
+    }
+  });
+  bubble.addEventListener('contextmenu', (e) => { e.preventDefault(); showContextMenu(e.clientX, e.clientY, text, sender); });
   row.appendChild(avatarDiv);row.appendChild(container);win.appendChild(row);win.scrollTop=win.scrollHeight;
   if(!skipSave){const msg={sessionId:currentSessionId,text,sender,quote,emoji,time:Date.now()};dbAdd('messages',msg).then(id=>{msg.id=id;chatMessages.push(msg);});}
 }
