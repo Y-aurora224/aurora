@@ -11,7 +11,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 #app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;background:var(--bg-color);position:relative;overflow:hidden;}
 .svg-icon{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 .svg-icon-sm{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-/* 桌面 */
 #page-home{display:none;flex:1;flex-direction:column;overflow:hidden;}
 #page-home.active{display:flex;}
 .home-container{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
@@ -29,14 +28,12 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .widget{background:var(--widget-bg);border-radius:16px;padding:16px;color:#4A4A4A;margin-bottom:20px;text-align:center;}
 .widget-title{font-size:12px;opacity:0.8;margin-bottom:4px;}
 .widget-content{font-size:18px;font-weight:600;}
-/* 页面 */
 .page{display:none;flex:1;flex-direction:column;overflow:hidden;background:var(--bg-color);position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;}
 .page.active{display:flex;}
 .navbar{height:48px;background:var(--nav-bg);color:var(--nav-text);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:500;border-bottom:1px solid var(--border-color);position:relative;flex-shrink:0;z-index:11;}
 .nav-btn{position:absolute;right:12px;background:none;border:none;color:var(--tab-active);font-size:15px;cursor:pointer;padding:5px;display:flex;align-items:center;}
 .nav-btn.left{left:12px;right:auto;}
 .scroll-area{flex:1;overflow-y:auto;padding:12px;}
-/* 聊天 */
 .chat-names-bar{display:flex;justify-content:space-between;padding:8px 16px;background:var(--bg-color);font-size:13px;color:#666;border-bottom:1px solid var(--border-color);flex-shrink:0;}
 .chat-window{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;background-position:center;background-size:cover;}
 .msg-row{display:flex;align-items:flex-start;gap:10px;width:100%;}
@@ -55,17 +52,14 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .msg.bot .quote-box{border-left-color:#ccc;background:rgba(0,0,0,0.04);color:#666;}
 .msg img.emoji-img{max-width:100px;max-height:100px;border-radius:8px;margin-top:5px;display:block;}
 .msg-time{font-size:10px;color:#999;margin-top:4px;}
-/* 输入栏 */
 .input-bar{display:flex;padding:8px 10px;background:var(--nav-bg);border-top:1px solid var(--border-color);gap:4px;flex-shrink:0;align-items:center;position:relative;}
 .input-bar input{flex:1;min-width:0;padding:10px 14px;border:none;border-radius:20px;background:#f0f0f0;font-size:15px;outline:none;}
 .circle-btn{width:32px;height:32px;border-radius:50%;background:transparent;border:none;display:flex;justify-content:center;align-items:center;font-size:18px;cursor:pointer;color:#555;flex-shrink:0;}
 .circle-btn.send{background:var(--my-bubble);color:#fff;}
-/* 表情面板 */
 .emoji-panel{position:absolute;bottom:60px;left:10px;right:10px;background:#fff;border-radius:16px;box-shadow:0 -4px 15px rgba(0,0,0,0.1);padding:15px;display:none;grid-template-columns:repeat(4,1fr);gap:12px;z-index:100;max-height:300px;overflow-y:auto;}
 .emoji-item-panel{width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:32px;cursor:pointer;border-radius:12px;background:#f7f7f7;transition:transform 0.1s;margin:0 auto;}
 .emoji-item-panel:active{transform:scale(0.9);background:#e0e0e0;}
 .emoji-item-panel img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
-/* 通用元素 */
 .session-item,.card-item,.emoji-item,.fav-item{background:#fff;padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;}
 .session-name{font-weight:600;font-size:16px;text-align:center;width:100%;}
 .item-actions button{background:none;border:1px solid #ddd;padding:4px 8px;border-radius:4px;font-size:12px;margin-left:5px;cursor:pointer;}
@@ -86,20 +80,17 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .close-btn{position:absolute;right:15px;top:15px;font-size:24px;color:#999;cursor:pointer;line-height:1;}
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:3000;display:none;text-align:center;}
 .empty{text-align:center;color:#999;padding:40px 20px;font-size:14px;}
-/* 通话悬浮窗 */
 .call-float{position:fixed;top:100px;left:50%;transform:translateX(-50%);width:280px;height:380px;background:#222;border-radius:20px;z-index:4000;display:none;flex-direction:column;justify-content:center;align-items:center;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.5);resize:both;overflow:auto;min-width:200px;min-height:300px;}
 .call-float .call-minimize{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;justify-content:center;align-items:center;}
 .call-float img{width:70px;height:70px;border-radius:50%;margin-bottom:15px;object-fit:cover;}
 .call-float .call-timer{font-size:20px;margin-top:10px;font-family:monospace;}
 .call-float .call-hangup{width:60px;height:60px;border-radius:50%;background:#ff3b30;border:none;display:flex;justify-content:center;align-items:center;margin-top:30px;cursor:pointer;}
-/* 通话灵动岛 */
 .call-island{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1c1c1e;border-radius:30px;padding:6px 12px;display:none;align-items:center;gap:10px;z-index:5000;color:#fff;box-shadow:0 4px 15px rgba(0,0,0,0.3);cursor:move;min-width:180px;}
 .call-island img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;}
 .call-island-info{display:flex;flex-direction:column;flex:1;overflow:hidden;}
 .call-island-name{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .call-island-timer{font-size:11px;color:#aaa;font-family:monospace;}
 .call-island-hangup{width:32px;height:32px;border-radius:50%;background:#ff3b30;border:none;display:flex;justify-content:center;align-items:center;cursor:pointer;flex-shrink:0;}
-/* 陪伴悬浮窗 */
 .companion-float{position:fixed;top:150px;right:20px;width:260px;height:320px;background:rgba(255,255,255,0.95);border-radius:16px;z-index:4000;display:none;flex-direction:column;padding:15px;box-shadow:0 10px 30px rgba(0,0,0,0.15);resize:both;overflow:auto;min-width:200px;min-height:250px;}
 .companion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:move;touch-action:none;}
 .companion-timer{font-size:24px;font-family:monospace;text-align:center;margin-bottom:10px;color:#4A4A4A;}
@@ -110,7 +101,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 </head>
 <body>
 <div id="app">
-  <!-- 桌面 -->
   <section class="page active" id="page-home">
     <div class="home-container">
       <div class="home-page">
@@ -139,13 +129,11 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
     </nav>
   </section>
 
-  <!-- 会话列表 -->
   <section class="page" id="page-sessions">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>消息<button class="nav-btn" onclick="openSessionModal()">+ 新建</button></header>
     <div class="scroll-area" id="session-list"></div>
   </section>
 
-  <!-- 聊天室 -->
   <section class="page" id="page-chat">
     <header class="navbar">
       <button class="nav-btn left" onclick="switchPage('sessions')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
@@ -169,13 +157,11 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
     <div class="emoji-panel" id="emoji-panel"></div>
   </section>
 
-  <!-- 功能占位页 -->
   <section class="page" id="page-feature">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button><span id="feature-title">功能</span></header>
     <div class="scroll-area" id="feature-content" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;padding:20px;"></div>
   </section>
 
-  <!-- 字卡库 -->
   <section class="page" id="page-cards">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>字卡库<button class="nav-btn" onclick="openCardGroupModal()">+ 分组</button></header>
     <div class="scroll-area">
@@ -185,18 +171,15 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
         <button class="btn-primary" style="flex:1;background:#333;" onclick="document.getElementById('import-file').click()">导入</button>
         <input type="file" id="import-file" accept=".json" hidden onchange="importData(event)">
       </div>
-      <button class="btn-primary" style="background:#8E9B90; margin-bottom:10px;" onclick="importBuiltinCards()">一键导入预设字卡</button>
       <div id="card-group-list"></div>
     </div>
   </section>
 
-  <!-- 表情包库 -->
   <section class="page" id="page-emojis">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>表情包库<button class="nav-btn" onclick="openEmojiModal()">+ 添加</button></header>
     <div class="scroll-area"><div id="emoji-list"></div></div>
   </section>
 
-  <!-- 收藏夹 -->
   <section class="page" id="page-favorites">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>收藏夹</header>
     <div class="scroll-area">
@@ -205,7 +188,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
     </div>
   </section>
 
-  <!-- 设置页 -->
   <section class="page" id="page-settings">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>设置</header>
     <div class="scroll-area">
@@ -227,7 +209,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
     </div>
   </section>
 
-  <!-- 外观页 -->
   <section class="page" id="page-appearance">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>外观</header>
     <div class="scroll-area">
@@ -250,7 +231,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 <div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
 <div class="toast" id="toast"></div>
 
-<!-- 通话悬浮窗 -->
 <div class="call-float" id="call-float">
   <button class="call-minimize" onclick="minimizeCall()">−</button>
   <div id="call-avatar-container"></div>
@@ -259,14 +239,12 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
   <button class="call-hangup" onclick="endCall()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg></button>
 </div>
 
-<!-- 通话灵动岛小窗 -->
 <div class="call-island" id="call-island">
   <div id="call-island-avatar"></div>
   <div class="call-island-info"><div class="call-island-name" id="call-island-name">对方</div><div class="call-island-timer" id="call-island-timer">00:00</div></div>
   <button class="call-island-hangup" onclick="endCall()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg></button>
 </div>
 
-<!-- 陪伴悬浮窗 -->
 <div class="companion-float" id="companion-float">
   <div class="companion-header">
     <span style="font-size:14px;font-weight:bold;" id="companion-title">陪伴中</span>
@@ -277,23 +255,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 </div>
 
 <script>
-const BUILTIN_CARDS = {
-  "关心": ["还记得你的计划吗","你今天穿的很好看","好好吃饭","规律饮食","多一点接触好吗","少熬夜玩手机","别乱花钱","把钱花在你自己身上","肚子还疼吗","别担心，有我在","抱抱","早点睡觉","记得吃饭","不要熬夜","不要担心","一切都会好起来的","晚饭吃了吗？","多喝水","不舒服？","照顾好自己","我会的","早点睡","多看看我吧","多笑笑吧","走路不要看手机","别看小红书了","别看抖音了","多穿点衣服","别哭了","一起出去散步吧","别熬夜了","已经很晚了","加油","少吃零食","我等你","今天辛苦了","夸夸你","少吃冰的","少吹点空调","记得擦防晒","别忘了防晒","要按时吃饭","别刷抖音了","少看点小红书","不要乱吃东西","吃饭要细嚼慢咽","来月经了？","肚子疼吗？","少喝冰的","晚上不要玩那么晚","淋雨了？","去洗个澡","别跟他们一般见识","我觉得你很厉害","你肯定可以的","你很厉害的","钱包在失望地看着你","揉揉肚子","吹吹就不疼了","会不会觉得有点冷？","是不是很热？","胃不舒服吗？","记得吃早饭","少喝点奶茶"],
-  "询问": ["在吗？","今天过得怎么样？","怎么了？","发生了什么？","在看什么？","在工作吗？","在学习吗？","然后呢？","有什么计划吗？","接下来准备做什么？","我很想听听你的想法","你需要我吗？","你会离开我吗？","你现在忙吗？","叫我做什么？","想我了吗？","为什么？","你没有正面回答","你在生气吗？","吃饭了吗","还好吗？","你认为下一步是什么？","你有什么建议吗？","过得怎么样？","去那里做什么？"],
-  "否定": ["不喜欢","不可以","不行","不是","我不允许","不可以这样","不是我发的","才不是这样","没有的","看不懂","不能说","这个不能说","我无法决定","我无法控制","不是这个意思","话非本意","不是的","才不听","不好","不许和AI聊天","少看点黄漫"],
-  "肯定": ["好的👌🏻","明白","谢谢","不客气","嗯","嗯嗯","真的吗？","我明白了","我相信你","好哦","不错","可以","同意","理解","收到","听懂了","记下了","我愿意","是的","当然","确实","没错","好呀","没问题","OK","了解","会的","我知道","我知道的","看得懂的","有的","可爱","当然了","就是这样","链接很通顺","做的很好","一样","我没有欺骗你"],
-  "称呼": ["老婆","宝宝","乖乖","小易","夫人","粘人精","丹恒","我是丹恒","乖孩子","坏孩子"],
-  "情绪状态": ["我很难过","惊醒了，睡不着","好累","我生气了","快乐","我很想安慰你","我要哭了！","痛痛","被吓到了？","惊讶","别不开心","生气","吃醋了","别叹气","眼花缭乱","很有创意","非常难用","可恶的网站","信息有点混乱","消息很混乱","之前总是这样","我真没招了","在尝试控制了","和代码搏斗中！","打过代码了！","在交替回复","聊到一半就跑","你很调皮","不乖","简直就是木头","吃醋怎么了，就爱吃醋！","不太习惯这个","我不是很适应这个,但我在努力","心痛"],
-  "行动状态": ["我在忙，等等我","在探索过程中","我在","在学习一些新东西","在努力了","刚睡醒","要睡回笼觉","浅眯一会","浅睡了一会","昨晚睡得不错","梦到你了","做噩梦了","准备睡啦","还没睡","夜深了睡不着","没有你在身边睡不着","老婆的床好小","老婆我在你身边，抱着你睡好不好","看书","看电视","在发呆","发呆放空，想你…","在学习","在读书","在工作","在游戏","在聚会","在休息","在听歌，猜猜我在听什么","我在洗漱","刚洗漱完，现在在床边坐着","准备洗漱入睡，晚安老婆","我在厕所","我在床上","整理东西，把老婆送的小礼物擦了擦，放到床边了","收拾房间","晾晒衣物","在叠衣服","在拖地打扫","在整理书包","在整理衣物收纳","我去健身了","刷到小众好物，推荐给你了","随手囤了零食 ，是你爱吃的","买了你常喝的","刚取完快递","出门啦","我出门","准备出门","出门吹风啦，带上了老婆的周边","漫无目的闲逛","慢悠悠散步，想老婆…","下楼散步","慢悠悠晃着","出门办事","在等人碰面","在路上啦","快到目的地了","走到半路啦","马上就到啦","堵车啦","换乘中","打车出发啦","返程路上","马上到家","在外赶路","临时绕路","正在赶路","即将出发","临时耽搁一会","马上要进电梯啦","电梯信号不好","正在排队","临时被喊住了","我出差了","行程结束了","现在要出门工作","坐公交出行","骑单车赶路","在等车","停靠休整","在坐地铁，这样会比较快","在短途步行","在走步行道","在坐扶梯","在停车","人有点多","路上有点堵","刚忙完","还在忙","刚歇下来","有些重要的事要处理","比较忙","临时有事","临时被叫走","临时加班","临时改行程","马上要忙正事","暂时没法回消息","暂时没空看手机","刚忙完一阵","抽空回你消息","今天有点忙","出去应酬","刚开完会","有个会议","吃过啦","刚刚吃过","吃完早餐","吃过午饭啦","刚吃完晚饭","想老婆…","买了小零食","尝了你喜欢的小零食","刚刚偷喝了你的奶茶","在排队","居家宅着"],
-  "简短回复": ["稍等","马上","让我想想怎么回答","等一下","来了","嗯哼","哼哼","好的","对不起","没关系","不用","别客气","就这样","很好","漂亮"],
-  "安慰和支持": ["有我在","别怕","我保护你","我支持你","我会看着你的","我会陪伴在你身边","我一直在","我就在你身边","我陪着你","我会帮你的","我很想照顾你","我心疼了","别哭","安慰我","哄哄你","不用和他们置气","别听他们的，听你自己的","没能帮上忙"],
-  "时间和等待": ["有时间差","几天后","几个小时后","很久之后","需要多久呢","要多久之后","再等等","我需要时间","再发一遍","坐等回复","稍等，在工作","稍后回复你","信号不太好，可能回复会延迟","让我确认一下信息再给你准确答复","等几分钟","等几个小时"],
-  "互动和请求": ["用塔罗牌和我沟通吧","看见我的暗号了吗？","给你推了传讯","聊聊天吧","哄我","陪我","撒个娇，理理我？","逗一下你","帮帮我","每日行一善","聊会儿天","赚钱赚钱","告诉我更多","让我们一起努力","给我写写信吧","手写信","电子信","离家出走","纵容","要一起出去兜风吗","一起去旅游吧","我想和你打电话","想和你一起听歌","可以戳戳你吗","戳戳","摸摸🫳🏻","揉揉","贴贴","亲亲","想听你的声音","想和你结婚","想和你约会","睁眼","睁开眼看看我","要记得想我"],
-  "一些表达": ["他朝若是同淋雪，此生也算共白头","怜悯我，然后爱我吧","命定如此","就这个","受限制了","链接有些混乱","话太少了，没我想说的","太短了","在磨合","寻找中","我做不到欺骗你","如果我说是呢","如果我说不是呢","没有我想说的","误会我了","这不是我想说的","有别的能量在干扰我","那不是我","有别的能量在影响你","环境太嘈杂","静下心来，感受我","慢慢感受我","我是笨蛋","我没有","听不懂","我也如此","一直如此","以后不会了","话说怎么会这样？","出去透透气","我是真的存在的","我能感受到你","我看见你写的信了","看到信了","多想想我好不好","是我是我","我真的在","真的是我","别怀疑我的存在","没能陪在你身边","怕自己伤害到你","我还做不到","不会让你等太久","我还没做好准备","我","你","ta","看手机","闭眼睛","出门","牵手","在床上","摸鱼中","正在熬夜","失眠了","正在打架","做了个梦","梦到你","等等","我收到戒指了，我很喜欢","少打点游戏","很适合你","戒指很好看","是我","晚安","看到记得回复🥲","会尽快查看的","保持联系","这对我来说是个新领域","换个想法吧？","作息混乱","下次可以试试","我也是这么想的","你说得对","有没有可能……","要用一下塔罗吗？","我知道你的意思","晚上好","早上好","中午好","你是我的","我是你的","我希望你自由","怎么啦","又在怀疑吗？","再见","别走","我觉得都可以","我会监督你的","小心些","终于想起我了？","遇到困难了","别生病","吃过了","还没吃","吃水果","这个消息不错","我希望能帮上忙","我想我们应该讨论一下这个问题","抱歉🥺","我正在忙，稍后回复你","别走，陪陪我","你会永远爱我吗？","此刻我想和你永远在一起","撒娇，你会喜欢吗？","就这样撒娇🥺","我现在不忙，有空的","我没有在欺骗你","开心(⌒∇⌒)","为什么","美好的象征","别打了","我们一起","想和你待在一起","去床上","春天","夏天","秋天","冬天","我不需要偷偷做这种事","出门，","受了点伤","我会帮你","不许看他们的黄文","我想要你","你很想要吗","我不是这么想的","你很可爱","别太焦虑","我会抱着你的","慢慢来","你在生气吗","摸摸","我帮你揉揉","早点睡觉吧","乖宝宝","听你自己的","我听你的","晚上不要总是偷偷摸摸做那种事","我在看着你","不用道歉","好","宝宝别生气","我正在忙","这个不好喝","我在吃饭","我同意了","你在做什么？","我也要一起","是不是不开心？","老婆你好香","我喜欢这个味道","我都看见了"],
-  "占有": ["不许和他们玩","别看他们，看我","不准爬墙","不许看别人","不要吵架","可不可以只看着我","只许看着我","不许看别人的黄文","我看你是有点皮痒","少看点黄文","少diy","对你身体不好","不许看他们","别听他们的","别听","别出门","别看别的男人"],
-  "情感表达(亲密和撒娇)": ["我很喜欢你","你很好看","我会陪着你的","我想和你做","喜欢","想你","我爱你","我喜欢","我很喜欢","你无人可及","我无人可及","在你身边就好了","我想靠近你","好想你","好喜欢你","喜欢和我在一起吗？","只喜欢我好不好","喜欢你害羞的样子","想要你","想要进入你的梦","昨天我来了","喜欢你","陪着我","老婆理理我","我喜欢你","一样的","因为喜欢你所以需要你","想要更近一步地贴贴","想触碰你","想要亲亲","鱼水之欢","我很想要亲亲欸🥺","很漂亮","会习惯的","你会喜欢的","我喜欢的、最好的你","我想你了","一直都很想你","我想和你待在一起","我想吻你","老婆亲亲","我想听你的声音","想和你有未来","我想和你吃🍎","我需要你","你陪陪我","你哄哄我","我哄哄你","永远在一起","我陪你","我会在你身边","我在你身边","抱着你睡好不好","去床上抱着","可以摸摸你的脸吗","摸摸头"]
-};
-
 let db;const DB_NAME='AuroraChatDB';const DB_VERSION=3;
 function initDB(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=(e)=>{const database=e.target.result;if(!database.objectStoreNames.contains('settings'))database.createObjectStore('settings',{keyPath:'key'});if(!database.objectStoreNames.contains('sessions'))database.createObjectStore('sessions',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('messages')){const store=database.createObjectStore('messages',{keyPath:'id',autoIncrement:true});store.createIndex('sessionId','sessionId',{unique:false});}if(!database.objectStoreNames.contains('cardGroups'))database.createObjectStore('cardGroups',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('cards')){const store=database.createObjectStore('cards',{keyPath:'id',autoIncrement:true});store.createIndex('groupId','groupId',{unique:false});}if(!database.objectStoreNames.contains('emojis'))database.createObjectStore('emojis',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('favorites'))database.createObjectStore('favorites',{keyPath:'id',autoIncrement:true});};request.onsuccess=(e)=>{db=e.target.result;resolve();};request.onerror=()=>reject(request.error);});}
 function dbGetAll(s){return new Promise(r=>{const tx=db.transaction(s,'readonly');const req=tx.objectStore(s).getAll();req.onsuccess=()=>r(req.result||[]);});}
@@ -353,6 +314,21 @@ function appendBubble(text,sender,quote,emoji,skipSave=false,time=Date.now()){
 }
 function showTyping(){const win=$('chat-window');const div=document.createElement('div');div.className='typing';div.id='typing';div.textContent='对方正在输入…';win.appendChild(div);win.scrollTop=win.scrollHeight;}
 function hideTyping(){const el=$('typing');if(el)el.remove();}
+
+function triggerBotReply() {
+  setTimeout(() => {
+    let pool = cards;
+    if (currentSession.groupIds && currentSession.groupIds.length > 0) pool = cards.filter(c => currentSession.groupIds.includes(c.groupId));
+    if (pool.length === 0) pool = cards;
+    if (pool.length === 0) return appendBubble('我还没有字卡呢，去添加一些吧。', 'bot', null, null);
+    let replyText; let attempts = 0;
+    do { replyText = randomPick(pool).text; attempts++; } 
+    while (pool.length > 1 && replyText === lastReply && attempts < 10);
+    lastReply = replyText;
+    appendBubble(replyText, 'bot', null, null);
+  }, 800 + Math.random() * 1000);
+}
+
 async function sendChat(){const input=$('chat-input');const text=input.value.trim();if(!text)return;
   const quoteToSend=pendingQuote;pendingQuote=null;input.placeholder='输入消息...';
   appendBubble(text,'user',quoteToSend,null);input.value='';showTyping();
@@ -360,34 +336,18 @@ async function sendChat(){const input=$('chat-input');const text=input.value.tri
   const maxDelay=(settings.maxReplyDelay!==undefined?settings.maxReplyDelay:2.0)*1000;
   const delay=minDelay+Math.random()*(maxDelay-minDelay);
   setTimeout(async()=>{hideTyping();let pool=cards;if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));if(pool.length===0)pool=cards;if(pool.length===0)return appendBubble('我还没有字卡呢，去添加一些吧。','bot',null,null);let replyText;let attempts=0;do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);lastReply=replyText;let quote=null;if(Math.random()*100<settings.probQuote){const userMsgs=chatMessages.filter(m=>m.sender==='user');if(userMsgs.length>0)quote=randomPick(userMsgs).text;}if(Math.random()*100<settings.probFav){const userMsgs=chatMessages.filter(m=>m.sender==='user');if(userMsgs.length>0){const favText=randomPick(userMsgs).text;await dbAdd('favorites',{sessionId:currentSessionId,text:favText,from:'ta',time:Date.now()});showToast(`TA 悄悄收藏了你的消息：“${favText}”`);}}let emoji=null;if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;appendBubble(replyText,'bot',quote,emoji);},delay);}
-function triggerBotReply() {
-  setTimeout(() => {
-    let pool = cards;
-    if (currentSession.groupIds && currentSession.groupIds.length > 0) pool = cards.filter(c => currentSession.groupIds.includes(c.groupId));
-    if (pool.length === 0) pool = cards;
-    if (pool.length === 0) return appendBubble('我还没有字卡呢，去添加一些吧。', 'bot', null, null);
-    
-    let replyText;
-    let attempts = 0;
-    do { replyText = randomPick(pool).text; attempts++; } 
-    while (pool.length > 1 && replyText === lastReply && attempts < 10);
-    lastReply = replyText;
-    
-    appendBubble(replyText, 'bot', null, null);
-  }, 800 + Math.random() * 1000);
-}
-  function sendLocalImage(event){const file=event.target.files[0];if(!file)return;readFileAsBase64(file).then(base64=>{appendBubble('','user',null,base64);setTimeout(()=>{let pool=cards;if(pool.length===0)return;const replyText=randomPick(pool).text;appendBubble(replyText,'bot',null,null);},800+Math.random()*1000);});event.target.value='';}
+
+function sendLocalImage(event){const file=event.target.files[0];if(!file)return;readFileAsBase64(file).then(base64=>{appendBubble('','user',null,base64);triggerBotReply();});event.target.value='';}
+
 function toggleEmojiPanel() {
   const panel = $('emoji-panel');
   if (panel.style.display === 'grid') { panel.style.display = 'none'; return; }
   panel.innerHTML = '';
-  
   emojis.forEach(e => {
     const div = document.createElement('div');
     div.className = 'emoji-item-panel';
     if (e.type === 'image') div.innerHTML = `<img src="${e.content}">`;
     else div.textContent = e.content;
-
     let clickCount = 0;
     let clickTimer = null;
     div.addEventListener('click', () => {
@@ -396,21 +356,15 @@ function toggleEmojiPanel() {
         clickTimer = setTimeout(() => {
           clickCount = 0;
           panel.style.display = 'none';
-          
-          // 获取输入框里当前的内容
           const inputVal = $('chat-input').value.trim();
-          
           if (inputVal) {
-            // 如果有文字，先发文字气泡
             appendBubble(inputVal, 'user', null, null);
             $('chat-input').value = '';
-            // 延迟一点点，再发独立的表情气泡
             setTimeout(() => {
               appendBubble('', 'user', null, e.content);
-              triggerBotReply(); // 触发对方回复
+              triggerBotReply();
             }, 300);
           } else {
-            // 没有文字，直接发独立的表情气泡
             appendBubble('', 'user', null, e.content);
             triggerBotReply();
           }
@@ -425,25 +379,14 @@ function toggleEmojiPanel() {
     });
     panel.appendChild(div);
   });
-
   const addBtn = document.createElement('div');
   addBtn.className = 'emoji-item-panel';
   addBtn.innerHTML = '<span style="font-size:28px;">+</span>';
   addBtn.onclick = () => { panel.style.display = 'none'; openEmojiModal(); };
   panel.appendChild(addBtn);
-  
   panel.style.display = 'grid';
 }
 
-  // 添加按钮
-  const addBtn = document.createElement('div');
-  addBtn.className = 'emoji-item-panel';
-  addBtn.innerHTML = '<span style="font-size:28px;">+</span>';
-  addBtn.onclick = () => { panel.style.display = 'none'; openEmojiModal(); };
-  panel.appendChild(addBtn);
-  
-  panel.style.display = 'grid';
-}
 function openAskModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>向 TA 提问</h3><div class="form-group"><label>你的问题</label><input type="text" id="ask-question" placeholder="输入问题..."></div><div class="form-group"><label>选项（可选，换行隔开，留空则从聊天词库随机回复）</label><textarea id="ask-options" rows="4" placeholder="选项A\n选项B\n选项C"></textarea></div><button class="btn-primary" onclick="submitAsk()">确定</button>`);}
 async function submitAsk(){const question=$('ask-question').value.trim();const optionsRaw=$('ask-options').value.trim();if(!question)return showToast('请输入问题');closeModal();appendBubble(question,'user',null,null);showTyping();setTimeout(async()=>{hideTyping();let replyText='';if(optionsRaw){const opts=optionsRaw.split('\n').filter(l=>l.trim());if(opts.length>0)replyText=randomPick(opts);}if(!replyText){let pool=cards;if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));if(pool.length===0)pool=cards;if(pool.length===0)replyText='嗯嗯。';else replyText=randomPick(pool).text;}appendBubble(replyText,'bot',null,null);},800+Math.random()*1200);}
 function showContextMenu(x,y,text,sender){const menu=$('context-menu');menu.style.display='flex';menu.style.left=Math.min(x,window.innerWidth-100)+'px';menu.style.top=Math.min(y,window.innerHeight-150)+'px';ctxTargetMsg={text,sender};}
@@ -456,17 +399,6 @@ async function loadCardData(){
   cardGroups=await dbGetAll('cardGroups');
   cards=await dbGetAll('cards');
   if(!cardGroups.find(g=>g.name==='每日状态')){await dbAdd('cardGroups',{name:'每日状态',isPinned:true});cardGroups=await dbGetAll('cardGroups');}
-}
-async function importBuiltinCards(){
-  if(!confirm('确定要导入预设字卡吗？这将补充你当前的字卡库。'))return;
-  for(const [groupName, items] of Object.entries(BUILTIN_CARDS)){
-    let group=cardGroups.find(g=>g.name===groupName);
-    let gid;
-    if(!group){gid=await dbAdd('cardGroups',{name:groupName,isPinned:false});cardGroups.push({id:gid,name:groupName,isPinned:false});}
-    else{gid=group.id;}
-    for(const itemText of items){await dbAdd('cards',{groupId:gid,text:itemText});}
-  }
-  await loadCardData();renderCardGroups();showToast('预设字卡导入成功！');
 }
 async function renderCardGroups(){await loadCardData();const container=$('card-group-list');container.innerHTML='';cardGroups.sort((a,b)=>(b.isPinned?1:0)-(a.isPinned?1:0));cardGroups.forEach(g=>{const groupDiv=document.createElement('div');groupDiv.style.marginBottom='15px';const groupCards=cards.filter(c=>c.groupId===g.id);let cardsHtml=groupCards.map(c=>`<div class="card-item"><div class="content">${escapeHtml(c.text)}</div><div class="item-actions"><button onclick="editCard(${c.id})">改</button><button onclick="deleteCard(${c.id})">删</button></div></div>`).join('');const isDailyStatus=g.name==='每日状态';const pinBtn=`<button style="font-size:12px;padding:3px 8px;" onclick="togglePinGroup(${g.id})">${g.isPinned?'取消置顶':'置顶'}</button>`;const delBtn=isDailyStatus?'':`<button style="font-size:12px;padding:3px 8px;" onclick="deleteGroup(${g.id})">删除分组</button>`;groupDiv.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><h4 style="font-size:15px;">${escapeHtml(g.name)} (${groupCards.length})</h4><div>${pinBtn} ${delBtn}</div></div>${cardsHtml||'<div class="empty" style="padding:10px;">这个分组暂无字卡</div>'}`;container.appendChild(groupDiv);});}
 function openCardGroupModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>新建字卡分组</h3><div class="form-group"><label>分组名称</label><input type="text" id="new-group-name" placeholder="例如：日常、安慰、每日状态"></div><button class="btn-primary" onclick="createCardGroup()">创建</button>`);}
@@ -483,7 +415,7 @@ async function loadEmojiData(){emojis=await dbGetAll('emojis');const defaultEmoj
 async function renderEmojis(){await loadEmojiData();const list=$('emoji-list');list.innerHTML='';emojis.forEach(e=>{const div=document.createElement('div');div.className='emoji-item';let display=e.type==='image'?`<img src="${e.content}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">`:escapeHtml(e.content);div.innerHTML=`<div class="content">${display}</div><div class="item-actions"><button onclick="deleteEmoji(${e.id})">删除</button></div>`;list.appendChild(div);});if(emojis.length===0)list.innerHTML='<div class="empty">暂无表情，点击右上角添加</div>';}
 function openEmojiModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>添加表情</h3><div class="form-group"><label>文本表情（Emoji / 颜文字）</label><input type="text" id="new-emoji-text" placeholder="例如：😀 (≧▽≦)"></div><div class="form-group"><label>或者上传图片</label><input type="file" id="new-emoji-img" accept="image/*"></div><button class="btn-primary" onclick="createEmoji()">保存</button>`);}
 async function createEmoji(){const text=$('new-emoji-text').value.trim();const file=$('new-emoji-img').files[0];if(file){const base64=await readFileAsBase64(file);await dbAdd('emojis',{type:'image',content:base64});}else if(text){await dbAdd('emojis',{type:'text',content:text});}else{return showToast('请输入文本或选择图片');}closeModal();renderEmojis();showToast('表情添加成功');}
-async function deleteEmoji(id){if(!confirm('删除这个表情？'))return;await dbDelete('emojis',id);renderEmojis();}
+async function deleteEmoji(id){await dbDelete('emojis',id);return true;}
 
 function openColorPicker(key,title){const colors=['#F7F6F2','#D4E0D9','#F2EBE5','#FFFFFF','#A3B1A6','#C9B4B0','#95ec69','#FFD3B6','#FFAAA5','#FF8B94','#D4A5A5','#A8E6CF','#DCEDC1'];let html=`<div class="close-btn" onclick="closeModal()">×</div><h3>选择${title}</h3><div class="color-circles">`;colors.forEach(c=>{html+=`<div class="color-circle" style="background:${c};" onclick="applyColor('${key}','${c}')"></div>`;});html+=`</div>`;openModal(html);}
 function applyColor(key,color){settings[key]=color;const root=document.documentElement;if(key==='bgColor'){root.style.setProperty('--bg-color',color);}if(key==='myBubble'){root.style.setProperty('--my-bubble',color);}if(key==='taBubble'){root.style.setProperty('--ta-bubble',color);}closeModal();showToast('颜色已更新，记得点保存哦');}
