@@ -173,7 +173,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
         </div>
         <div class="affection-widget">
           <div class="affection-header">
-            <span>❤️ DH</span>
+            <span>❤️ 好感度</span>
             <span class="affection-level" id="affection-level">陌生</span>
           </div>
           <div class="affection-bar-bg"><div class="affection-bar-fill" id="affection-bar" style="width:0%;"></div></div>
@@ -591,42 +591,36 @@ function triggerBotReply(){
     if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));
     if(pool.length===0)pool=cards;
     if(pool.length===0)return appendBubble('我还没有字卡呢，去添加一些吧。','bot',null,null);
-    hideTyping();
     const minC=settings.minReplyCount||1;
     const maxC=settings.maxReplyCount||1;
     const replyCount=minC+Math.floor(Math.random()*(maxC-minC+1));
     const minD=(settings.minReplyDelay||0.5)*1000;
     const maxD=(settings.maxReplyDelay||2.0)*1000;
-    let cumulative=0;
-    const sendOne=async()=>{
-      let replyText;let attempts=0;
-      do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);
-      lastReply=replyText;
-      let quote=null;
-      if(Math.random()*100<settings.probQuote){
-        const userMsgs=chatMessages.filter(m=>m.sender==='user');
-        const todayMsgs=userMsgs.filter(m=>new Date(m.time).toDateString()===new Date().toDateString());
-        if(todayMsgs.length>0)quote=randomPick(todayMsgs).text;
-      }
-      if(Math.random()*100<settings.probFav){
-        const userMsgs=chatMessages.filter(m=>m.sender==='user');
-        if(userMsgs.length>0){
-          const favText=randomPick(userMsgs).text;
-          await dbAdd('favorites',{sessionId:currentSessionId,text:favText,from:'ta',time:Date.now()});
-          showToast(`TA 悄悄收藏了你的消息：“${favText}”`);
-        }
-      }
-      let emoji=null;
-      if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;
-      appendBubble(replyText,'bot',quote,emoji);
-    };
     for(let i=0;i<replyCount;i++){
-      cumulative+=minD+Math.random()*(maxD-minD);
-      if(i===0){
-        setTimeout(sendOne,cumulative);
-      }else{
-        setTimeout(sendOne,cumulative);
-      }
+      const delay=(minD+Math.random()*(maxD-minD))*(i+1);
+      setTimeout(async()=>{
+        hideTyping();
+        let replyText;let attempts=0;
+        do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);
+        lastReply=replyText;
+        let quote=null;
+        if(Math.random()*100<settings.probQuote){
+          const userMsgs=chatMessages.filter(m=>m.sender==='user');
+          const todayMsgs=userMsgs.filter(m=>new Date(m.time).toDateString()===new Date().toDateString());
+          if(todayMsgs.length>0)quote=randomPick(todayMsgs).text;
+        }
+        if(Math.random()*100<settings.probFav){
+          const userMsgs=chatMessages.filter(m=>m.sender==='user');
+          if(userMsgs.length>0){
+            const favText=randomPick(userMsgs).text;
+            await dbAdd('favorites',{sessionId:currentSessionId,text:favText,from:'ta',time:Date.now()});
+            showToast(`TA 悄悄收藏了你的消息：“${favText}”`);
+          }
+        }
+        let emoji=null;
+        if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;
+        appendBubble(replyText,'bot',quote,emoji);
+      },delay);
     }
   },300);
 }
@@ -635,12 +629,6 @@ async function sendChat(){const input=$('chat-input');const text=input.value.tri
   appendBubble(text,'user',quoteToSend,null);input.value='';showTyping();
   addAffection('聊天');
   triggerBotReply();
-}
-  const quoteToSend=pendingQuote;pendingQuote=null;input.placeholder='输入消息...';
-  appendBubble(text,'user',quoteToSend,null);input.value='';showTyping();
-  addAffection('聊天');
-  triggerBotReply();
-  setTimeout(hideTyping,(settings.minReplyDelay||0.5)*1000);
 }
 function sendLocalImage(event){const file=event.target.files[0];if(!file)return;readFileAsBase64(file).then(base64=>{appendBubble('','user',null,base64);dbAdd('photos',{data:base64,time:Date.now()});addAffection('发图片');triggerBotReply();});event.target.value='';}
 function toggleEmojiPanel(){const panel=$('emoji-panel');if(panel.style.display==='grid'){panel.style.display='none';return;}panel.innerHTML='';emojis.forEach(e=>{const div=document.createElement('div');div.className='emoji-item-panel';if(e.type==='image')div.innerHTML=`<img src="${e.content}">`;else div.textContent=e.content;let clickCount=0;let clickTimer=null;div.addEventListener('click',()=>{clickCount++;if(clickCount===1){clickTimer=setTimeout(()=>{clickCount=0;panel.style.display='none';const inputVal=$('chat-input').value.trim();if(inputVal){appendBubble(inputVal,'user',null,null);$('chat-input').value='';setTimeout(()=>{appendBubble('','user',null,e.content);triggerBotReply();},300);}else{appendBubble('','user',null,e.content);triggerBotReply();}addAffection('发表情');},300);}else if(clickCount===2){clearTimeout(clickTimer);clickCount=0;if(confirm('是否删除这个表情？')){deleteEmoji(e.id).then(()=>{toggleEmojiPanel();});}}});panel.appendChild(div);});const addBtn=document.createElement('div');addBtn.className='emoji-item-panel';addBtn.innerHTML='<span style="font-size:28px;">+</span>';addBtn.onclick=()=>{panel.style.display='none';openEmojiModal();};panel.appendChild(addBtn);panel.style.display='grid';}
