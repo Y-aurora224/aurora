@@ -11,7 +11,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 #app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;background:var(--bg-color);position:relative;overflow:hidden;}
 .svg-icon{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 .svg-icon-sm{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-#page-home{display:none;flex:1;flex-direction:column;overflow:hidden;background-image:var(--desktop-bg);background-size:cover;background-position:center;position:relative;}
+#page-home{display:none;flex:1;flex-direction:column;overflow:hidden;background-image:var(--desktop-bg);background-size:cover;background-position:center;}
 #page-home.active{display:flex;}
 .home-container{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
 .home-container::-webkit-scrollbar{display:none;}
@@ -48,7 +48,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .nav-btn.left{left:12px;right:auto;}
 .scroll-area{flex:1;overflow-y:auto;padding:12px;}
 .chat-names-bar{display:flex;justify-content:space-between;padding:8px 16px 4px 16px;background:var(--bg-color);font-size:13px;color:#666;flex-shrink:0;}
-.chat-status-bar{text-align:center;padding:4px 0 8px 0;background:var(--bg-color);font-size:12px;color:#888;border-bottom:1px solid var(--border-color);flex-shrink:0;}
 .chat-window{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;background-position:center;background-size:cover;}
 .msg-row{display:flex;align-items:flex-start;gap:10px;width:100%;}
 .msg-row.user{flex-direction:row-reverse;}
@@ -140,7 +139,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 #crop-image{position:absolute;max-width:100%;max-height:100%;cursor:move;touch-action:none;}
 .crop-footer{height:70px;display:flex;justify-content:center;align-items:center;}
 .crop-footer button{background:var(--my-bubble);color:#fff;border:none;padding:10px 40px;border-radius:20px;font-size:16px;cursor:pointer;}
-/* 裁剪参考线 */
 .crop-guide{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
 .crop-guide-time{position:absolute;top:30px;left:20px;color:rgba(255,255,255,0.85);font-size:30px;font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,0.6);}
 .crop-guide-date{position:absolute;top:70px;left:20px;color:rgba(255,255,255,0.85);font-size:13px;text-shadow:0 2px 4px rgba(0,0,0,0.6);}
@@ -150,7 +148,6 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .crop-guide-icon-box{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,0.15);border:1px dashed rgba(255,255,255,0.5);margin:0 auto;}
 .crop-guide-dock{position:absolute;bottom:0;left:0;right:0;height:70px;background:rgba(255,255,255,0.15);border-top:1px dashed rgba(255,255,255,0.5);display:flex;justify-content:space-around;align-items:center;}
 .crop-guide-dock-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);border:1px dashed rgba(255,255,255,0.5);}
-/* 每日一问 */
 .question-card{background:#fff;border-radius:12px;padding:20px;margin-bottom:12px;}
 .question-title{font-size:16px;font-weight:600;color:#333;margin-bottom:16px;line-height:1.5;}
 .question-option{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:10px;background:#f7f7f7;border:1px solid #eee;border-radius:8px;font-size:14px;color:#333;cursor:pointer;}
@@ -441,22 +438,16 @@ function openModal(html){$('modal-content').innerHTML=html;$('modal-overlay').st
 function closeModal(){$('modal-overlay').style.display='none';}
 function switchPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(`page-${page}`).classList.add('active');}
 
-/* 背景音 */
 function stopCompanionSound(){if(currentSound){try{currentSound.stop();}catch(e){}currentSound=null;}}
 function changeCompanionSound(type){
-  stopCompanionSound();
-  if(type==='none')return;
+  stopCompanionSound();if(type==='none')return;
   try{
     if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     if(audioCtx.state==='suspended')audioCtx.resume();
-    const bufferSize=2*audioCtx.sampleRate;
-    const buffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
-    const data=buffer.getChannelData(0);
-    for(let i=0;i<bufferSize;i++)data[i]=Math.random()*2-1;
-    const source=audioCtx.createBufferSource();
-    source.buffer=buffer;source.loop=true;
-    const filter=audioCtx.createBiquadFilter();
-    const gain=audioCtx.createGain();
+    const bufferSize=2*audioCtx.sampleRate;const buffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
+    const data=buffer.getChannelData(0);for(let i=0;i<bufferSize;i++)data[i]=Math.random()*2-1;
+    const source=audioCtx.createBufferSource();source.buffer=buffer;source.loop=true;
+    const filter=audioCtx.createBiquadFilter();const gain=audioCtx.createGain();
     if(type==='rain'){filter.type='lowpass';filter.frequency.value=1200;gain.gain.value=0.15;}
     else if(type==='wave'){filter.type='lowpass';filter.frequency.value=500;gain.gain.value=0.2;}
     else if(type==='cafe'){filter.type='bandpass';filter.frequency.value=800;gain.gain.value=0.08;}
@@ -466,7 +457,6 @@ function changeCompanionSound(type){
   }catch(e){console.log('音频启动失败',e);}
 }
 
-/* 时间感知问候 */
 async function checkTimeGreeting(){
   const now=new Date();const h=now.getHours();const today=now.toDateString();
   if(settings.lastGreeting===today)return;
@@ -476,23 +466,19 @@ async function checkTimeGreeting(){
   if(msg&&currentSession){
     await dbAdd('messages',{sessionId:currentSessionId,text:msg,sender:'bot',time:Date.now()});
     chatMessages.push({text:msg,sender:'bot',time:Date.now()});
-    settings.lastGreeting=today;
-    await dbPut('settings',{key:'lastGreeting',value:today});
+    settings.lastGreeting=today;await dbPut('settings',{key:'lastGreeting',value:today});
     showTopNotification(currentSession.name,msg,currentSession.avatar);
     if(document.getElementById('page-chat').classList.contains('active'))renderChat();
   }
 }
 
-/* 好感度 */
 function getAffectionLevel(value){if(value<50)return '陌生';if(value<150)return '熟悉';if(value<300)return '亲密';if(value<500)return '依赖';return '专属';}
 function renderAffection(){const val=settings.affection||0;const level=getAffectionLevel(val);const maxVal=600;const pct=Math.min(100,(val/maxVal)*100);if($('affection-bar'))$('affection-bar').style.width=pct+'%';if($('affection-value'))$('affection-value').textContent=val;if($('affection-level'))$('affection-level').textContent=level;}
 async function addAffection(reason){const inc=Math.floor(Math.random()*5)+1;settings.affection=(settings.affection||0)+inc;await dbPut('settings',{key:'affection',value:settings.affection});renderAffection();}
 
-/* 纪念日 */
 function renderAnniversary(){
   if(settings.anniversaryDate){
-    const now=new Date();now.setHours(0,0,0,0);
-    const start=new Date(settings.anniversaryDate);start.setHours(0,0,0,0);
+    const now=new Date();now.setHours(0,0,0,0);const start=new Date(settings.anniversaryDate);start.setHours(0,0,0,0);
     const days=Math.floor((now-start)/86400000);
     if($('anniversary-widget'))$('anniversary-widget').style.display='block';
     if($('anniversary-placeholder'))$('anniversary-placeholder').style.display='none';
@@ -507,7 +493,6 @@ function openAnniversaryModal(){openModal(`<div class="close-btn" onclick="close
 async function saveAnniversary(){const name=$('anni-name').value.trim()||'纪念日';const date=$('anni-date').value;if(!date)return showToast('请选择日期');settings.anniversaryName=name;settings.anniversaryDate=date;await dbPut('settings',{key:'anniversaryName',value:name});await dbPut('settings',{key:'anniversaryDate',value:date});renderAnniversary();closeModal();showToast('纪念日已保存');}
 async function clearAnniversary(){settings.anniversaryName='';settings.anniversaryDate='';await dbPut('settings',{key:'anniversaryName',value:''});await dbPut('settings',{key:'anniversaryDate',value:''});renderAnniversary();closeModal();showToast('已清除');}
 
-/* 每日一问 100题 */
 const QUESTION_BANK=[
 {q:'你今天心情怎么样？',o:['开心','还行','有点累','不太想说话']},{q:'最近有什么让你开心的事吗？',o:['有，很多','有一两件','想不起来了']},{q:'如果现在能去一个地方，你想去哪？',o:['海边','山里','另一个城市','家里躺着']},{q:'你更喜欢哪种天气？',o:['晴天','雨天','阴天','下雪']},{q:'今天想和我说什么？',o:['想你了','今天发生的事','没什么','你来问我']},{q:'最近有好好吃饭吗？',o:['有','还行','经常忘记','没胃口']},{q:'昨晚睡得好吗？',o:['很好','还行','不太好','几乎没睡']},{q:'你最喜欢我哪一点？',o:['温柔','贴心','有趣','还不知道']},{q:'如果只能选一样，你会选？',o:['咖啡','奶茶','果汁','白开水']},{q:'周末你更想做什么？',o:['宅在家','出去玩','睡懒觉','看书']},{q:'最近有什么事让你困扰吗？',o:['工作/学习','感情','生活琐事','没什么']},{q:'你喜欢早上还是晚上？',o:['早上','下午','傍晚','深夜']},{q:'今天有没有想起我？',o:['有','好几次','一直在想','没有']},{q:'你最喜欢什么颜色？',o:['红','蓝','绿','黄']},{q:'最近看什么剧或书？',o:['电视剧','电影','小说','都没看']},{q:'今天累不累？',o:['不累','还行','有点累','非常累']},{q:'你有什么想对我说但没说出口的吗？',o:['有','想不起来','现在就说','先不说']},{q:'你更喜欢我主动还是你主动？',o:['我主动','你主动','都可以','看情况']},{q:'今天心情的颜色是？',o:['明亮的黄','温柔的粉','平静的蓝','有点灰']},{q:'如果现在可以实现一个愿望，你想要什么？',o:['和你在一起','家人平安','工作顺利','世界和平']},
 {q:'你喜欢猫还是狗？',o:['猫','狗','都喜欢','都不喜欢']},{q:'今天最想做的事是什么？',o:['和你聊天','睡觉','出去走走','放空']},{q:'你觉得自己是个什么样的人？',o:['温柔','内向','开朗','复杂']},{q:'最近在听什么歌？',o:['流行','轻音乐','老歌','没听']},{q:'今天有没有偷偷笑出声？',o:['有','差点','没有','不记得']},{q:'你更喜欢热闹还是安静？',o:['热闹','安静','看心情','都不喜欢']},{q:'今天最想吃什么？',o:['火锅','甜品','家常菜','随便']},{q:'你希望我多了解你哪一面？',o:['软弱的','开心的','脆弱的','真实的']},{q:'如果今晚可以和我一起做一件事，你想做什么？',o:['散步','看电影','聊天','安静待着']},{q:'你今天穿的是什么颜色的衣服？',o:['浅色','深色','花花的','睡衣']},
@@ -520,13 +505,9 @@ const QUESTION_BANK=[
 {q:'你觉得我们认识多久了？',o:['很久','不久','刚刚','记不清']},{q:'你想和我一起做什么小游戏？',o:['猜拳','真心话','抽签','都行']},{q:'你今天有没有想偷偷靠近我？',o:['有','有点','没有','不能说']},{q:'你今天最想听的那句话是什么？',o:['我爱你','辛苦了','别怕','你在就好']},{q:'如果现在能让我为你做一件事，你想要什么？',o:['陪着','哄哄','抱抱','不用']},{q:'你想和我一起看什么？',o:['星星','电影','夕阳','都行']},{q:'你今天最想被提醒什么？',o:['喝水','吃饭','休息','什么都好']},{q:'你希望我变成什么样？',o:['更好','不用变','随你','慢慢来']},{q:'你今天最想拥有的东西是什么？',o:['时间','拥抱','勇气','安静']},{q:'此刻你最想对我说什么？',o:['晚安','谢谢','喜欢你','明天见']}
 ];
 
-async function openDailyQuestion(){
-  switchPage('question');
-  await renderDailyQuestion();
-}
+async function openDailyQuestion(){switchPage('question');await renderDailyQuestion();}
 async function renderDailyQuestion(){
-  const area=$('question-area');
-  area.innerHTML='';
+  const area=$('question-area');area.innerHTML='';
   const records=await dbGetAll('qaRecords');
   const answeredIds=records.map(r=>r.qid);
   const remaining=QUESTION_BANK.map((q,i)=>({...q,id:i})).filter(q=>!answeredIds.includes(q.id));
@@ -534,22 +515,18 @@ async function renderDailyQuestion(){
   const today=new Date().toDateString();
   let todayRecord=records.find(r=>r.date===today);
   let question;
-  if(todayRecord){
-    question=QUESTION_BANK[todayRecord.qid];
-  }else{
-    question=remaining[0];
-  }
+  if(todayRecord){question=QUESTION_BANK[todayRecord.qid];}
+  if(!question){question=remaining[0];}
+  if(!question){area.innerHTML='<div class="empty">所有问题都问过啦～<br>明天再来吧</div>';return;}
   const qid=QUESTION_BANK.indexOf(question);
   let html=`<div class="question-card"><div class="question-title">${escapeHtml(question.q)}</div>`;
-  question.o.forEach((opt,idx)=>{
+  question.o.forEach((opt)=>{
     const selected=todayRecord&&todayRecord.answer===opt?' selected':'';
     const disabled=todayRecord?'disabled':'';
     html+=`<button class="question-option${selected}" ${disabled} onclick="answerQuestion(${qid},'${escapeHtml(opt).replace(/'/g,"\\'")}',this)">${escapeHtml(opt)}</button>`;
   });
   html+='</div>';
-  if(todayRecord){
-    html+=`<div class="question-answer-text">你已经回答过啦，TA 说：我记下了 💕</div>`;
-  }
+  if(todayRecord){html+=`<div class="question-answer-text">你已经回答过啦，TA 说：我记下了 💕</div>`;}
   area.innerHTML=html;
 }
 async function answerQuestion(qid,answer,btn){
@@ -560,39 +537,25 @@ async function answerQuestion(qid,answer,btn){
   document.querySelectorAll('.question-option').forEach(b=>{b.disabled=true;b.classList.remove('selected');});
   btn.classList.add('selected');
   addAffection('回答问题');
-  const area=$('question-area');
-  const tip=document.createElement('div');
-  tip.className='question-answer-text';
-  tip.textContent='TA 说：我记下了 💕';
-  area.appendChild(tip);
+  const area=$('question-area');const tip=document.createElement('div');
+  tip.className='question-answer-text';tip.textContent='TA 说：我记下了 💕';area.appendChild(tip);
 }
 
-/* 聊天 */
 async function loadSessions(){sessions=await dbGetAll('sessions');if(sessions.length===0){const ds={name:'小明',avatar:'😀',groupIds:[]};const id=await dbAdd('sessions',ds);ds.id=id;sessions.push(ds);}renderSessions();}
 function renderSessions(){const list=$('session-list');list.innerHTML='';sessions.forEach(s=>{const div=document.createElement('div');div.className='session-item';div.innerHTML=`<div class="avatar">${s.avatar&&s.avatar.startsWith('data:image')?`<img src="${s.avatar}">`:escapeHtml(s.avatar||'👤')}</div><div class="session-info"><div class="session-name">${escapeHtml(s.name)}</div></div><button class="delete-session-btn" style="background:#ff3b30;color:#fff;border:none;border-radius:4px;padding:5px 10px;font-size:12px;cursor:pointer;">删除</button>`;div.onclick=()=>enterChat(s);div.querySelector('.delete-session-btn').onclick=(e)=>{e.stopPropagation();if(!confirm(`确定删除聊天窗口 "${s.name}" 及所有聊天记录吗？`))return;dbDelete('sessions',s.id).then(async()=>{const msgs=await dbGetByIndex('messages','sessionId',s.id);for(const m of msgs)await dbDelete('messages',m.id);loadSessions();showToast('已删除');});};list.appendChild(div);});}
 
 async function enterChat(session){
-  currentSessionId=session.id;
-  currentSession=session;
-  $('chat-title').textContent=session.name;
-  $('chat-ta-name').textContent=session.name;
-  $('chat-my-name').textContent=settings.myName;
+  currentSessionId=session.id;currentSession=session;
+  $('chat-title').textContent=session.name;$('chat-ta-name').textContent=session.name;$('chat-my-name').textContent=settings.myName;
   chatMessages=await dbGetByIndex('messages','sessionId',session.id);
   renderChat();
   const statusGroup=cardGroups.find(g=>g.name==='当前状态');
   let statusText='在线';
   if(statusGroup){const statusPool=cards.filter(c=>c.groupId===statusGroup.id);if(statusPool.length>0)statusText=randomPick(statusPool).text;}
   $('chat-status').textContent='当前状态：'+statusText;
-  const badge=$('badge-chat');
-  if(badge)badge.style.display='none';
+  const badge=$('badge-chat');if(badge)badge.style.display='none';
   switchPage('chat');
-  // 修复滚动：使用 requestAnimationFrame + 多重延迟
-  requestAnimationFrame(()=>{
-    const win=$('chat-window');
-    if(win)win.scrollTop=win.scrollHeight;
-    setTimeout(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;},50);
-    setTimeout(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;},250);
-  });
+  requestAnimationFrame(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;setTimeout(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;},50);setTimeout(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;},250);});
   checkTimeGreeting();
 }
 
@@ -655,7 +618,6 @@ function showContextMenu(x,y,text,sender){const menu=$('context-menu');menu.styl
 function ctxAction(action){$('context-menu').style.display='none';if(!ctxTargetMsg)return;if(action==='quote'){pendingQuote=ctxTargetMsg.text;const senderName=ctxTargetMsg.sender==='user'?'我':(currentSession?currentSession.name:'TA');$('chat-input').placeholder=`回复 ${senderName}：${pendingQuote}`;$('chat-input').focus();}else if(action==='fav'){dbAdd('favorites',{sessionId:currentSessionId,text:ctxTargetMsg.text,from:'me',time:Date.now()});showToast('已加入我的收藏夹');}else if(action==='delete'){chatMessages=chatMessages.filter(m=>!(m.text===ctxTargetMsg.text&&m.sender===ctxTargetMsg.sender));renderChat();showToast('已删除');}}
 document.addEventListener('click',(e)=>{if(!$('context-menu').contains(e.target))$('context-menu').style.display='none';if(!$('emoji-panel').contains(e.target)&&!e.target.closest('button'))$('emoji-panel').style.display='none';});
 
-/* 朋友圈、相册、信件、字卡、表情、设置等同上一版本，此处省略部分通用逻辑，保持功能一致 */
 async function renderFavorites(){favorites=await dbGetAll('favorites');const myList=$('fav-my-list');const taList=$('fav-ta-list');myList.innerHTML='';taList.innerHTML='';favorites.filter(f=>f.from==='me').forEach(f=>{const div=document.createElement('div');div.className='fav-item';div.innerHTML=`<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;myList.appendChild(div);});if(myList.innerHTML==='')myList.innerHTML='<div class="empty">还没有收藏</div>';favorites.filter(f=>f.from==='ta').forEach(f=>{const div=document.createElement('div');div.className='fav-item';div.innerHTML=`<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;taList.appendChild(div);});if(taList.innerHTML==='')taList.innerHTML='<div class="empty">TA 还没有收藏你的消息</div>';}
 
 async function loadCardData(){cardGroups=await dbGetAll('cardGroups');cards=await dbGetAll('cards');if(!cardGroups.find(g=>g.name==='每日状态')){await dbAdd('cardGroups',{name:'每日状态',isPinned:true});cardGroups=await dbGetAll('cardGroups');}if(!cardGroups.find(g=>g.name==='朋友圈')){await dbAdd('cardGroups',{name:'朋友圈',isPinned:false});cardGroups=await dbGetAll('cardGroups');}if(!cardGroups.find(g=>g.name==='当前状态')){await dbAdd('cardGroups',{name:'当前状态',isPinned:false});cardGroups=await dbGetAll('cardGroups');}}
@@ -682,14 +644,12 @@ function applyColor(key,color){settings[key]=color;const root=document.documentE
 function openWidgetGradientPicker(){const gradients=['linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)','linear-gradient(135deg,#E2D9F3 0%,#F3E7E9 100%)','linear-gradient(135deg,#D6E4FF 0%,#F2E9E4 100%)','linear-gradient(135deg,#F5E6E8 0%,#D5E1DF 100%)','linear-gradient(135deg,#E8DCD2 0%,#DCE4E8 100%)'];let html=`<div class="close-btn" onclick="closeModal()">×</div><h3>选择状态栏渐变</h3><div class="color-circles">`;gradients.forEach(g=>{html+=`<div class="color-circle" style="background:${g};" onclick="applyWidgetGradient('${g}')"></div>`;});html+=`</div>`;openModal(html);}
 function applyWidgetGradient(gradient){settings.widgetBg=gradient;document.documentElement.style.setProperty('--widget-bg',gradient);closeModal();showToast('状态栏渐变已更新，记得保存');}
 
-/* 背景裁剪 */
 function changeDesktopBg(event){
   const file=event.target.files[0];if(!file)return;
   readFileAsBase64(file).then(base64=>{
     cropImageSrc=base64;$('crop-image').src=base64;
     cropScale=1;cropTranslateX=0;cropTranslateY=0;
     $('crop-image').style.transform=`translate(0px,0px) scale(1)`;
-    // 更新参考线
     $('crop-guide-time').textContent=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
     $('crop-guide-date').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
     const icons={'sunny':'☀️','rainy':'🌧️','cloudy':'🌥️','overcast':'☁️'};
@@ -750,20 +710,9 @@ function startCompanion(type){
   companionMsgTimer=setInterval(addBarrage,settings.barrageInterval*60*1000);
 }
 function endCompanion(){clearInterval(companionTimer);clearInterval(companionMsgTimer);$('companion-float').style.display='none';stopCompanionSound();addAffection('陪伴');showToast('陪伴结束');}
-function getRandomCardFromPool(type){if(type==='status'){const dailyGroup=cardGroups.find(g=>g.name==='每日状态');const pool=dailyGroup?cards.filter(c=>c.groupId===dailyGroup.id):[];if(pool.length>0)return randomPick(pool).text;}const pool=cards.length?cards:[{text:'今天也要加油哦'}];return randomPick(pool).text;}
-
+function getRandomCardFromPool(type){const safeCards=cards||[];const safeGroups=cardGroups||[];if(type==='status'){const dailyGroup=safeGroups.find(g=>g.name==='每日状态');const pool=dailyGroup?safeCards.filter(c=>c.groupId===dailyGroup.id):[];if(pool.length>0)return randomPick(pool).text;}const pool=safeCards.length?safeCards:[{text:'今天也要加油哦'}];return randomPick(pool).text;}
 const TAROT_DECK=['愚者','魔术师','女祭司','女皇','皇帝','教皇','恋人','战车','力量','隐士','命运之轮','正义','倒吊人','死神','节制','恶魔','高塔','星星','月亮','太阳','审判','世界','权杖 Ace','权杖 2','权杖 3','权杖 4','权杖 5','权杖 6','权杖 7','权杖 8','权杖 9','权杖 10','权杖 侍从','权杖 骑士','权杖 王后','权杖 国王','圣杯 Ace','圣杯 2','圣杯 3','圣杯 4','圣杯 5','圣杯 6','圣杯 7','圣杯 8','圣杯 9','圣杯 10','圣杯 侍从','圣杯 骑士','圣杯 王后','圣杯 国王','宝剑 Ace','宝剑 2','宝剑 3','宝剑 4','宝剑 5','宝剑 6','宝剑 7','宝剑 8','宝剑 9','宝剑 10','宝剑 侍从','宝剑 骑士','宝剑 王后','宝剑 国王','星币 Ace','星币 2','星币 3','星币 4','星币 5','星币 6','星币 7','星币 8','星币 9','星币 10','星币 侍从','星币 骑士','星币 王后','星币 国王'];
 function doDivine(count){const question=$('divine-question').value.trim();if(!question)return showToast('请先输入你的问题');const resultDiv=$('divine-result');resultDiv.innerHTML='';for(let i=0;i<count;i++){const card=randomPick(TAROT_DECK);const isUpright=Math.random()<0.5;const position=isUpright?'正位':'逆位';const cardDiv=document.createElement('div');cardDiv.className='tarot-card';cardDiv.style.cssText='width:30%;max-width:100px;height:150px;';cardDiv.innerHTML=`<div class="tarot-card-inner"><div class="tarot-card-front" style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:5px;"><div style="font-size:14px;font-weight:bold;text-align:center;margin-bottom:10px;word-break:break-all;">${card}</div><div style="font-size:12px;color:${isUpright?'#4A4A4A':'#C9B4B0'};">${position}</div></div><div class="tarot-card-back"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path><path d="M19 8.5a4.5 4.5 0 1 1-2.5-4.03A5.5 5.5 0 0 0 19 8.5z"></path></svg></div></div>`;cardDiv.onclick=()=>{cardDiv.classList.add('flipped');};resultDiv.appendChild(cardDiv);}}
 
 function startCall(){if(!currentSession)return showToast('请先进入聊天');if(Math.random()<0.5){showToast('对方已拒绝');return;}showCallFloat();}
-function showCallFloat(){$('call-float').style.display='flex';$('call-island').style.display='none';$('call-name').textContent=currentSession.name;const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<div style="font-size:36px;">${currentSession.avatar||'👤'}</div>`;$('call-avatar-container').innerHTML=avatarHtml;callSeconds=0;$('call-timer').textContent='00:00';if(callInterval)clearInterval(callInterval);callInterval=setInterval(()=>{callSeconds++;const m=String(Math.floor(callSeconds/60)).padStart(2,'0');const s=String(callSeconds%60).padStart(2,'0');$('call-timer').textContent=`${m}:${s}`;$('call-island-timer').textContent=`${m}:${s}`;},1000);}
-function minimizeCall(){$('call-float').style.display='none';$('call-island').style.display='flex';const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<span style="font-size:20px;">${currentSession.avatar||'👤'}</span>`;$('call-island-avatar').innerHTML=avatarHtml;$('call-island-name').textContent=currentSession.name;}
-function endCall(){clearInterval(callInterval);callInterval=null;$('call-float').style.display='none';$('call-island').style.display='none';}
-
-function setupTimers(){if(msgTimer)clearInterval(msgTimer);msgTimer=setInterval(()=>{if(currentSession&&Math.random()<0.2){const pool=cards.length?cards:[{text:'在干嘛呢？'}];const msg=randomPick(pool).text;dbAdd('messages',{sessionId:currentSessionId,text:msg,sender:'bot',time:Date.now()});chatMessages.push({text:msg,sender:'bot',time:Date.now()});showTopNotification(currentSession.name,msg,currentSession.avatar);const badge=$('badge-chat');if(badge)badge.style.display='block';if(document.getElementById('page-chat').classList.contains('active')){renderChat();const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;}}},settings.msgInterval*60*1000);}
-
-let lastHiddenTime=Date.now();
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const now=Date.now();const elapsed=now-lastHiddenTime;const interval=(settings.msgInterval||5)*60*1000;if(elapsed>interval){if(currentSession){const pool=cards.length?cards:[{text:'在干嘛呢？'}];const msg=randomPick(pool).text;dbAdd('messages',{sessionId:currentSessionId,text:msg,sender:'bot',time:Date.now()});chatMessages.push({text:msg,sender:'bot',time:Date.now()});showTopNotification(currentSession.name,msg,currentSession.avatar);const badge=$('badge-chat');if(badge)badge.style.display='block';if(document.getElementById('page-chat').classList.contains('active')){renderChat();const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;}}}lastHiddenTime=Date.now();}else{lastHiddenTime=Date.now();}checkLetters();checkMomentsAutoPost();});
-
-/* 朋友圈 */
-async function renderMoments(){moments=await dbGetAll('moments');moments.sort((a,b)=>b.time-a.time);const list=$('moment-list');list.innerHTML='';if(moments.length===0){list.innerHTML='<div class="empty">还没有动态，点右上角发一条吧</div>';return;}moments.forEach(m=>{const div=document.createElement('div');div.className='moment-item';const session=sessions.find(s=>s.id===m.sessionId);const name=session?session.name:'未知';const avatar=session?session.avatar:'👤';let commentsHtml='';if(m.comments&&m.comments.length>0){commentsHtml='<div class="moment-comments">'+m.comments.map(c=>{const cName=c.from==='user'?'我':name;return `<div class="moment-comment"><b>${cName}：</b>${escapeHtml(c.text)}</div>`;}).join('')+'</div>';}div.innerHTML=`<div class="moment-header"><div class="avatar">${avatar&&avatar.startsWith('data:image')?`<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="font-size:20px;">${avatar||'👤'}</span>`}</div><div class="moment-name">${escapeHtml(name)}</div></div><div class="moment-content">${escapeHtml(m.content)}</div><div class="moment-actions"><span onclick="likeMoment(${m.id})">❤️ ${m.likes||0}</span><span onclick="openCommentModal(${m.id})">💬 评论</span><span onclick="deleteMoment(${m.id})" style="color:#
+function showCallFloat(){$('call-float').style.display='flex';$('call-island').style.display='none';$('call-name').textContent=currentSession.name;const avatarHtml=currentSession.avatar&&currentSession.avatar.startsWith('data:image')?`<img src="${currentSession.avatar}">`:`<div style="font-size:36px;">${currentSession.avatar||'👤'}</div>`;$('call-avatar-container').innerHTML=avatarHtml;callSeconds=0;$('call-timer').textContent='00:00';if(callInterval)clearInterval(callInterval);callInterval=setInterval(()=>{callSeconds++;const m=String(Math.floor(callSeconds/60)).padStart(2,'0');const s=String(callSeconds%60).pad
