@@ -587,21 +587,44 @@ let replyTimeout=null;
 function triggerBotReply(){
   if(replyTimeout)clearTimeout(replyTimeout);
   replyTimeout=setTimeout(async()=>{
-    let pool=cards;if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));if(pool.length===0)pool=cards;
+    let pool=cards;
+    if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));
+    if(pool.length===0)pool=cards;
     if(pool.length===0)return appendBubble('我还没有字卡呢，去添加一些吧。','bot',null,null);
-    const minC=settings.minReplyCount||1;const maxC=settings.maxReplyCount||1;const replyCount=minC+Math.floor(Math.random()*(maxC-minC+1));
-    let delayAccumulator=0;
-    for(let i=0;i<replyCount;i++){
-      delayAccumulator+=(settings.minReplyDelay||0.5)*1000+Math.random()*1000;
-      setTimeout(async()=>{
-        let replyText;let attempts=0;do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);lastReply=replyText;
-        let quote=null;if(Math.random()*100<settings.probQuote){const userMsgs=chatMessages.filter(m=>m.sender==='user');const todayMsgs=userMsgs.filter(m=>new Date(m.time).toDateString()===new Date().toDateString());if(todayMsgs.length>0)quote=randomPick(todayMsgs).text;}
-        if(Math.random()*100<settings.probFav){const userMsgs=chatMessages.filter(m=>m.sender==='user');if(userMsgs.length>0){const favText=randomPick(userMsgs).text;await dbAdd('favorites',{sessionId:currentSessionId,text:favText,from:'ta',time:Date.now()});showToast(`TA 悄悄收藏了你的消息：“${favText}”`);}}
-        let emoji=null;if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;
-        appendBubble(replyText,'bot',quote,emoji);
-      },delayAccumulator);
+    hideTyping();
+    const minC=settings.minReplyCount||1;
+    const maxC=settings.maxReplyCount||1;
+    const replyCount=minC+Math.floor(Math.random()*(maxC-minC+1));
+    const sendOne=async()=>{
+      let replyText;let attempts=0;
+      do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);
+      lastReply=replyText;
+      let quote=null;
+      if(Math.random()*100<settings.probQuote){
+        const userMsgs=chatMessages.filter(m=>m.sender==='user');
+        const todayMsgs=userMsgs.filter(m=>new Date(m.time).toDateString()===new Date().toDateString());
+        if(todayMsgs.length>0)quote=randomPick(todayMsgs).text;
+      }
+      if(Math.random()*100<settings.probFav){
+        const userMsgs=chatMessages.filter(m=>m.sender==='user');
+        if(userMsgs.length>0){
+          const favText=randomPick(userMsgs).text;
+          await dbAdd('favorites',{sessionId:currentSessionId,text:favText,from:'ta',time:Date.now()});
+          showToast(`TA 悄悄收藏了你的消息：“${favText}”`);
+        }
+      }
+      let emoji=null;
+      if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;
+      appendBubble(replyText,'bot',quote,emoji);
+    };
+    // 第一条立即显示
+    sendOne();
+    // 后续条目按间隔依次显示
+    for(let i=1;i<replyCount;i++){
+      const delay=(settings.minReplyDelay||0.5)*1000+Math.random()*1000;
+      setTimeout(sendOne,delay*i);
     }
-  },2000);
+  },500);
 }
 async function sendChat(){const input=$('chat-input');const text=input.value.trim();if(!text)return;
   const quoteToSend=pendingQuote;pendingQuote=null;input.placeholder='输入消息...';
