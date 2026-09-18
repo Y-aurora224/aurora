@@ -22,8 +22,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .home-weather{font-size:28px;cursor:pointer;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1));transition:transform 0.2s;}
 .home-weather:active{transform:scale(0.9);}
 .icon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 15px;margin-top:10px;position:relative;}
-.app-icon{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;position:relative;transition:transform 0.2s;touch-action:none;}
-.app-icon.dragging{opacity:0.8;transform:scale(1.1);z-index:999;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.2));}
+.app-icon{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;position:relative;transition:transform 0.2s;}
 .icon-box{width:60px;height:60px;border-radius:16px;background:var(--card-bg);display:flex;justify-content:center;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);color:#555;transition:transform 0.1s;pointer-events:none;}
 .icon-label{font-size:12px;color:#555;font-weight:500;text-shadow:0 1px 4px rgba(255,255,255,0.8);pointer-events:none;}
 .badge{position:absolute;top:-2px;right:8px;background:#ff3b30;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;border:2px solid var(--bg-color);}
@@ -509,44 +508,6 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 
 try{const workerCode=`let t=null; self.onmessage=function(e){ if(e.data.cmd==='start'){ if(t)clearInterval(t); t=setInterval(()=>self.postMessage('tick'), e.data.interval); } };`;const blob=new Blob([workerCode],{type:'application/javascript'});const worker=new Worker(URL.createObjectURL(blob));worker.onmessage=(e)=>{if(e.data==='tick'&&currentSession){}};worker.postMessage({cmd:'start',interval:(settings.msgInterval||5)*60*1000});}catch(err){console.log('Worker 启动失败，降级使用普通定时器');}
 
-/* 图标拖拽（长按触发） */
-let draggedIcon = null;
-let longPressTimer = null;
-document.querySelectorAll('.app-icon').forEach(icon => {
-    icon.addEventListener('touchstart', (e) => {
-        longPressTimer = setTimeout(() => {
-            draggedIcon = icon;
-            icon.classList.add('dragging');
-            const touch = e.touches[0];
-            const rect = icon.getBoundingClientRect();
-            icon.dataset.startX = touch.clientX - rect.left;
-            icon.dataset.startY = touch.clientY - rect.top;
-            icon.style.position = 'absolute';
-            icon.style.zIndex = '999';
-            showToast('拖拽模式已开启');
-        }, 600);
-    }, { passive: true });
-
-    icon.addEventListener('touchmove', (e) => {
-        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        if (!draggedIcon) return;
-        e.preventDefault();
-        const touch = e.touches[0];
-        const parentRect = icon.parentElement.getBoundingClientRect();
-        draggedIcon.style.left = (touch.clientX - parentRect.left - parseInt(draggedIcon.dataset.startX)) + 'px';
-        draggedIcon.style.top = (touch.clientY - parentRect.top - parseInt(draggedIcon.dataset.startY)) + 'px';
-    }, { passive: false });
-
-    icon.addEventListener('touchend', () => {
-        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        if (draggedIcon) {
-            draggedIcon.classList.remove('dragging');
-            draggedIcon.style.zIndex = '';
-            draggedIcon = null;
-            showToast('位置已保存');
-        }
-    });
-});
 async function initApp(){
   await initDB();
   const savedSettings=await dbGetAll('settings');const loaded={};savedSettings.forEach(s=>{loaded[s.key]=s.value;});
