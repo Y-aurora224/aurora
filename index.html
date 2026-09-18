@@ -595,6 +595,9 @@ function triggerBotReply(){
     const minC=settings.minReplyCount||1;
     const maxC=settings.maxReplyCount||1;
     const replyCount=minC+Math.floor(Math.random()*(maxC-minC+1));
+    const minD=(settings.minReplyDelay||0.5)*1000;
+    const maxD=(settings.maxReplyDelay||2.0)*1000;
+    let cumulative=0;
     const sendOne=async()=>{
       let replyText;let attempts=0;
       do{replyText=randomPick(pool).text;attempts++;}while(pool.length>1&&replyText===lastReply&&attempts<10);
@@ -617,16 +620,22 @@ function triggerBotReply(){
       if(Math.random()*100<settings.probEmoji&&emojis.length>0)emoji=randomPick(emojis).content;
       appendBubble(replyText,'bot',quote,emoji);
     };
-    // 第一条立即显示
-    sendOne();
-    // 后续条目按间隔依次显示
-    for(let i=1;i<replyCount;i++){
-      const delay=(settings.minReplyDelay||0.5)*1000+Math.random()*1000;
-      setTimeout(sendOne,delay*i);
+    for(let i=0;i<replyCount;i++){
+      cumulative+=minD+Math.random()*(maxD-minD);
+      if(i===0){
+        setTimeout(sendOne,cumulative);
+      }else{
+        setTimeout(sendOne,cumulative);
+      }
     }
-  },500);
+  },300);
 }
 async function sendChat(){const input=$('chat-input');const text=input.value.trim();if(!text)return;
+  const quoteToSend=pendingQuote;pendingQuote=null;input.placeholder='输入消息...';
+  appendBubble(text,'user',quoteToSend,null);input.value='';showTyping();
+  addAffection('聊天');
+  triggerBotReply();
+}
   const quoteToSend=pendingQuote;pendingQuote=null;input.placeholder='输入消息...';
   appendBubble(text,'user',quoteToSend,null);input.value='';showTyping();
   addAffection('聊天');
