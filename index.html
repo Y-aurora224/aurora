@@ -509,15 +509,44 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 
 try{const workerCode=`let t=null; self.onmessage=function(e){ if(e.data.cmd==='start'){ if(t)clearInterval(t); t=setInterval(()=>self.postMessage('tick'), e.data.interval); } };`;const blob=new Blob([workerCode],{type:'application/javascript'});const worker=new Worker(URL.createObjectURL(blob));worker.onmessage=(e)=>{if(e.data==='tick'&&currentSession){}};worker.postMessage({cmd:'start',interval:(settings.msgInterval||5)*60*1000});}catch(err){console.log('Worker 启动失败，降级使用普通定时器');}
 
-/* 图标拖拽 */
-let dragEnabled=false;let draggedIcon=null;
-document.querySelectorAll('.app-icon').forEach(icon=>{
-    icon.addEventListener('dblclick',()=>{dragEnabled=true;icon.classList.add('dragging');showToast('拖拽模式已开启，拖动图标调整位置');});
-    icon.addEventListener('touchstart',(e)=>{if(!dragEnabled)return;draggedIcon=icon;const touch=e.touches[0];const rect=icon.getBoundingClientRect();icon.dataset.startX=touch.clientX-rect.left;icon.dataset.startY=touch.clientY-rect.top;icon.style.position='absolute';icon.style.zIndex='999';},{passive:true});
-    icon.addEventListener('touchmove',(e)=>{if(!dragEnabled||!draggedIcon)return;e.preventDefault();const touch=e.touches[0];const parentRect=icon.parentElement.getBoundingClientRect();draggedIcon.style.left=(touch.clientX-parentRect.left-parseInt(draggedIcon.dataset.startX))+'px';draggedIcon.style.top=(touch.clientY-parentRect.top-parseInt(draggedIcon.dataset.startY))+'px';},{passive:false});
-    icon.addEventListener('touchend',()=>{if(draggedIcon){dragEnabled=false;draggedIcon.classList.remove('dragging');draggedIcon.style.zIndex='';draggedIcon=null;showToast('位置已保存');}});
-});
+/* 图标拖拽（长按触发） */
+let draggedIcon = null;
+let longPressTimer = null;
+document.querySelectorAll('.app-icon').forEach(icon => {
+    icon.addEventListener('touchstart', (e) => {
+        longPressTimer = setTimeout(() => {
+            draggedIcon = icon;
+            icon.classList.add('dragging');
+            const touch = e.touches[0];
+            const rect = icon.getBoundingClientRect();
+            icon.dataset.startX = touch.clientX - rect.left;
+            icon.dataset.startY = touch.clientY - rect.top;
+            icon.style.position = 'absolute';
+            icon.style.zIndex = '999';
+            showToast('拖拽模式已开启');
+        }, 600);
+    }, { passive: true });
 
+    icon.addEventListener('touchmove', (e) => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        if (!draggedIcon) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const parentRect = icon.parentElement.getBoundingClientRect();
+        draggedIcon.style.left = (touch.clientX - parentRect.left - parseInt(draggedIcon.dataset.startX)) + 'px';
+        draggedIcon.style.top = (touch.clientY - parentRect.top - parseInt(draggedIcon.dataset.startY)) + 'px';
+    }, { passive: false });
+
+    icon.addEventListener('touchend', () => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        if (draggedIcon) {
+            draggedIcon.classList.remove('dragging');
+            draggedIcon.style.zIndex = '';
+            draggedIcon = null;
+            showToast('位置已保存');
+        }
+    });
+});
 async function initApp(){
   await initDB();
   const savedSettings=await dbGetAll('settings');const loaded={};savedSettings.forEach(s=>{loaded[s.key]=s.value;});
