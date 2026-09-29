@@ -154,6 +154,14 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .question-option.selected{background:var(--my-bubble);color:#fff;border-color:var(--my-bubble);}
 .question-option:disabled{opacity:0.7;cursor:default;}
 .question-answer-text{font-size:14px;color:#666;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:8px;text-align:center;}
+.diary-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;}
+.diary-header{display:flex;align-items:center;gap:8px;font-size:13px;color:#888;margin-bottom:10px;}
+.diary-header .avatar{width:28px;height:28px;font-size:16px;border-radius:50%;background:#e0e0e0;display:flex;justify-content:center;align-items:center;overflow:hidden;flex-shrink:0;}
+.diary-header .avatar img{width:100%;height:100%;object-fit:cover;}
+.diary-mood{background:#f3ede8;color:#8a7568;border-radius:10px;padding:2px 8px;font-size:12px;}
+.diary-content{font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap;word-break:break-word;}
+.diary-reply{margin-top:10px;padding:10px;background:#f5f9f5;border-left:3px solid #A3B1A6;border-radius:4px;font-size:13px;color:#555;line-height:1.7;white-space:pre-wrap;}
+.diary-reply b{color:#5e7a68;}
 </style>
 </head>
 <body>
@@ -194,7 +202,8 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
         <div class="icon-grid" id="icon-grid-2">
           <div class="app-icon" onclick="openFeature('小游戏')"><div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"></path></svg></div><div class="icon-label">小游戏</div></div>
           <div class="app-icon" onclick="openFeature('相册')"><div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div><div class="icon-label">相册</div></div>
-          <div class="app-icon" onclick="openDailyQuestion()"><div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div><div class="icon-label">每日一问</div></div><div class="app-icon" onclick="openFeature('日记')"><div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 4h14a2 2 0 0 1 2 2v14l-4-3-4 3-4-3-4 3V6a2 2 0 0 1 2-2z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line></svg></div><div class="icon-label">日记</div></div>
+          <div class="app-icon" onclick="openDailyQuestion()"><div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div><div class="icon-label">每日一问</div></div>
+          <div class="app-icon" onclick="openFeature('日记')"><div class="icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 4h14a2 2 0 0 1 2 2v14l-4-3-4 3-4-3-4 3V6a2 2 0 0 1 2-2z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line></svg></div><div class="icon-label">日记</div></div>
         </div>
         <div class="anniversary-widget" id="anniversary-widget" onclick="openAnniversaryModal()" style="display:none;">
           <div class="anniversary-label" id="anniversary-label">在一起已经</div>
@@ -253,10 +262,12 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 
   <section class="page" id="page-question">
     <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>每日一问</header>
-    <div class="scroll-area" id="question-area"></div><section class="page" id="page-diary">
-  <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>日记<button class="nav-btn" onclick="openWriteDiary()">写日记</button></header>
-  <div class="scroll-area" id="diary-list"></div>
-</section>
+    <div class="scroll-area" id="question-area"></div>
+  </section>
+
+  <section class="page" id="page-diary">
+    <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>日记<button class="nav-btn" onclick="openWriteDiary()">写日记</button></header>
+    <div class="scroll-area" id="diary-list"></div>
   </section>
 
   <section class="page" id="page-moments">
@@ -419,14 +430,14 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 
 <script>
 let db;const DB_NAME='AuroraChatDB';const DB_VERSION=9;
-function initDB(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=(e)=>{const database=e.target.result;if(!database.objectStoreNames.contains('settings'))database.createObjectStore('settings',{keyPath:'key'});if(!database.objectStoreNames.contains('sessions'))database.createObjectStore('sessions',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('messages')){const store=database.createObjectStore('messages',{keyPath:'id',autoIncrement:true});store.createIndex('sessionId','sessionId',{unique:false});}if(!database.objectStoreNames.contains('cardGroups'))database.createObjectStore('cardGroups',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('cards')){const store=database.createObjectStore('cards',{keyPath:'id',autoIncrement:true});store.createIndex('groupId','groupId',{unique:false});}if(!database.objectStoreNames.contains('emojis'))database.createObjectStore('emojis',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('favorites'))database.createObjectStore('favorites',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('letters')){const store=database.createObjectStore('letters',{keyPath:'id',autoIncrement:true});store.createIndex('sessionId','sessionId',{unique:false});}if(!database.objectStoreNames.contains('moments'))database.createObjectStore('moments',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('photos'))database.createObjectStore('photos',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('qaRecords'))database.createObjectStore('qaRecords',{keyPath:'id',autoIncrement:true});};request.onsuccess=(e)=>{db=e.target.result;resolve();};request.onerror=()=>reject(request.error);});}if(!database.objectStoreNames.contains('diaries'))database.createObjectStore('diaries',{keyPath:'id',autoIncrement:true});
+function initDB(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=(e)=>{const database=e.target.result;if(!database.objectStoreNames.contains('settings'))database.createObjectStore('settings',{keyPath:'key'});if(!database.objectStoreNames.contains('sessions'))database.createObjectStore('sessions',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('messages')){const store=database.createObjectStore('messages',{keyPath:'id',autoIncrement:true});store.createIndex('sessionId','sessionId',{unique:false});}if(!database.objectStoreNames.contains('cardGroups'))database.createObjectStore('cardGroups',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('cards')){const store=database.createObjectStore('cards',{keyPath:'id',autoIncrement:true});store.createIndex('groupId','groupId',{unique:false});}if(!database.objectStoreNames.contains('emojis'))database.createObjectStore('emojis',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('favorites'))database.createObjectStore('favorites',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('letters')){const store=database.createObjectStore('letters',{keyPath:'id',autoIncrement:true});store.createIndex('sessionId','sessionId',{unique:false});}if(!database.objectStoreNames.contains('moments'))database.createObjectStore('moments',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('photos'))database.createObjectStore('photos',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('qaRecords'))database.createObjectStore('qaRecords',{keyPath:'id',autoIncrement:true});if(!database.objectStoreNames.contains('diaries'))database.createObjectStore('diaries',{keyPath:'id',autoIncrement:true});};request.onsuccess=(e)=>{db=e.target.result;resolve();};request.onerror=()=>reject(request.error);});}
 function dbGetAll(s){return new Promise(r=>{const tx=db.transaction(s,'readonly');const req=tx.objectStore(s).getAll();req.onsuccess=()=>r(req.result||[]);});}
 function dbAdd(s,d){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).add(d);req.onsuccess=()=>r(req.result);});}
 function dbPut(s,d){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).put(d);req.onsuccess=()=>r(req.result);});}
 function dbDelete(s,id){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).delete(id);req.onsuccess=()=>r();});}
 function dbGetByIndex(s,i,v){return new Promise(r=>{const tx=db.transaction(s,'readonly');const idx=tx.objectStore(s).index(i);const req=idx.getAll(v);req.onsuccess=()=>r(req.result||[]);});}
 
-const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2,minReplyDelay:0.5,maxReplyDelay:2.0,minReplyCount:1,maxReplyCount:1,chatFontSize:16,weather:'sunny',desktopBg:'',affection:0,anniversaryName:'',anniversaryDate:'',lastGreeting:'',lastDiaryDate:''};,dQCurrent:null,dQUsed:[]};
+const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2,minReplyDelay:0.5,maxReplyDelay:2.0,minReplyCount:1,maxReplyCount:1,chatFontSize:16,weather:'sunny',desktopBg:'',affection:0,anniversaryName:'',anniversaryDate:'',lastGreeting:'',lastDiaryDate:''};
 let settings={...DEFAULT_SETTINGS};let sessions=[];let currentSessionId=null;let currentSession=null;let chatMessages=[];let cardGroups=[];let cards=[];let emojis=[];let favorites=[];let letters=[];let moments=[];let photos=[];let lastReply='';let ctxTargetMsg=null;let pendingQuote=null;let callInterval=null;let callSeconds=0;let msgTimer=null;let croppedImageBase64='';let lastTap=0;let currentLetterTab='sent';let currentMomentId=null;
 let cropImageSrc='';let cropScale=1;let cropTranslateX=0;let cropTranslateY=0;let isDragging=false;let dragStartX=0;let dragStartY=0;let initialPinchDistance=0;let initialScale=1;
 let audioCtx=null;let currentSound=null;
@@ -496,6 +507,7 @@ function openAnniversaryModal(){openModal(`<div class="close-btn" onclick="close
 async function saveAnniversary(){const name=$('anni-name').value.trim()||'纪念日';const date=$('anni-date').value;if(!date)return showToast('请选择日期');settings.anniversaryName=name;settings.anniversaryDate=date;await dbPut('settings',{key:'anniversaryName',value:name});await dbPut('settings',{key:'anniversaryDate',value:date});renderAnniversary();closeModal();showToast('纪念日已保存');}
 async function clearAnniversary(){settings.anniversaryName='';settings.anniversaryDate='';await dbPut('settings',{key:'anniversaryName',value:''});await dbPut('settings',{key:'anniversaryDate',value:''});renderAnniversary();closeModal();showToast('已清除');}
 
+/* 每日一问 */
 const QUESTION_BANK=[
 {q:'你今天心情怎么样？',o:['开心','还行','有点累','不太想说话']},{q:'最近有什么让你开心的事吗？',o:['有，很多','有一两件','想不起来了']},{q:'如果现在能去一个地方，你想去哪？',o:['海边','山里','另一个城市','家里躺着']},{q:'你更喜欢哪种天气？',o:['晴天','雨天','阴天','下雪']},{q:'今天想和我说什么？',o:['想你了','今天发生的事','没什么','你来问我']},{q:'最近有好好吃饭吗？',o:['有','还行','经常忘记','没胃口']},{q:'昨晚睡得好吗？',o:['很好','还行','不太好','几乎没睡']},{q:'你最喜欢我哪一点？',o:['温柔','贴心','有趣','还不知道']},{q:'如果只能选一样，你会选？',o:['咖啡','奶茶','果汁','白开水']},{q:'周末你更想做什么？',o:['宅在家','出去玩','睡懒觉','看书']},{q:'最近有什么事让你困扰吗？',o:['工作/学习','感情','生活琐事','没什么']},{q:'你喜欢早上还是晚上？',o:['早上','下午','傍晚','深夜']},{q:'今天有没有想起我？',o:['有','好几次','一直在想','没有']},{q:'你最喜欢什么颜色？',o:['红','蓝','绿','黄']},{q:'最近看什么剧或书？',o:['电视剧','电影','小说','都没看']},{q:'今天累不累？',o:['不累','还行','有点累','非常累']},{q:'你有什么想对我说但没说出口的吗？',o:['有','想不起来','现在就说','先不说']},{q:'你更喜欢我主动还是你主动？',o:['我主动','你主动','都可以','看情况']},{q:'今天心情的颜色是？',o:['明亮的黄','温柔的粉','平静的蓝','有点灰']},{q:'如果现在可以实现一个愿望，你想要什么？',o:['和你在一起','家人平安','工作顺利','世界和平']},
 {q:'你喜欢猫还是狗？',o:['猫','狗','都喜欢','都不喜欢']},{q:'今天最想做的事是什么？',o:['和你聊天','睡觉','出去走走','放空']},{q:'你觉得自己是个什么样的人？',o:['温柔','内向','开朗','复杂']},{q:'最近在听什么歌？',o:['流行','轻音乐','老歌','没听']},{q:'今天有没有偷偷笑出声？',o:['有','差点','没有','不记得']},{q:'你更喜欢热闹还是安静？',o:['热闹','安静','看心情','都不喜欢']},{q:'今天最想吃什么？',o:['火锅','甜品','家常菜','随便']},{q:'你希望我多了解你哪一面？',o:['软弱的','开心的','脆弱的','真实的']},{q:'如果今晚可以和我一起做一件事，你想做什么？',o:['散步','看电影','聊天','安静待着']},{q:'你今天穿的是什么颜色的衣服？',o:['浅色','深色','花花的','睡衣']},
@@ -522,8 +534,7 @@ async function renderDailyQuestion(){
     const pool=QUESTION_BANK.map((q,i)=>i).filter(i=>!answeredIds.includes(i)&&!usedIds.includes(i));
     if(pool.length===0){area.innerHTML='<div class="empty">所有问题都问过啦～<br>明天再来吧</div>';return;}
     todayQid=randomPick(pool);
-    settings.dQDate=today;
-    settings.dQCurrent=todayQid;
+    settings.dQDate=today;settings.dQCurrent=todayQid;
     settings.dQUsed=[...usedIds,todayQid];
     await dbPut('settings',{key:'dQDate',value:today});
     await dbPut('settings',{key:'dQCurrent',value:todayQid});
@@ -539,14 +550,7 @@ async function renderDailyQuestion(){
     html+=`<button class="question-option${selected}" ${disabled} onclick="answerQuestion(${todayQid},'${escapeHtml(opt).replace(/'/g,"\\'")}',this)">${escapeHtml(opt)}</button>`;
   });
   html+='</div>';
-  if(todayRecord){html+=`<div class="question-answer-text">你已经回答过啦，TA 说：我记下了 💕</div>`;}.diary-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;}
-.diary-header{display:flex;align-items:center;gap:8px;font-size:13px;color:#888;margin-bottom:10px;}
-.diary-header .avatar{width:28px;height:28px;font-size:16px;border-radius:50%;background:#e0e0e0;display:flex;justify-content:center;align-items:center;overflow:hidden;}
-.diary-header .avatar img{width:100%;height:100%;object-fit:cover;}
-.diary-mood{background:#f3ede8;color:#8a7568;border-radius:10px;padding:2px 8px;font-size:12px;}
-.diary-content{font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap;word-break:break-word;}
-.diary-reply{margin-top:10px;padding:10px;background:#f5f9f5;border-left:3px solid #A3B1A6;border-radius:4px;font-size:13px;color:#555;line-height:1.7;white-space:pre-wrap;}
-.diary-reply b{color:#5e7a68;}
+  if(todayRecord){html+=`<div class="question-answer-text">你已经回答过啦，TA 说：我记下了 💕</div>`;}
   area.innerHTML=html;
 }
 async function answerQuestion(qid,answer,btn){
@@ -561,6 +565,102 @@ async function answerQuestion(qid,answer,btn){
   tip.className='question-answer-text';tip.textContent='TA 说：我记下了 💕';area.appendChild(tip);
 }
 
+/* 日记 */
+function getMoodList(){
+  const g=cardGroups.find(x=>x.name==='情绪');
+  if(!g)return ['😊 开心','😌 平静','😔 难过'];
+  const list=cards.filter(c=>c.groupId===g.id).map(c=>c.text);
+  return list.length?list:['😊 开心','😌 平静'];
+}
+async function openWriteDiary(){
+  const today=new Date().toDateString();
+  const all=await dbGetAll('diaries');
+  if(all.find(d=>d.isUser&&d.date===today))return showToast('今天已经写过日记啦');
+  const moods=getMoodList();
+  let html=`<div class="close-btn" onclick="closeModal()">×</div><h3>写日记</h3>
+    <div class="form-group"><label>今天发生了什么？</label>
+    <textarea id="diary-content-input" rows="6" placeholder="写下今天的心情和事情..."></textarea></div>
+    <div class="form-group"><label>今天的心情</label><div id="mood-options" style="display:flex;flex-wrap:wrap;gap:8px;">`;
+  moods.forEach(m=>{html+=`<button class="question-option" style="width:auto;margin:0;" onclick="selectDiaryMood(this,'${escapeHtml(m).replace(/'/g,"\\'")}')">${escapeHtml(m)}</button>`;});
+  html+=`</div></div><button class="btn-primary" onclick="submitDiary()">保存</button>`;
+  openModal(html);
+  window._selectedMood=moods[0];
+  document.querySelectorAll('#mood-options .question-option').forEach(b=>{if(b.textContent===moods[0])b.classList.add('selected');});
+}
+function selectDiaryMood(btn,mood){
+  window._selectedMood=mood;
+  document.querySelectorAll('#mood-options .question-option').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+async function submitDiary(){
+  const content=$('diary-content-input').value.trim();
+  if(!content)return showToast('写点什么吧');
+  const mood=window._selectedMood||getMoodList()[0];
+  const today=new Date().toDateString();
+  const id=await dbAdd('diaries',{isUser:true,date:today,content,mood,time:Date.now(),reply:''});
+  closeModal();
+  addAffection('写日记');
+  renderDiary();
+  setTimeout(async()=>{
+    const all=await dbGetAll('diaries');
+    const mine=all.find(d=>d.id===id);
+    if(!mine)return;
+    let pool=cards;
+    if(currentSession&&currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));
+    if(pool.length===0)pool=cards;
+    if(pool.length===0)return;
+    const count=1+Math.floor(Math.random()*2);
+    let reply='';
+    for(let i=0;i<count;i++)reply+=randomPick(pool).text+(i<count-1?'，':'。');
+    mine.reply=reply;
+    await dbPut('diaries',mine);
+    renderDiary();
+  },1000+Math.random()*1200);
+}
+function generateTADiary(){
+  const pool=cards.length?cards:[{text:'今天也想你'}];
+  const count=10+Math.floor(Math.random()*21);
+  let lines=[];
+  for(let i=0;i<count;i++)lines.push(randomPick(pool).text);
+  return lines.join('\n');
+}
+function generateTAMood(){
+  const list=getMoodList();
+  return randomPick(list);
+}
+async function checkAutoWriteDiary(){
+  const today=new Date().toDateString();
+  const all=await dbGetAll('diaries');
+  if(all.find(d=>!d.isUser&&d.date===today))return;
+  const content=generateTADiary();
+  const mood=generateTAMood();
+  await dbAdd('diaries',{isUser:false,date:today,content,mood,time:Date.now()});
+}
+async function renderDiary(){
+  try{await checkAutoWriteDiary();}catch(e){console.log('日记自动写失败',e);}
+  const all=await dbGetAll('diaries');
+  all.sort((a,b)=>b.time-a.time);
+  const list=$('diary-list');
+  if(!list)return;
+  list.innerHTML='';
+  if(all.length===0){list.innerHTML='<div class="empty">还没有日记</div>';return;}
+  for(const d of all){
+    const div=document.createElement('div');
+    div.className='diary-card';
+    let name='我',avatar=settings.myAvatar||'👤';
+    if(!d.isUser){
+      const session=sessions.find(s=>s.id===d.sessionId);
+      name=session?session.name:'TA';
+      avatar=session?session.avatar:'👤';
+    }
+    let avatarHtml=avatar&&avatar.startsWith('data:image')?`<img src="${avatar}">`:`<span>${avatar||'👤'}</span>`;
+    let replyHtml=d.reply?`<div class="diary-reply"><b>${escapeHtml(name)}回复：</b><br>${escapeHtml(d.reply)}</div>`:'';
+    div.innerHTML=`<div class="diary-header"><div class="avatar">${avatarHtml}</div><span>${escapeHtml(name)}</span><span>·</span><span>${escapeHtml(d.date)}</span><span class="diary-mood">${escapeHtml(d.mood||'')}</span></div><div class="diary-content">${escapeHtml(d.content)}</div>${replyHtml}`;
+    list.appendChild(div);
+  }
+}
+
+/* 聊天 */
 async function loadSessions(){sessions=await dbGetAll('sessions');if(sessions.length===0){const ds={name:'小明',avatar:'😀',groupIds:[]};const id=await dbAdd('sessions',ds);ds.id=id;sessions.push(ds);}renderSessions();}
 function renderSessions(){const list=$('session-list');list.innerHTML='';sessions.forEach(s=>{const div=document.createElement('div');div.className='session-item';div.innerHTML=`<div class="avatar">${s.avatar&&s.avatar.startsWith('data:image')?`<img src="${s.avatar}">`:escapeHtml(s.avatar||'👤')}</div><div class="session-info"><div class="session-name">${escapeHtml(s.name)}</div></div><button class="delete-session-btn" style="background:#ff3b30;color:#fff;border:none;border-radius:4px;padding:5px 10px;font-size:12px;cursor:pointer;">删除</button>`;div.onclick=()=>enterChat(s);div.querySelector('.delete-session-btn').onclick=(e)=>{e.stopPropagation();if(!confirm(`确定删除聊天窗口 "${s.name}" 及所有聊天记录吗？`))return;dbDelete('sessions',s.id).then(async()=>{const msgs=await dbGetByIndex('messages','sessionId',s.id);for(const m of msgs)await dbDelete('messages',m.id);loadSessions();showToast('已删除');});};list.appendChild(div);});}
 
@@ -610,7 +710,7 @@ function triggerBotReply(){
     let pool=cards;
     if(currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));
     if(pool.length===0)pool=cards;
-    if(pool.length===0)return appendBubble('我还没有字卡呢，去添加一些吧。','bot',null,null);
+    if(pool.length===0){hideTyping();return appendBubble('我还没有字卡呢，去添加一些吧。','bot',null,null);}
     const minC=settings.minReplyCount||1;
     const maxC=settings.maxReplyCount||1;
     const replyCount=minC+Math.floor(Math.random()*(maxC-minC+1));
@@ -660,12 +760,17 @@ document.addEventListener('click',(e)=>{if(!$('context-menu').contains(e.target)
 
 async function renderFavorites(){favorites=await dbGetAll('favorites');const myList=$('fav-my-list');const taList=$('fav-ta-list');myList.innerHTML='';taList.innerHTML='';favorites.filter(f=>f.from==='me').forEach(f=>{const div=document.createElement('div');div.className='fav-item';div.innerHTML=`<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;myList.appendChild(div);});if(myList.innerHTML==='')myList.innerHTML='<div class="empty">还没有收藏</div>';favorites.filter(f=>f.from==='ta').forEach(f=>{const div=document.createElement('div');div.className='fav-item';div.innerHTML=`<div>${escapeHtml(f.text)}</div><div style="font-size:12px;color:#999;">${formatTime(f.time)}</div>`;taList.appendChild(div);});if(taList.innerHTML==='')taList.innerHTML='<div class="empty">TA 还没有收藏你的消息</div>';}
 
-async function loadCardData(){cardGroups=await dbGetAll('cardGroups');cards=await dbGetAll('cards');if(!cardGroups.find(g=>g.name==='每日状态')){await dbAdd('cardGroups',{name:'每日状态',isPinned:true});cardGroups=await dbGetAll('cardGroups');}if(!cardGroups.find(g=>g.name==='朋友圈')){await dbAdd('cardGroups',{name:'朋友圈',isPinned:false});cardGroups=await dbGetAll('cardGroups');}if(!cardGroups.find(g=>g.name==='当前状态')){await dbAdd('cardGroups',{name:'当前状态',isPinned:false});cardGroups=await dbGetAll('cardGroups');}}if(!cardGroups.find(g=>g.name==='情绪')){
-  const gid=await dbAdd('cardGroups',{name:'情绪',isPinned:false});
-  const defaultMoods=['😊 开心','😌 平静','😔 难过','😴 疲惫','🥰 想你','😤 烦躁','🤔 思考','😶 发呆','🌧️ 低落','✨ 期待'];
-  for(const m of defaultMoods)await dbAdd('cards',{groupId:gid,text:m});
-  cardGroups=await dbGetAll('cardGroups');
-  cards=await dbGetAll('cards');
+async function loadCardData(){
+  cardGroups=await dbGetAll('cardGroups');cards=await dbGetAll('cards');
+  if(!cardGroups.find(g=>g.name==='每日状态')){await dbAdd('cardGroups',{name:'每日状态',isPinned:true});cardGroups=await dbGetAll('cardGroups');}
+  if(!cardGroups.find(g=>g.name==='朋友圈')){await dbAdd('cardGroups',{name:'朋友圈',isPinned:false});cardGroups=await dbGetAll('cardGroups');}
+  if(!cardGroups.find(g=>g.name==='当前状态')){await dbAdd('cardGroups',{name:'当前状态',isPinned:false});cardGroups=await dbGetAll('cardGroups');}
+  if(!cardGroups.find(g=>g.name==='情绪')){
+    const gid=await dbAdd('cardGroups',{name:'情绪',isPinned:false});
+    const defaultMoods=['😊 开心','😌 平静','😔 难过','😴 疲惫','🥰 想你','😤 烦躁','🤔 思考','😶 发呆','🌧️ 低落','✨ 期待'];
+    for(const m of defaultMoods)await dbAdd('cards',{groupId:gid,text:m});
+    cardGroups=await dbGetAll('cardGroups');cards=await dbGetAll('cards');
+  }
 }
 async function renderCardGroups(){await loadCardData();const container=$('card-group-list');container.innerHTML='';const searchTerm=$('card-search')?$('card-search').value.toLowerCase():'';let displayGroups=[...cardGroups];if(searchTerm){displayGroups=cardGroups.filter(g=>g.name.toLowerCase().includes(searchTerm)||cards.some(c=>c.groupId===g.id&&c.text.toLowerCase().includes(searchTerm)));}displayGroups.sort((a,b)=>(b.isPinned?1:0)-(a.isPinned?1:0));displayGroups.forEach(g=>{const groupDiv=document.createElement('div');groupDiv.style.marginBottom='15px';let groupCards=cards.filter(c=>c.groupId===g.id);if(searchTerm){groupCards=groupCards.filter(c=>c.text.toLowerCase().includes(searchTerm)||g.name.toLowerCase().includes(searchTerm));}let cardsHtml=groupCards.map(c=>`<div class="card-item"><div class="content">${escapeHtml(c.text)}</div><div class="item-actions"><button onclick="editCard(${c.id})">改</button><button onclick="deleteCard(${c.id})">删</button></div></div>`).join('');const isDailyStatus=g.name==='每日状态';const pinBtn=`<button style="font-size:12px;padding:3px 8px;" onclick="togglePinGroup(${g.id})">${g.isPinned?'取消置顶':'置顶'}</button>`;const delBtn=isDailyStatus?'':`<button style="font-size:12px;padding:3px 8px;" onclick="deleteGroup(${g.id})">删除分组</button>`;groupDiv.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><h4 style="font-size:15px;">${escapeHtml(g.name)} (${groupCards.length})</h4><div>${pinBtn} ${delBtn}</div></div>${cardsHtml||'<div class="empty" style="padding:10px;">这个分组暂无字卡</div>'}`;container.appendChild(groupDiv);});}
 function openCardGroupModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>新建字卡分组</h3><div class="form-group"><label>分组名称</label><input type="text" id="new-group-name" placeholder="例如：日常、安慰、每日状态"></div><button class="btn-primary" onclick="createCardGroup()">创建</button>`);}
@@ -826,6 +931,7 @@ async function initApp(){
     await loadSessions();
     try{await checkLetters();}catch(e){console.log('checkLetters错误',e);}
     try{await checkMomentsAutoPost();}catch(e){console.log('checkMoments错误',e);}
+    try{await checkAutoWriteDiary();}catch(e){console.log('日记错误',e);}
     renderAffection();renderAnniversary();
     const dateStr=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
     if($('home-date'))$('home-date').textContent=dateStr;
@@ -834,113 +940,10 @@ async function initApp(){
     if($('home-weather'))$('home-weather').textContent=weatherIcons[settings.weather||'sunny'];
     if($('widget-text'))$('widget-text').textContent=getRandomCardFromPool('status');
     setInterval(()=>{if($('home-time'))$('home-time').textContent=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});},1000);
-try{await checkAutoWriteDiary();}catch(e){console.log('日记错误',e);}
-setupTimers();switchPage('home');
+    setupTimers();switchPage('home');
   }catch(err){
     console.error('初始化错误:',err);
     if($('widget-text'))$('widget-text').textContent='加载出错，请刷新重试';
-  }
-}
-/* ============ 日记模块 ============ */
-function getMoodList(){
-  const g=cardGroups.find(x=>x.name==='情绪');
-  if(!g)return ['😊 开心','😌 平静','😔 难过'];
-  const list=cards.filter(c=>c.groupId===g.id).map(c=>c.text);
-  return list.length?list:['😊 开心','😌 平静'];
-}
-
-async function openWriteDiary(){
-  const today=new Date().toDateString();
-  const all=await dbGetAll('diaries');
-  if(all.find(d=>d.isUser&&d.date===today))return showToast('今天已经写过日记啦');
-  const moods=getMoodList();
-  let html=`<div class="close-btn" onclick="closeModal()">×</div><h3>写日记</h3>
-    <div class="form-group"><label>今天发生了什么？</label>
-    <textarea id="diary-content-input" rows="6" placeholder="写下今天的心情和事情..."></textarea></div>
-    <div class="form-group"><label>今天的心情</label><div id="mood-options" style="display:flex;flex-wrap:wrap;gap:8px;">`;
-  moods.forEach(m=>{html+=`<button class="question-option" style="width:auto;margin:0;" onclick="selectDiaryMood(this,'${escapeHtml(m).replace(/'/g,"\\'")}')">${escapeHtml(m)}</button>`;});
-  html+=`</div></div><button class="btn-primary" onclick="submitDiary()">保存</button>`;
-  openModal(html);
-  window._selectedMood=moods[0];
-  document.querySelectorAll('#mood-options .question-option').forEach(b=>{if(b.textContent===moods[0])b.classList.add('selected');});
-}
-
-function selectDiaryMood(btn,mood){
-  window._selectedMood=mood;
-  document.querySelectorAll('#mood-options .question-option').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
-
-async function submitDiary(){
-  const content=$('diary-content-input').value.trim();
-  if(!content)return showToast('写点什么吧');
-  const mood=window._selectedMood||getMoodList()[0];
-  const today=new Date().toDateString();
-  const id=await dbAdd('diaries',{isUser:true,date:today,content,mood,time:Date.now(),reply:''});
-  closeModal();
-  addAffection('写日记');
-  renderDiary();
-  // TA 回复
-  setTimeout(async()=>{
-    const all=await dbGetAll('diaries');
-    const mine=all.find(d=>d.id===id);
-    if(!mine)return;
-    let pool=cards;
-    if(currentSession&&currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));
-    if(pool.length===0)pool=cards;
-    if(pool.length===0)return;
-    const count=1+Math.floor(Math.random()*2);
-    let reply='';
-    for(let i=0;i<count;i++)reply+=randomPick(pool).text+(i<count-1?'，':'。');
-    mine.reply=reply;
-    await dbPut('diaries',mine);
-    renderDiary();
-  },1000+Math.random()*1200);
-}
-
-function generateTADiary(){
-  const pool=cards.length?cards:[{text:'今天也想你'}];
-  const count=10+Math.floor(Math.random()*21);
-  let lines=[];
-  for(let i=0;i<count;i++)lines.push(randomPick(pool).text);
-  return lines.join('\n');
-}
-
-function generateTAMood(){
-  const list=getMoodList();
-  return randomPick(list);
-}
-
-async function checkAutoWriteDiary(){
-  const today=new Date().toDateString();
-  const all=await dbGetAll('diaries');
-  if(all.find(d=>!d.isUser&&d.date===today))return;
-  const content=generateTADiary();
-  const mood=generateTAMood();
-  await dbAdd('diaries',{isUser:false,date:today,content,mood,time:Date.now()});
-}
-
-async function renderDiary(){
-  await checkAutoWriteDiary();
-  const all=await dbGetAll('diaries');
-  all.sort((a,b)=>b.time-a.time);
-  const list=$('diary-list');
-  if(!list)return;
-  list.innerHTML='';
-  if(all.length===0){list.innerHTML='<div class="empty">还没有日记</div>';return;}
-  for(const d of all){
-    const div=document.createElement('div');
-    div.className='diary-card';
-    let name='我',avatar=settings.myAvatar||'👤';
-    if(!d.isUser){
-      const session=sessions.find(s=>s.id===d.sessionId);
-      name=session?session.name:'TA';
-      avatar=session?session.avatar:'👤';
-    }
-    let avatarHtml=avatar&&avatar.startsWith('data:image')?`<img src="${avatar}">`:`<span>${avatar||'👤'}</span>`;
-    let replyHtml=d.reply?`<div class="diary-reply"><b>${escapeHtml(name)}回复：</b><br>${escapeHtml(d.reply)}</div>`:'';
-    div.innerHTML=`<div class="diary-header"><div class="avatar">${avatarHtml}</div><span>${escapeHtml(name)}</span><span>·</span><span>${d.date.replace(/^[A-Za-z]+\s/,'')}</span><span class="diary-mood">${escapeHtml(d.mood||'')}</span></div><div class="diary-content">${escapeHtml(d.content)}</div>${replyHtml}`;
-    list.appendChild(div);
   }
 }
 window.addEventListener('DOMContentLoaded',initApp);
