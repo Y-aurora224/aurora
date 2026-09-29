@@ -335,6 +335,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
         <div style="display:flex;justify-content:space-between;align-items:center;"><span>陪伴弹幕间隔（分钟）：</span><input type="number" id="set-prob-barrage-interval" style="width:60px;text-align:center;"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;"><span>对方回复最快（秒）：</span><input type="number" id="set-prob-reply-min" style="width:60px;text-align:center;" step="0.1"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;"><span>对方回复最慢（秒）：</span><input type="number" id="set-prob-reply-max" style="width:60px;text-align:center;" step="0.1"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;"><span>聊天记录保留天数（0=永久）：</span><input type="number" id="set-keep-days" style="width:60px;text-align:center;" min="0"></div>
       </div>
       <button class="btn-primary" onclick="saveSettings()">保存设置</button>
     </div>
@@ -437,7 +438,7 @@ function dbPut(s,d){return new Promise(r=>{const tx=db.transaction(s,'readwrite'
 function dbDelete(s,id){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).delete(id);req.onsuccess=()=>r();});}
 function dbGetByIndex(s,i,v){return new Promise(r=>{const tx=db.transaction(s,'readonly');const idx=tx.objectStore(s).index(i);const req=idx.getAll(v);req.onsuccess=()=>r(req.result||[]);});}
 
-const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2,minReplyDelay:0.5,maxReplyDelay:2.0,minReplyCount:1,maxReplyCount:1,chatFontSize:16,weather:'sunny',desktopBg:'',affection:0,anniversaryName:'',anniversaryDate:'',lastGreeting:'',dQDate:'',dQCurrent:null,dQUsed:[]};
+const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2,minReplyDelay:0.5,maxReplyDelay:2.0,minReplyCount:1,maxReplyCount:1,chatFontSize:16,weather:'sunny',desktopBg:'',affection:0,anniversaryName:'',anniversaryDate:'',lastGreeting:'',dQDate:'',dQCurrent:null,dQUsed:[],keepDays:7};
 let settings={...DEFAULT_SETTINGS};let sessions=[];let currentSessionId=null;let currentSession=null;let chatMessages=[];let cardGroups=[];let cards=[];let emojis=[];let favorites=[];let letters=[];let moments=[];let photos=[];let lastReply='';let ctxTargetMsg=null;let pendingQuote=null;let callInterval=null;let callSeconds=0;let msgTimer=null;let croppedImageBase64='';let lastTap=0;let currentLetterTab='sent';let currentMomentId=null;
 let cropImageSrc='';let cropScale=1;let cropTranslateX=0;let cropTranslateY=0;let isDragging=false;let dragStartX=0;let dragStartY=0;let initialPinchDistance=0;let initialScale=1;
 let audioCtx=null;let currentSound=null;
@@ -641,7 +642,7 @@ async function submitDiary(){
     if(sessions[0]&&sessions[0].groupIds&&sessions[0].groupIds.length>0)pool=cards.filter(c=>sessions[0].groupIds.includes(c.groupId));
     if(pool.length===0)pool=cards;
     if(pool.length===0)return;
-    const count=1+Math.floor(Math.random()*2);
+    const count=3+Math.floor(Math.random()*3);
     let reply='';
     for(let i=0;i<count;i++)reply+=randomPick(pool).text+(i<count-1?'，':'。');
     mine.reply=reply;
@@ -687,10 +688,26 @@ async function renderDiary(){
       avatar=session?session.avatar:'👤';
     }
     let avatarHtml=avatar&&avatar.startsWith('data:image')?`<img src="${avatar}">`:`<span>${avatar||'👤'}</span>`;
-    let replyHtml=d.reply?`<div class="diary-reply"><b>${escapeHtml(name)}回复：</b><br>${escapeHtml(d.reply)}</div>`:'';
+    let replyName = sessions[0] ? sessions[0].name : 'TA';
+    let replyHtml=d.reply?`<div class="diary-reply"><b>${escapeHtml(replyName)}回复：</b><br>${escapeHtml(d.reply)}</div>`:'';
     div.innerHTML=`<div class="diary-header"><div class="avatar">${avatarHtml}</div><span>${escapeHtml(name)}</span><span>·</span><span>${escapeHtml(d.date)}</span><span class="diary-mood">${escapeHtml(d.mood||'')}</span></div><div class="diary-content">${escapeHtml(d.content)}</div>${replyHtml}`;
     list.appendChild(div);
   }
+}
+
+async function cleanupOldMessages(){
+  const days = parseInt(settings.keepDays) || 0;
+  if(days <= 0) return;
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const all = await dbGetAll('messages');
+  let deleted = 0;
+  for(const m of all){
+    if(m.time && m.time < cutoff){
+      await dbDelete('messages', m.id);
+      deleted++;
+    }
+  }
+  if(deleted > 0) console.log('清理了', deleted, '条旧聊天记录');
 }
 
 /* 聊天 */
@@ -905,15 +922,15 @@ window.addEventListener('mousemove',(e)=>{if(!isDragging)return;cropTranslateX=e
 window.addEventListener('mouseup',()=>{isDragging=false;});
 
 function resetDesktopBg(){dbPut('settings',{key:'desktopBg',value:''});settings.desktopBg='';document.documentElement.style.setProperty('--desktop-bg','url(\'\')');showToast('已恢复默认背景');}
-function loadSettingsUI(){$('set-my-name').value=settings.myName;$('set-chat-font-size').value=settings.chatFontSize;$('set-prob-quote').value=settings.probQuote;$('set-prob-fav').value=settings.probFav;$('set-prob-emoji').value=settings.probEmoji;$('set-prob-msg-interval').value=settings.msgInterval;$('set-prob-barrage-interval').value=settings.barrageInterval;$('set-prob-reply-min').value=settings.minReplyDelay;$('set-prob-reply-max').value=settings.maxReplyDelay;$('set-prob-reply-min-count').value=settings.minReplyCount;$('set-prob-reply-max-count').value=settings.maxReplyCount;}
-async function saveSettings(){settings.myName=$('set-my-name').value.trim()||'我';settings.chatFontSize=parseInt($('set-chat-font-size').value)||16;document.documentElement.style.setProperty('--chat-font-size',settings.chatFontSize+'px');settings.probQuote=parseInt($('set-prob-quote').value)||0;settings.probFav=parseInt($('set-prob-fav').value)||0;settings.probEmoji=parseInt($('set-prob-emoji').value)||0;settings.msgInterval=parseInt($('set-prob-msg-interval').value)||5;settings.barrageInterval=parseInt($('set-prob-barrage-interval').value)||2;settings.minReplyDelay=parseFloat($('set-prob-reply-min').value)||0.5;settings.maxReplyDelay=parseFloat($('set-prob-reply-max').value)||2.0;if(settings.minReplyDelay>settings.maxReplyDelay){const t=settings.minReplyDelay;settings.minReplyDelay=settings.maxReplyDelay;settings.maxReplyDelay=t;}settings.minReplyCount=parseInt($('set-prob-reply-min-count').value)||1;settings.maxReplyCount=parseInt($('set-prob-reply-max-count').value)||1;if(settings.minReplyCount>settings.maxReplyCount){const t=settings.minReplyCount;settings.minReplyCount=settings.maxReplyCount;settings.maxReplyCount=t;}for(const [key,value]of Object.entries(settings))await dbPut('settings',{key,value});if($('chat-my-name'))$('chat-my-name').textContent=settings.myName;if(currentSession)renderChat();showToast('设置已保存');setTimeout(()=>switchPage('home'),500);setupTimers();}
+function loadSettingsUI(){$('set-my-name').value=settings.myName;$('set-chat-font-size').value=settings.chatFontSize;$('set-prob-quote').value=settings.probQuote;$('set-prob-fav').value=settings.probFav;$('set-prob-emoji').value=settings.probEmoji;$('set-prob-msg-interval').value=settings.msgInterval;$('set-prob-barrage-interval').value=settings.barrageInterval;$('set-prob-reply-min').value=settings.minReplyDelay;$('set-prob-reply-max').value=settings.maxReplyDelay;$('set-prob-reply-min-count').value=settings.minReplyCount;$('set-prob-reply-max-count').value=settings.maxReplyCount;$('set-keep-days').value=settings.keepDays||7;}
+async function saveSettings(){settings.myName=$('set-my-name').value.trim()||'我';settings.chatFontSize=parseInt($('set-chat-font-size').value)||16;document.documentElement.style.setProperty('--chat-font-size',settings.chatFontSize+'px');settings.probQuote=parseInt($('set-prob-quote').value)||0;settings.probFav=parseInt($('set-prob-fav').value)||0;settings.probEmoji=parseInt($('set-prob-emoji').value)||0;settings.msgInterval=parseInt($('set-prob-msg-interval').value)||5;settings.barrageInterval=parseInt($('set-prob-barrage-interval').value)||2;settings.minReplyDelay=parseFloat($('set-prob-reply-min').value)||0.5;settings.maxReplyDelay=parseFloat($('set-prob-reply-max').value)||2.0;if(settings.minReplyDelay>settings.maxReplyDelay){const t=settings.minReplyDelay;settings.minReplyDelay=settings.maxReplyDelay;settings.maxReplyDelay=t;}settings.minReplyCount=parseInt($('set-prob-reply-min-count').value)||1;settings.maxReplyCount=parseInt($('set-prob-reply-max-count').value)||1;if(settings.minReplyCount>settings.maxReplyCount){const t=settings.minReplyCount;settings.minReplyCount=settings.maxReplyCount;settings.maxReplyCount=t;}settings.keepDays=parseInt($('set-keep-days').value);if(isNaN(settings.keepDays))settings.keepDays=7;for(const [key,value]of Object.entries(settings))await dbPut('settings',{key,value});if($('chat-my-name'))$('chat-my-name').textContent=settings.myName;if(currentSession)renderChat();showToast('设置已保存');setTimeout(()=>switchPage('home'),500);setupTimers();}
 async function saveAppearance(){for(const [key,value]of Object.entries(settings))await dbPut('settings',{key,value});showToast('外观已保存');setTimeout(()=>switchPage('home'),500);}
 
 function cropImage(event,targetKey){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(e)=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const size=Math.min(img.width,img.height);canvas.width=size;canvas.height=size;const ctx=canvas.getContext('2d');const sx=(img.width-size)/2;const sy=(img.height-size)/2;ctx.drawImage(img,sx,sy,size,size,0,0,size,size);croppedImageBase64=canvas.toDataURL('image/jpeg',0.8);if(targetKey==='myAvatar'){settings.myAvatar=croppedImageBase64;showToast('头像已更新，点击保存生效');}else if(targetKey==='newSessionAvatar'){showToast('头像已裁剪，点击创建即可');}else if(targetKey==='chatBg'){settings.chatBgImage=croppedImageBase64;applyChatBg();}};img.src=e.target.result;};reader.readAsDataURL(file);event.target.value='';}
 function applyChatBg(){if(settings.chatBgImage){$('chat-window').style.backgroundImage=`url(${settings.chatBgImage})`;}else{$('chat-window').style.backgroundImage='none';}}
 function editTaProfile(){if(!currentSession)return;openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>修改 TA 的资料</h3><div class="form-group"><label>昵称</label><input type="text" id="edit-ta-name" value="${escapeHtml(currentSession.name)}"></div><div class="form-group"><label>头像（不上传则保持原样）</label><input type="file" id="edit-ta-avatar" accept="image/*" onchange="cropImage(event,'newSessionAvatar')"></div><button class="btn-primary" onclick="saveTaProfile()">保存</button>`);}
 async function saveTaProfile(){const newName=$('edit-ta-name').value.trim();if(newName){currentSession.name=newName;$('chat-title').textContent=newName;$('chat-ta-name').textContent=newName;}if(croppedImageBase64){currentSession.avatar=croppedImageBase64;croppedImageBase64='';}await dbPut('sessions',currentSession);const idx=sessions.findIndex(s=>s.id===currentSession.id);if(idx!==-1)sessions[idx]=currentSession;closeModal();renderChat();showToast('资料已更新');}
-function openChatMenu(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>聊天设置</h3><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn-primary" onclick="closeModal();openFeature('朋友圈')">朋友圈</button><button class="btn-primary" onclick="document.getElementById('chat-bg-input').click()">改变当前聊天背景</button><input type="file" id="chat-bg-input" accept="image/*" hidden onchange="cropImage(event,'chatBg')"></div>`);}
+function openChatMenu(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>聊天设置</h3><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn-primary" onclick="document.getElementById('chat-bg-input').click()">改变当前聊天背景</button><input type="file" id="chat-bg-input" accept="image/*" hidden onchange="cropImage(event,'chatBg')"></div>`);}
 
 let companionTimer=null;let companionMsgTimer=null;
 function startCompanion(type){
@@ -1002,6 +1019,7 @@ async function initApp(){
     try{await checkLetters();}catch(e){console.log('checkLetters错误',e);}
     try{await checkMomentsAutoPost();}catch(e){console.log('checkMoments错误',e);}
     try{await checkAutoWriteDiary();}catch(e){console.log('日记错误',e);}
+    try{await cleanupOldMessages();}catch(e){console.log('清理记录失败',e);}
     renderAffection();renderAnniversary();
     const dateStr=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
     if($('home-date'))$('home-date').textContent=dateStr;
