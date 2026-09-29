@@ -73,7 +73,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .emoji-item-panel{width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:32px;cursor:pointer;border-radius:12px;background:#f7f7f7;margin:0 auto;}
 .emoji-item-panel img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
 .session-item,.card-item,.emoji-item,.fav-item,.letter-item,.moment-item{background:#fff;padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;}
-.session-name{font-weight:600;font-size:16px;text-align:center;width:100%;}
+.session-name{font-weight:600;font-size:16px;}
 .item-actions button{background:none;border:1px solid #ddd;padding:4px 8px;border-radius:4px;font-size:12px;margin-left:5px;cursor:pointer;}
 .btn-primary{background:var(--my-bubble);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;width:100%;margin-top:10px;}
 .btn-primary:disabled{background:#ccc;cursor:default;}
@@ -155,7 +155,7 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
 .question-option:disabled{opacity:0.7;cursor:default;}
 .question-answer-text{font-size:14px;color:#666;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:8px;text-align:center;}
 .diary-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;}
-.diary-header{display:flex;align-items:center;gap:8px;font-size:13px;color:#888;margin-bottom:10px;}
+.diary-header{display:flex;align-items:center;gap:8px;font-size:13px;color:#888;margin-bottom:10px;flex-wrap:wrap;}
 .diary-header .avatar{width:28px;height:28px;font-size:16px;border-radius:50%;background:#e0e0e0;display:flex;justify-content:center;align-items:center;overflow:hidden;flex-shrink:0;}
 .diary-header .avatar img{width:100%;height:100%;object-fit:cover;}
 .diary-mood{background:#f3ede8;color:#8a7568;border-radius:10px;padding:2px 8px;font-size:12px;}
@@ -225,8 +225,8 @@ html,body{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);paddin
   </section>
 
   <section class="page" id="page-sessions">
-    <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>消息<button class="nav-btn" onclick="openSessionModal()">+ 新建</button></header>
-    <div class="scroll-area" id="session-list"></div>
+    <header class="navbar"><button class="nav-btn left" onclick="switchPage('home')"><svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 桌面</button>消息</header>
+    <div class="scroll-area" id="session-list" onclick="handleSessionClick(event)"></div>
   </section>
 
   <section class="page" id="page-chat">
@@ -437,7 +437,7 @@ function dbPut(s,d){return new Promise(r=>{const tx=db.transaction(s,'readwrite'
 function dbDelete(s,id){return new Promise(r=>{const tx=db.transaction(s,'readwrite');const req=tx.objectStore(s).delete(id);req.onsuccess=()=>r();});}
 function dbGetByIndex(s,i,v){return new Promise(r=>{const tx=db.transaction(s,'readonly');const idx=tx.objectStore(s).index(i);const req=idx.getAll(v);req.onsuccess=()=>r(req.result||[]);});}
 
-const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2,minReplyDelay:0.5,maxReplyDelay:2.0,minReplyCount:1,maxReplyCount:1,chatFontSize:16,weather:'sunny',desktopBg:'',affection:0,anniversaryName:'',anniversaryDate:'',lastGreeting:'',lastDiaryDate:''};
+const DEFAULT_SETTINGS={myName:'我',myAvatar:'',probQuote:20,probFav:10,probEmoji:30,bgColor:'#F7F6F2',myBubble:'#A3B1A6',taBubble:'#FFFFFF',widgetBg:'linear-gradient(135deg,#D4E0D9 0%,#F2EBE5 100%)',msgInterval:5,barrageInterval:2,minReplyDelay:0.5,maxReplyDelay:2.0,minReplyCount:1,maxReplyCount:1,chatFontSize:16,weather:'sunny',desktopBg:'',affection:0,anniversaryName:'',anniversaryDate:'',lastGreeting:'',dQDate:'',dQCurrent:null,dQUsed:[]};
 let settings={...DEFAULT_SETTINGS};let sessions=[];let currentSessionId=null;let currentSession=null;let chatMessages=[];let cardGroups=[];let cards=[];let emojis=[];let favorites=[];let letters=[];let moments=[];let photos=[];let lastReply='';let ctxTargetMsg=null;let pendingQuote=null;let callInterval=null;let callSeconds=0;let msgTimer=null;let croppedImageBase64='';let lastTap=0;let currentLetterTab='sent';let currentMomentId=null;
 let cropImageSrc='';let cropScale=1;let cropTranslateX=0;let cropTranslateY=0;let isDragging=false;let dragStartX=0;let dragStartY=0;let initialPinchDistance=0;let initialScale=1;
 let audioCtx=null;let currentSound=null;
@@ -507,7 +507,6 @@ function openAnniversaryModal(){openModal(`<div class="close-btn" onclick="close
 async function saveAnniversary(){const name=$('anni-name').value.trim()||'纪念日';const date=$('anni-date').value;if(!date)return showToast('请选择日期');settings.anniversaryName=name;settings.anniversaryDate=date;await dbPut('settings',{key:'anniversaryName',value:name});await dbPut('settings',{key:'anniversaryDate',value:date});renderAnniversary();closeModal();showToast('纪念日已保存');}
 async function clearAnniversary(){settings.anniversaryName='';settings.anniversaryDate='';await dbPut('settings',{key:'anniversaryName',value:''});await dbPut('settings',{key:'anniversaryDate',value:''});renderAnniversary();closeModal();showToast('已清除');}
 
-/* 每日一问 */
 const QUESTION_BANK=[
 {q:'你今天心情怎么样？',o:['开心','还行','有点累','不太想说话']},{q:'最近有什么让你开心的事吗？',o:['有，很多','有一两件','想不起来了']},{q:'如果现在能去一个地方，你想去哪？',o:['海边','山里','另一个城市','家里躺着']},{q:'你更喜欢哪种天气？',o:['晴天','雨天','阴天','下雪']},{q:'今天想和我说什么？',o:['想你了','今天发生的事','没什么','你来问我']},{q:'最近有好好吃饭吗？',o:['有','还行','经常忘记','没胃口']},{q:'昨晚睡得好吗？',o:['很好','还行','不太好','几乎没睡']},{q:'你最喜欢我哪一点？',o:['温柔','贴心','有趣','还不知道']},{q:'如果只能选一样，你会选？',o:['咖啡','奶茶','果汁','白开水']},{q:'周末你更想做什么？',o:['宅在家','出去玩','睡懒觉','看书']},{q:'最近有什么事让你困扰吗？',o:['工作/学习','感情','生活琐事','没什么']},{q:'你喜欢早上还是晚上？',o:['早上','下午','傍晚','深夜']},{q:'今天有没有想起我？',o:['有','好几次','一直在想','没有']},{q:'你最喜欢什么颜色？',o:['红','蓝','绿','黄']},{q:'最近看什么剧或书？',o:['电视剧','电影','小说','都没看']},{q:'今天累不累？',o:['不累','还行','有点累','非常累']},{q:'你有什么想对我说但没说出口的吗？',o:['有','想不起来','现在就说','先不说']},{q:'你更喜欢我主动还是你主动？',o:['我主动','你主动','都可以','看情况']},{q:'今天心情的颜色是？',o:['明亮的黄','温柔的粉','平静的蓝','有点灰']},{q:'如果现在可以实现一个愿望，你想要什么？',o:['和你在一起','家人平安','工作顺利','世界和平']},
 {q:'你喜欢猫还是狗？',o:['猫','狗','都喜欢','都不喜欢']},{q:'今天最想做的事是什么？',o:['和你聊天','睡觉','出去走走','放空']},{q:'你觉得自己是个什么样的人？',o:['温柔','内向','开朗','复杂']},{q:'最近在听什么歌？',o:['流行','轻音乐','老歌','没听']},{q:'今天有没有偷偷笑出声？',o:['有','差点','没有','不记得']},{q:'你更喜欢热闹还是安静？',o:['热闹','安静','看心情','都不喜欢']},{q:'今天最想吃什么？',o:['火锅','甜品','家常菜','随便']},{q:'你希望我多了解你哪一面？',o:['软弱的','开心的','脆弱的','真实的']},{q:'如果今晚可以和我一起做一件事，你想做什么？',o:['散步','看电影','聊天','安静待着']},{q:'你今天穿的是什么颜色的衣服？',o:['浅色','深色','花花的','睡衣']},
@@ -532,7 +531,10 @@ async function renderDailyQuestion(){
     todayQid=settings.dQCurrent;
   }else{
     const pool=QUESTION_BANK.map((q,i)=>i).filter(i=>!answeredIds.includes(i)&&!usedIds.includes(i));
-    if(pool.length===0){area.innerHTML='<div class="empty">所有问题都问过啦～<br>明天再来吧</div>';return;}
+    if(pool.length===0){
+      area.innerHTML='<div class="empty">所有问题都问过啦～<br>明天再来吧</div>'+renderQAHistory(records);
+      return;
+    }
     todayQid=randomPick(pool);
     settings.dQDate=today;settings.dQCurrent=todayQid;
     settings.dQUsed=[...usedIds,todayQid];
@@ -541,28 +543,58 @@ async function renderDailyQuestion(){
     await dbPut('settings',{key:'dQUsed',value:settings.dQUsed});
   }
   const question=QUESTION_BANK[todayQid];
-  if(!question){area.innerHTML='<div class="empty">所有问题都问过啦～<br>明天再来吧</div>';return;}
-  const todayRecord=records.find(r=>r.date===today);
-  let html=`<div class="question-card"><div class="question-title">${escapeHtml(question.q)}</div>`;
+  if(!question){area.innerHTML='<div class="empty">所有问题都问过啦</div>'+renderQAHistory(records);return;}
+  const todayRecord=records.find(r=>r.date===today && r.qid===todayQid);
+  let html=`<div class="question-card"><div class="question-title">${escapeHtml(question.q)}</div><div id="question-options">`;
   question.o.forEach((opt)=>{
     const selected=todayRecord&&todayRecord.answer===opt?' selected':'';
     const disabled=todayRecord?'disabled':'';
-    html+=`<button class="question-option${selected}" ${disabled} onclick="answerQuestion(${todayQid},'${escapeHtml(opt).replace(/'/g,"\\'")}',this)">${escapeHtml(opt)}</button>`;
+    html+=`<button class="question-option${selected}" ${disabled} data-answer="${escapeHtml(opt)}" data-qid="${todayQid}">${escapeHtml(opt)}</button>`;
   });
-  html+='</div>';
+  html+='</div></div>';
   if(todayRecord){html+=`<div class="question-answer-text">你已经回答过啦，TA 说：我记下了 💕</div>`;}
+  html+=renderQAHistory(records);
   area.innerHTML=html;
+  document.querySelectorAll('#question-options .question-option').forEach(btn=>{
+    btn.addEventListener('click',()=>{answerQuestion(parseInt(btn.dataset.qid),btn.dataset.answer,btn);});
+  });
 }
+
+function renderQAHistory(records){
+  if(!records||records.length===0)return '';
+  const sorted=[...records].sort((a,b)=>b.time-a.time).slice(0,100);
+  let html='<h4 style="margin:24px 0 12px;font-size:15px;color:#666;">历史记录</h4>';
+  sorted.forEach(r=>{
+    const q=r.question||(QUESTION_BANK[r.qid]?QUESTION_BANK[r.qid].q:('问题'+(r.qid+1)));
+    html+=`<div class="question-card" style="padding:14px;margin-bottom:8px;">
+      <div style="font-size:12px;color:#aaa;margin-bottom:6px;">${escapeHtml(r.date||'')}</div>
+      <div style="font-size:14px;color:#333;margin-bottom:6px;">${escapeHtml(q)}</div>
+      <div style="font-size:14px;color:#5e7a68;">我的回答：${escapeHtml(r.answer||'')}</div>
+    </div>`;
+  });
+  return html;
+}
+
 async function answerQuestion(qid,answer,btn){
   const today=new Date().toDateString();
   const records=await dbGetAll('qaRecords');
-  if(records.find(r=>r.date===today))return;
-  await dbAdd('qaRecords',{qid,answer,date:today,time:Date.now()});
-  document.querySelectorAll('.question-option').forEach(b=>{b.disabled=true;b.classList.remove('selected');});
+  if(records.find(r=>r.date===today&&r.qid===qid))return;
+  const q=QUESTION_BANK[qid];
+  await dbAdd('qaRecords',{qid,question:q?q.q:'',options:q?q.o:[],answer,date:today,time:Date.now()});
+  document.querySelectorAll('#question-options .question-option').forEach(b=>{b.disabled=true;b.classList.remove('selected');});
   btn.classList.add('selected');
   addAffection('回答问题');
-  const area=$('question-area');const tip=document.createElement('div');
-  tip.className='question-answer-text';tip.textContent='TA 说：我记下了 💕';area.appendChild(tip);
+  const area=$('question-area');
+  const tip=document.createElement('div');
+  tip.className='question-answer-text';tip.textContent='TA 说：我记下了 💕';
+  const card=area.querySelector('.question-card');
+  if(card)card.appendChild(tip);
+  const newRecords=await dbGetAll('qaRecords');
+  const oldH=area.querySelector('h4');
+  if(oldH)oldH.remove();
+  const oldCards=area.querySelectorAll('.question-card');
+  oldCards.forEach((c,i)=>{if(i>0)c.remove();});
+  area.insertAdjacentHTML('beforeend',renderQAHistory(newRecords));
 }
 
 /* 日记 */
@@ -606,7 +638,7 @@ async function submitDiary(){
     const mine=all.find(d=>d.id===id);
     if(!mine)return;
     let pool=cards;
-    if(currentSession&&currentSession.groupIds&&currentSession.groupIds.length>0)pool=cards.filter(c=>currentSession.groupIds.includes(c.groupId));
+    if(sessions[0]&&sessions[0].groupIds&&sessions[0].groupIds.length>0)pool=cards.filter(c=>sessions[0].groupIds.includes(c.groupId));
     if(pool.length===0)pool=cards;
     if(pool.length===0)return;
     const count=1+Math.floor(Math.random()*2);
@@ -634,7 +666,8 @@ async function checkAutoWriteDiary(){
   if(all.find(d=>!d.isUser&&d.date===today))return;
   const content=generateTADiary();
   const mood=generateTAMood();
-  await dbAdd('diaries',{isUser:false,date:today,content,mood,time:Date.now()});
+  const sid=(sessions&&sessions.length>0)?sessions[0].id:null;
+  await dbAdd('diaries',{isUser:false,date:today,content,mood,time:Date.now(),sessionId:sid});
 }
 async function renderDiary(){
   try{await checkAutoWriteDiary();}catch(e){console.log('日记自动写失败',e);}
@@ -649,7 +682,7 @@ async function renderDiary(){
     div.className='diary-card';
     let name='我',avatar=settings.myAvatar||'👤';
     if(!d.isUser){
-      const session=sessions.find(s=>s.id===d.sessionId);
+      const session=sessions[0];
       name=session?session.name:'TA';
       avatar=session?session.avatar:'👤';
     }
@@ -661,26 +694,63 @@ async function renderDiary(){
 }
 
 /* 聊天 */
-async function loadSessions(){sessions=await dbGetAll('sessions');if(sessions.length===0){const ds={name:'小明',avatar:'😀',groupIds:[]};const id=await dbAdd('sessions',ds);ds.id=id;sessions.push(ds);}renderSessions();}
-function renderSessions(){const list=$('session-list');list.innerHTML='';sessions.forEach(s=>{const div=document.createElement('div');div.className='session-item';div.innerHTML=`<div class="avatar">${s.avatar&&s.avatar.startsWith('data:image')?`<img src="${s.avatar}">`:escapeHtml(s.avatar||'👤')}</div><div class="session-info"><div class="session-name">${escapeHtml(s.name)}</div></div><button class="delete-session-btn" style="background:#ff3b30;color:#fff;border:none;border-radius:4px;padding:5px 10px;font-size:12px;cursor:pointer;">删除</button>`;div.onclick=()=>enterChat(s);div.querySelector('.delete-session-btn').onclick=(e)=>{e.stopPropagation();if(!confirm(`确定删除聊天窗口 "${s.name}" 及所有聊天记录吗？`))return;dbDelete('sessions',s.id).then(async()=>{const msgs=await dbGetByIndex('messages','sessionId',s.id);for(const m of msgs)await dbDelete('messages',m.id);loadSessions();showToast('已删除');});};list.appendChild(div);});}
-
-async function enterChat(session){
-  currentSessionId=session.id;currentSession=session;
-  $('chat-title').textContent=session.name;$('chat-ta-name').textContent=session.name;$('chat-my-name').textContent=settings.myName;
-  chatMessages=await dbGetByIndex('messages','sessionId',session.id);
-  renderChat();
-  const statusGroup=cardGroups.find(g=>g.name==='当前状态');
-  let statusText='在线';
-  if(statusGroup){const statusPool=cards.filter(c=>c.groupId===statusGroup.id);if(statusPool.length>0)statusText=randomPick(statusPool).text;}
-  $('chat-status').textContent='当前状态：'+statusText;
-  const badge=$('badge-chat');if(badge)badge.style.display='none';
-  switchPage('chat');
-  requestAnimationFrame(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;setTimeout(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;},50);setTimeout(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;},250);});
-  checkTimeGreeting();
+async function loadSessions(){
+  sessions=await dbGetAll('sessions');
+  if(sessions.length===0){
+    const ds={name:'小明',avatar:'😀',groupIds:[]};
+    const id=await dbAdd('sessions',ds);
+    ds.id=id;sessions.push(ds);
+  }
+  if(sessions.length>1){
+    for(let i=1;i<sessions.length;i++){
+      const s=sessions[i];
+      const msgs=await dbGetByIndex('messages','sessionId',s.id);
+      for(const m of msgs)await dbDelete('messages',m.id);
+      await dbDelete('sessions',s.id);
+    }
+    sessions=sessions.slice(0,1);
+  }
+  renderSessions();
+}
+function renderSessions(){
+  const list=$('session-list');list.innerHTML='';
+  sessions.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='session-item';
+    div.dataset.id=s.id;
+    div.innerHTML=`<div class="avatar">${s.avatar&&s.avatar.startsWith('data:image')?`<img src="${s.avatar}">`:escapeHtml(s.avatar||'👤')}</div><div class="session-info"><div class="session-name">${escapeHtml(s.name)}</div></div>`;
+    list.appendChild(div);
+  });
+}
+function handleSessionClick(e){
+  const item=e.target.closest('.session-item');
+  if(!item)return;
+  const id=parseInt(item.dataset.id);
+  const session=sessions.find(s=>s.id===id);
+  if(session)enterChat(session);
 }
 
-function openSessionModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>新建聊天窗口</h3><div class="form-group"><label>TA 的昵称</label><input type="text" id="new-session-name" placeholder="例如：小红"></div><div class="form-group"><label>TA 的头像</label><input type="file" id="new-session-avatar" accept="image/*" onchange="cropImage(event,'newSessionAvatar')"></div><div class="form-group"><label>绑定字卡分组（可多选）</label><div id="new-session-groups" style="max-height:150px;overflow-y:auto;"></div></div><button class="btn-primary" onclick="createSession()">创建</button>`);const groupDiv=$('new-session-groups');cardGroups.forEach(g=>{const label=document.createElement('label');label.style.display='block';label.style.marginBottom='5px';label.innerHTML=`<input type="checkbox" value="${g.id}" style="width:auto;margin-right:5px;"> ${escapeHtml(g.name)}`;groupDiv.appendChild(label);});}
-async function createSession(){const name=$('new-session-name').value.trim();if(!name)return showToast('请输入昵称');let avatar='👤';if(croppedImageBase64){avatar=croppedImageBase64;croppedImageBase64='';}const checkedGroups=Array.from($('new-session-groups').querySelectorAll('input:checked')).map(c=>parseInt(c.value));const newSession={name,avatar,groupIds:checkedGroups};const id=await dbAdd('sessions',newSession);newSession.id=id;sessions.push(newSession);closeModal();renderSessions();showToast('创建成功');}
+let _enteringChat=false;
+async function enterChat(session){
+  if(_enteringChat)return;
+  _enteringChat=true;
+  try{
+    currentSessionId=session.id;currentSession=session;
+    $('chat-title').textContent=session.name;$('chat-ta-name').textContent=session.name;$('chat-my-name').textContent=settings.myName;
+    chatMessages=await dbGetByIndex('messages','sessionId',session.id);
+    renderChat();
+    const statusGroup=cardGroups.find(g=>g.name==='当前状态');
+    let statusText='在线';
+    if(statusGroup){const statusPool=cards.filter(c=>c.groupId===statusGroup.id);if(statusPool.length>0)statusText=randomPick(statusPool).text;}
+    $('chat-status').textContent='当前状态：'+statusText;
+    const badge=$('badge-chat');if(badge)badge.style.display='none';
+    switchPage('chat');
+    requestAnimationFrame(()=>{const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;});
+    checkTimeGreeting();
+  }finally{
+    _enteringChat=false;
+  }
+}
 
 function renderChat(){const win=$('chat-window');win.innerHTML='';if(chatMessages.length===0){appendBubble('你好呀～','bot',null,null,true);return;}chatMessages.forEach(m=>appendBubble(m.text,m.sender,m.quote,m.emoji,true,m.time));}
 function appendBubble(text,sender,quote,emoji,skipSave=false,time=Date.now()){
@@ -875,7 +945,7 @@ function setupTimers(){if(msgTimer)clearInterval(msgTimer);msgTimer=setInterval(
 let lastHiddenTime=Date.now();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const now=Date.now();const elapsed=now-lastHiddenTime;const interval=(settings.msgInterval||5)*60*1000;if(elapsed>interval){if(currentSession){const pool=cards.length?cards:[{text:'在干嘛呢？'}];const msg=randomPick(pool).text;dbAdd('messages',{sessionId:currentSessionId,text:msg,sender:'bot',time:Date.now()});chatMessages.push({text:msg,sender:'bot',time:Date.now()});showTopNotification(currentSession.name,msg,currentSession.avatar);const badge=$('badge-chat');if(badge)badge.style.display='block';if(document.getElementById('page-chat').classList.contains('active')){renderChat();const win=$('chat-window');if(win)win.scrollTop=win.scrollHeight;}}}lastHiddenTime=Date.now();}else{lastHiddenTime=Date.now();}checkLetters();checkMomentsAutoPost();});
 
-async function renderMoments(){moments=await dbGetAll('moments');moments.sort((a,b)=>b.time-a.time);const list=$('moment-list');list.innerHTML='';if(moments.length===0){list.innerHTML='<div class="empty">还没有动态，点右上角发一条吧</div>';return;}moments.forEach(m=>{const div=document.createElement('div');div.className='moment-item';let name='我';let avatar=settings.myAvatar||'👤';if(!m.isUser){const session=sessions.find(s=>s.id===m.sessionId);name=session?session.name:'未知';avatar=session?session.avatar:'👤';}let commentsHtml='';if(m.comments&&m.comments.length>0){commentsHtml='<div class="moment-comments">'+m.comments.map(c=>{const cName=c.from==='user'?'我':name;return `<div class="moment-comment"><b>${cName}：</b>${escapeHtml(c.text)}</div>`;}).join('')+'</div>';}let imageHtml=m.image?`<img src="${m.image}" style="width:100%;border-radius:8px;margin-top:8px;">`:'';div.innerHTML=`<div class="moment-header"><div class="avatar">${avatar&&avatar.startsWith('data:image')?`<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="font-size:20px;">${avatar||'👤'}</span>`}</div><div class="moment-name">${escapeHtml(name)}</div></div><div class="moment-content">${escapeHtml(m.content)}</div>${imageHtml}<div class="moment-actions"><span onclick="likeMoment(${m.id})">❤️ ${m.likes||0}</span><span onclick="openCommentModal(${m.id})">💬 评论</span><span style="margin-left:auto;color:#bbb;font-size:12px;">${formatTime(m.time)}</span><span onclick="deleteMoment(${m.id})" style="color:#ff3b30;margin-left:10px;">删除</span></div>${commentsHtml}`;list.appendChild(div);});}
+async function renderMoments(){moments=await dbGetAll('moments');moments.sort((a,b)=>b.time-a.time);const list=$('moment-list');list.innerHTML='';if(moments.length===0){list.innerHTML='<div class="empty">还没有动态，点右上角发一条吧</div>';return;}moments.forEach(m=>{const div=document.createElement('div');div.className='moment-item';let name='我';let avatar=settings.myAvatar||'👤';if(!m.isUser){const session=sessions[0];name=session?session.name:'未知';avatar=session?session.avatar:'👤';}let commentsHtml='';if(m.comments&&m.comments.length>0){commentsHtml='<div class="moment-comments">'+m.comments.map(c=>{const cName=c.from==='user'?'我':name;return `<div class="moment-comment"><b>${cName}：</b>${escapeHtml(c.text)}</div>`;}).join('')+'</div>';}let imageHtml=m.image?`<img src="${m.image}" style="width:100%;border-radius:8px;margin-top:8px;">`:'';div.innerHTML=`<div class="moment-header"><div class="avatar">${avatar&&avatar.startsWith('data:image')?`<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="font-size:20px;">${avatar||'👤'}</span>`}</div><div class="moment-name">${escapeHtml(name)}</div></div><div class="moment-content">${escapeHtml(m.content)}</div>${imageHtml}<div class="moment-actions"><span onclick="likeMoment(${m.id})">❤️ ${m.likes||0}</span><span onclick="openCommentModal(${m.id})">💬 评论</span><span style="margin-left:auto;color:#bbb;font-size:12px;">${formatTime(m.time)}</span><span onclick="deleteMoment(${m.id})" style="color:#ff3b30;margin-left:10px;">删除</span></div>${commentsHtml}`;list.appendChild(div);});}
 async function openPostMomentModal(){openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>发布动态</h3><div class="form-group"><label>内容</label><textarea id="moment-content-input" rows="4" placeholder="分享你的想法..."></textarea></div><div class="form-group"><label>上传图片（可选）</label><input type="file" id="moment-image-input" accept="image/*"></div><button class="btn-primary" onclick="postMoment()">发布</button>`);}
 async function postMoment(){const content=$('moment-content-input').value.trim();const file=$('moment-image-input').files[0];if(!content && !file) return showToast('请输入内容或选择图片');let imageBase64='';if(file)imageBase64=await readFileAsBase64(file);await dbAdd('moments',{isUser:true,content:content,image:imageBase64,time:Date.now(),likes:0,comments:[]});closeModal();renderMoments();showToast('发布成功');addAffection('发布动态');}
 async function likeMoment(id){const m=moments.find(m=>m.id===id);if(m){m.likes=(m.likes||0)+1;await dbPut('moments',m);renderMoments();addAffection('点赞朋友圈');}}
@@ -887,11 +957,11 @@ async function checkMomentsAutoPost(){const now=Date.now();const lastPost=localS
 async function renderGallery(){photos=await dbGetAll('photos');const grid=$('photo-grid');grid.innerHTML='';photos.sort((a,b)=>b.time-a.time);photos.forEach(p=>{const img=document.createElement('img');img.src=p.data;img.addEventListener('click',()=>{openModal(`<div class="close-btn" onclick="closeModal()">×</div><img src="${p.data}" style="width:100%;border-radius:8px;">`);});let pressTimer;img.addEventListener('touchstart',()=>{pressTimer=setTimeout(()=>{if(confirm('确定删除这张照片吗？')){dbDelete('photos',p.id).then(()=>renderGallery());}},800);});img.addEventListener('touchend',()=>clearTimeout(pressTimer));img.addEventListener('touchmove',()=>clearTimeout(pressTimer));grid.appendChild(img);});if(photos.length===0)grid.innerHTML='<div class="empty">还没有图片</div>';}
 
 function switchLetterTab(tab){currentLetterTab=tab;$('tab-sent').style.color=tab==='sent'?'var(--tab-active)':'#999';$('tab-received').style.color=tab==='received'?'var(--tab-active)':'#999';renderLetters();}
-async function renderLetters(){letters=await dbGetAll('letters');const list=$('letter-list');list.innerHTML='';letters.sort((a,b)=>b.time-a.time);const filtered=letters.filter(l=>l.type===currentLetterTab);if(filtered.length===0){list.innerHTML=`<div class="empty">暂无信件</div>`;return;}filtered.forEach(l=>{const div=document.createElement('div');div.className='letter-item';div.style.flexDirection='column';div.style.alignItems='flex-start';const session=sessions.find(s=>s.id===l.sessionId);const sessionName=session?session.name:'未知';div.innerHTML=`<div class="letter-header"><span>${l.type==='sent'?'寄给 '+sessionName:'来自 '+sessionName}</span><span>${formatTime(l.time)}</span></div><div style="font-size:14px;line-height:1.6;color:#333;white-space:pre-wrap;width:100%;">${escapeHtml(l.content)}</div>`;list.appendChild(div);});}
+async function renderLetters(){letters=await dbGetAll('letters');const list=$('letter-list');list.innerHTML='';letters.sort((a,b)=>b.time-a.time);const filtered=letters.filter(l=>l.type===currentLetterTab);if(filtered.length===0){list.innerHTML=`<div class="empty">暂无信件</div>`;return;}filtered.forEach(l=>{const div=document.createElement('div');div.className='letter-item';div.style.flexDirection='column';div.style.alignItems='flex-start';const session=sessions[0];const sessionName=session?session.name:'未知';div.innerHTML=`<div class="letter-header"><span>${l.type==='sent'?'寄给 '+sessionName:'来自 '+sessionName}</span><span>${formatTime(l.time)}</span></div><div style="font-size:14px;line-height:1.6;color:#333;white-space:pre-wrap;width:100%;">${escapeHtml(l.content)}</div>`;list.appendChild(div);});}
 function openWriteLetterModal(){if(sessions.length===0)return showToast('请先创建一个聊天对象');openModal(`<div class="close-btn" onclick="closeModal()">×</div><h3>写信</h3><div class="form-group"><label>收件人</label><select id="letter-recipient">${sessions.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select></div><div class="form-group"><label>信件内容</label><textarea id="letter-content" rows="8" placeholder="写下你想说的话..."></textarea></div><button class="btn-primary" onclick="sendLetter()">寄出</button>`);}
 async function sendLetter(){const recipientId=parseInt($('letter-recipient').value);const content=$('letter-content').value.trim();if(!content)return showToast('请输入信件内容');const replyAt=Date.now()+Math.random()*24*60*60*1000;await dbAdd('letters',{sessionId:recipientId,type:'sent',content,time:Date.now(),replyAt,replied:false});closeModal();switchLetterTab('sent');showToast('信件已寄出，等待回信中...');addAffection('写信');}
-async function checkLetters(){const now=Date.now();letters=await dbGetAll('letters');for(const l of letters){if(l.type==='sent'&&!l.replied&&l.replyAt<=now){l.replied=true;await dbPut('letters',l);const session=sessions.find(s=>s.id===l.sessionId);const sessionName=session?session.name:'对方';const replyContent=await generateReplyLetter(l.content,l.sessionId);await dbAdd('letters',{sessionId:l.sessionId,type:'received',content:replyContent,time:Date.now()});showTopNotification(sessionName,'收到了一封回信',session?session.avatar:'👤');}}if(currentLetterTab){renderLetters();}}
-async function generateReplyLetter(originalText,sessionId){const charCount=originalText.length;const cardCount=Math.min(Math.floor(charCount/5)||1,18);const targetSession=sessions.find(s=>s.id===sessionId);let letterPool=cards;if(targetSession&&targetSession.groupIds&&targetSession.groupIds.length>0){letterPool=cards.filter(c=>targetSession.groupIds.includes(c.groupId));}if(letterPool.length===0)letterPool=cards;if(letterPool.length===0)return '我收到了你的信，但我还没有字卡可以回复你。';let selectedCards=[];for(let i=0;i<cardCount;i++){selectedCards.push(randomPick(letterPool).text);}const salutation=selectedCards.length>0?selectedCards.shift():(targetSession?targetSession.name:'你');const signOff=selectedCards.length>0?selectedCards.pop():'爱你';const body=selectedCards.join('，')+'。';return `${salutation}：\n\n${body}\n\n${signOff}\n${new Date().toLocaleDateString()}`;}
+async function checkLetters(){const now=Date.now();letters=await dbGetAll('letters');for(const l of letters){if(l.type==='sent'&&!l.replied&&l.replyAt<=now){l.replied=true;await dbPut('letters',l);const session=sessions[0];const sessionName=session?session.name:'对方';const replyContent=await generateReplyLetter(l.content,l.sessionId);await dbAdd('letters',{sessionId:l.sessionId,type:'received',content:replyContent,time:Date.now()});showTopNotification(sessionName,'收到了一封回信',session?session.avatar:'👤');}}if(currentLetterTab){renderLetters();}}
+async function generateReplyLetter(originalText,sessionId){const charCount=originalText.length;const cardCount=Math.min(Math.floor(charCount/5)||1,18);const targetSession=sessions[0];let letterPool=cards;if(targetSession&&targetSession.groupIds&&targetSession.groupIds.length>0){letterPool=cards.filter(c=>targetSession.groupIds.includes(c.groupId));}if(letterPool.length===0)letterPool=cards;if(letterPool.length===0)return '我收到了你的信，但我还没有字卡可以回复你。';let selectedCards=[];for(let i=0;i<cardCount;i++){selectedCards.push(randomPick(letterPool).text);}const salutation=selectedCards.length>0?selectedCards.shift():(targetSession?targetSession.name:'你');const signOff=selectedCards.length>0?selectedCards.pop():'爱你';const body=selectedCards.join('，')+'。';return `${salutation}：\n\n${body}\n\n${signOff}\n${new Date().toLocaleDateString()}`;}
 
 async function openFeature(name){
   switchPage('home');
